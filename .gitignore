@@ -1,0 +1,11 @@
+.env
+*.env
+data/mimic/
+__pycache__/
+*.pyc
+node_modules/
+.next/
+.venv/
+venv/
+*.log
+.DS_Store
