@@ -1,0 +1,51 @@
+allergy_id,patient_id,allergy,reaction,recorded_date
+ff954bba,p001,Penicillin allergy,rash on exposure,2024-10-11
+9db3fbd2,p002,Latex allergy,contact dermatitis,2024-08-15
+9e62c116,p003,NKDA,no known drug allergies,2024-01-07
+bc8665ba,p004,Latex allergy,contact dermatitis,2020-04-05
+2fcd574f,p005,NKDA,no known drug allergies,2024-09-11
+7d1aa801,p006,NKDA,no known drug allergies,2020-09-09
+52c6417a,p007,NKDA,no known drug allergies,2022-07-11
+54fe7b39,p008,NKDA,no known drug allergies,2023-04-21
+4a1d6aa7,p009,NKDA,no known drug allergies,2020-10-02
+51e65b48,p010,NKDA,no known drug allergies,2020-01-09
+8f9bdc20,p011,NKDA,no known drug allergies,2020-04-09
+d8a4c02e,p012,NKDA,no known drug allergies,2022-06-05
+8a265410,p013,NKDA,no known drug allergies,2022-09-16
+53adaeb8,p014,NKDA,no known drug allergies,2024-05-18
+3ce20c1d,p015,NKDA,no known drug allergies,2020-12-28
+19d656c3,p016,NKDA,no known drug allergies,2020-12-21
+99f0a99c,p017,NKDA,no known drug allergies,2020-09-19
+0a64ebb5,p018,Sulphonamide allergy,rash,2023-05-26
+b7db2e2f,p019,NKDA,no known drug allergies,2022-10-29
+8b1d37a0,p020,NKDA,no known drug allergies,2022-05-07
+b5f1a7ff,p021,NKDA,no known drug allergies,2023-11-19
+4c55df0b,p022,NKDA,no known drug allergies,2021-07-14
+59d66d71,p023,Nuts allergy,anaphylaxis,2021-08-25
+e1465fc0,p024,NKDA,no known drug allergies,2020-09-30
+68e73ac4,p025,Sulphonamide allergy,rash,2023-12-04
+191d6376,p026,NKDA,no known drug allergies,2022-11-15
+32192586,p027,Sulphonamide allergy,rash,2024-10-28
+314d440c,p028,Sulphonamide allergy,rash,2023-07-19
+c6da32aa,p029,Aspirin allergy,bronchospasm,2023-07-02
+14edff20,p030,NKDA,no known drug allergies,2023-11-07
+b5416614,p031,Aspirin allergy,bronchospasm,2023-12-25
+6672883b,p032,NKDA,no known drug allergies,2020-12-30
+0b2b9169,p033,NKDA,no known drug allergies,2023-11-22
+2f90b7fa,p034,NKDA,no known drug allergies,2023-12-25
+47747554,p035,Nuts allergy,anaphylaxis,2023-02-25
+c81c8340,p036,NKDA,no known drug allergies,2023-03-14
+e408482c,p037,NKDA,no known drug allergies,2023-12-25
+768a11f4,p038,NKDA,no known drug allergies,2024-03-11
+b95456ff,p039,NKDA,no known drug allergies,2022-12-29
+3022424a,p040,Latex allergy,contact dermatitis,2024-07-13
+3eecd994,p041,Penicillin allergy,rash on exposure,2020-02-21
+691a05ba,p042,Penicillin allergy,rash on exposure,2023-10-04
+abf5de32,p043,Nuts allergy,anaphylaxis,2024-03-16
+178ea632,p044,NKDA,no known drug allergies,2021-08-09
+a25c9cf8,p045,NKDA,no known drug allergies,2020-10-26
+af17d595,p046,NKDA,no known drug allergies,2023-11-15
+a78bf449,p047,NKDA,no known drug allergies,2021-02-21
+4b215a82,p048,NKDA,no known drug allergies,2020-03-07
+bf1e2032,p049,Latex allergy,contact dermatitis,2020-07-28
+067ddd40,p050,NKDA,no known drug allergies,2023-10-15

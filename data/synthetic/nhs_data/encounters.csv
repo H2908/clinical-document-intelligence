@@ -1,0 +1,263 @@
+encounter_id,patient_id,date,type,provider,location
+f9ca60f3,p001,2023-10-17,Hospital admission,Dr. Charles Okafor,Croydon Health Centre
+c74b20e3,p001,2024-07-20,Renal clinic,Dr. Mohammed Davies,Croydon Health Centre
+e3162502,p001,2023-07-25,Hospital admission,Dr. Chloe Carter,Croydon Health Centre
+0bb4ed3c,p001,2023-11-08,A&E attendance,Dr. Grace Davies,Croydon Health Centre
+dd3ed5ca,p001,2024-08-28,Renal clinic,Dr. Michael Hughes,Croydon Health Centre
+34b20f5c,p002,2023-09-09,Diabetes review,Dr. Mohammed Kaur,Camden Health Centre
+c912729b,p002,2024-02-24,GP consultation,Dr. Robert Singh,Camden Health Centre
+3d28c8fe,p002,2023-12-21,GP consultation,Dr. Edward Al-Rashidi,Camden Health Centre
+02cb79e0,p002,2024-11-04,Heart failure clinic,Dr. Ethan Ramanathan,Camden Health Centre
+1a9ade67,p002,2023-07-30,A&E attendance,Dr. Sophie Walker,Camden Health Centre
+f7f75b61,p002,2023-03-03,Diabetes review,Dr. Liam Okafor,Camden Health Centre
+29bd20a4,p003,2023-08-26,Heart failure clinic,Dr. Priya Roberts,Croydon Health Centre
+50b7b416,p003,2023-03-28,Cardiology clinic,Dr. Ava Henshaw,Croydon Health Centre
+ee53f89e,p004,2024-02-08,Cardiology clinic,Dr. Fatima Ahmed,Greenwich Health Centre
+43e3b5cb,p004,2023-03-05,Heart failure clinic,Dr. Margaret Henshaw,Greenwich Health Centre
+27663299,p004,2023-08-31,Hospital admission,Dr. Hassan Begum,Greenwich Health Centre
+323faef7,p004,2023-11-19,Heart failure clinic,Dr. Charles Taylor,Greenwich Health Centre
+24785565,p004,2024-04-08,Hospital admission,Dr. Robert Okafor,Greenwich Health Centre
+5b2b4de2,p004,2023-07-27,Diabetes review,Dr. Fatima Ramanathan,Greenwich Health Centre
+49a90feb,p004,2023-06-09,Cardiology clinic,Dr. Raj Roberts,Greenwich Health Centre
+804c1fda,p005,2023-11-18,Heart failure clinic,Dr. Thomas Singh,Greenwich Health Centre
+24df73ad,p005,2024-01-02,A&E attendance,Dr. Lily Wilson,Greenwich Health Centre
+4819c715,p005,2024-04-19,Hospital admission,Dr. Thomas Okafor,Greenwich Health Centre
+0cb2ef6d,p005,2023-06-11,Hospital admission,Dr. Zara Whitcombe,Greenwich Health Centre
+9a243d1f,p005,2023-08-09,Outpatient follow-up,Dr. Arjun Okafor,Greenwich Health Centre
+50b5bb5a,p006,2023-09-12,Outpatient follow-up,Dr. Emma Khan,Hackney Health Centre
+17723bf2,p006,2023-02-20,Hospital admission,Dr. Hassan Mahmood,Hackney Health Centre
+64d7207d,p006,2023-06-28,GP consultation,Dr. Emma Begum,Hackney Health Centre
+8d8c573e,p006,2024-04-08,A&E attendance,Dr. Harry Roberts,Hackney Health Centre
+503afa21,p006,2023-04-15,Diabetes review,Dr. Thomas Al-Rashidi,Hackney Health Centre
+1968fc47,p006,2023-03-05,A&E attendance,Dr. Daniel Patel,Hackney Health Centre
+40e3d3e3,p006,2024-02-15,Outpatient follow-up,Dr. Elizabeth Johnson,Hackney Health Centre
+0e128a5f,p007,2023-03-28,Hospital admission,Dr. Oliver Al-Rashidi,Greenwich Health Centre
+294b0782,p007,2023-03-08,A&E attendance,Dr. Rebecca Roberts,Greenwich Health Centre
+2b76cdbf,p007,2023-05-12,Cardiology clinic,Dr. Edward Ramanathan,Greenwich Health Centre
+b64684d5,p007,2023-02-13,Renal clinic,Dr. James Bello,Greenwich Health Centre
+d96fa9ab,p007,2024-08-10,Heart failure clinic,Dr. Emma Walker,Greenwich Health Centre
+de286f41,p007,2023-01-31,Heart failure clinic,Dr. Elizabeth Thomas,Greenwich Health Centre
+78ea4fe3,p007,2023-06-26,Outpatient follow-up,Dr. John Kaur,Greenwich Health Centre
+9e02dd8d,p008,2023-10-09,Hospital admission,Dr. Lily Shah,Camden Health Centre
+02699d3d,p008,2023-06-02,GP consultation,Dr. Hannah Hussain,Camden Health Centre
+64f6bd43,p008,2024-09-23,A&E attendance,Dr. Rebecca Wilson,Camden Health Centre
+0b8e5302,p009,2024-02-26,Renal clinic,Dr. James Okafor,Hackney Health Centre
+e2ead256,p009,2023-10-14,Heart failure clinic,Dr. Daniel Thomas,Hackney Health Centre
+1c108a06,p009,2023-07-24,A&E attendance,Dr. Sarah Carter,Hackney Health Centre
+6fcdbb12,p009,2024-07-10,GP consultation,Dr. Aisha Carter,Hackney Health Centre
+71ca3ee1,p009,2024-12-31,Outpatient follow-up,Dr. Isla Singh,Hackney Health Centre
+d98aa341,p010,2024-05-11,Outpatient follow-up,Dr. Chloe Khan,Greenwich Health Centre
+7546227a,p010,2023-11-26,Heart failure clinic,Dr. Liam Bello,Greenwich Health Centre
+9d9130bc,p010,2023-01-27,Outpatient follow-up,Dr. Zara Smith,Greenwich Health Centre
+5d8c1084,p010,2023-01-31,Hospital admission,Dr. James Carter,Greenwich Health Centre
+8ef3ae72,p010,2024-04-28,Outpatient follow-up,Dr. Fatima Smith,Greenwich Health Centre
+a68b1e08,p010,2023-06-13,Cardiology clinic,Dr. Ahmed Williams,Greenwich Health Centre
+382216d1,p010,2023-09-04,Hospital admission,Dr. Amelia Mahmood,Greenwich Health Centre
+e618c159,p010,2023-02-27,A&E attendance,Dr. Chloe Begum,Greenwich Health Centre
+49fb25a7,p011,2024-02-02,Outpatient follow-up,Dr. David Bello,Hackney Health Centre
+94e244ab,p011,2023-08-31,Outpatient follow-up,Dr. Eleanor Kaur,Hackney Health Centre
+0738695c,p011,2024-08-28,GP consultation,Dr. Eleanor Ahmed,Hackney Health Centre
+b346cab4,p011,2024-07-31,Diabetes review,Dr. Chloe Patel,Hackney Health Centre
+b7e934a6,p011,2024-05-19,Hospital admission,Dr. David Walker,Hackney Health Centre
+ae2e26f4,p011,2023-02-08,Cardiology clinic,Dr. James Smith,Hackney Health Centre
+4d5a89cb,p011,2024-09-08,A&E attendance,Dr. Jacob Khan,Hackney Health Centre
+f0160e86,p011,2024-05-04,GP consultation,Dr. Edward Kaur,Hackney Health Centre
+949a19bd,p012,2023-07-26,Diabetes review,Dr. Edward Jones,Hackney Health Centre
+970f0155,p012,2023-07-01,Outpatient follow-up,Dr. James Al-Rashidi,Hackney Health Centre
+f5bf945b,p012,2023-06-01,Diabetes review,Dr. Thomas Begum,Hackney Health Centre
+35aecc74,p012,2024-06-22,Outpatient follow-up,Dr. Oliver Davies,Hackney Health Centre
+6e628ae9,p012,2024-12-22,Heart failure clinic,Dr. Fatima Ramanathan,Hackney Health Centre
+d2afb5e6,p012,2023-12-11,Hospital admission,Dr. Charles Henshaw,Hackney Health Centre
+22016eb3,p013,2024-03-23,Renal clinic,Dr. Rebecca Taylor,Hackney Health Centre
+03555d63,p013,2023-06-28,Outpatient follow-up,Dr. Robert Williams,Hackney Health Centre
+93e1ebfe,p013,2024-08-26,Diabetes review,Dr. Aisha Wilson,Hackney Health Centre
+5a038c89,p014,2024-12-06,Hospital admission,Dr. Daniel Bello,Camden Health Centre
+7578c28b,p014,2023-01-02,Heart failure clinic,Dr. Chloe Whitcombe,Camden Health Centre
+fe0c2e4c,p014,2023-07-06,Outpatient follow-up,Dr. Hannah Smith,Camden Health Centre
+8b7701f0,p014,2024-10-16,Cardiology clinic,Dr. Olivia Henshaw,Camden Health Centre
+83a8c7fd,p014,2023-12-06,Cardiology clinic,Dr. Ahmed Davies,Camden Health Centre
+67aa6277,p014,2023-11-24,Diabetes review,Dr. Sarah Shah,Camden Health Centre
+ad366cd9,p014,2023-04-01,Outpatient follow-up,Dr. Lily Al-Rashidi,Camden Health Centre
+3c7e6042,p015,2023-08-03,A&E attendance,Dr. Oliver Davies,Croydon Health Centre
+f12216ac,p015,2023-09-20,Cardiology clinic,Dr. Mohammed Whitcombe,Croydon Health Centre
+7e333f48,p015,2024-01-31,Renal clinic,Dr. Sophie Bello,Croydon Health Centre
+1ac1b9e2,p015,2024-02-28,Renal clinic,Dr. Aisha Davies,Croydon Health Centre
+12e2ae62,p016,2024-01-20,Cardiology clinic,Dr. Isla Carter,Croydon Health Centre
+b02aa40d,p016,2024-08-14,A&E attendance,Dr. Raj Roberts,Croydon Health Centre
+d5b2f11d,p016,2023-03-17,GP consultation,Dr. Noah Al-Rashidi,Croydon Health Centre
+679337ed,p016,2023-11-23,Hospital admission,Dr. Harry Okafor,Croydon Health Centre
+51dc0d7b,p016,2023-12-17,Diabetes review,Dr. Aisha Bello,Croydon Health Centre
+be1364bd,p016,2023-03-18,Cardiology clinic,Dr. Edward Hussain,Croydon Health Centre
+d5307a4c,p017,2024-05-09,GP consultation,Dr. Charlotte Johnson,Croydon Health Centre
+69b872c8,p017,2023-06-18,Heart failure clinic,Dr. Raj Whitcombe,Croydon Health Centre
+e8312df9,p017,2023-04-14,Outpatient follow-up,Dr. John Patel,Croydon Health Centre
+3895b775,p017,2024-02-24,Hospital admission,Dr. Margaret Wilson,Croydon Health Centre
+fbe1fabc,p017,2023-11-01,A&E attendance,Dr. Harry Whitcombe,Croydon Health Centre
+000eb0b8,p017,2024-02-07,Renal clinic,Dr. Arjun Whitcombe,Croydon Health Centre
+4443cc7b,p018,2023-01-04,Heart failure clinic,Dr. William Wilson,Hackney Health Centre
+d8188973,p018,2024-11-08,Renal clinic,Dr. Michael Ramanathan,Hackney Health Centre
+01be54c1,p018,2023-01-27,A&E attendance,Dr. Raj Johnson,Hackney Health Centre
+b6e818d9,p018,2023-10-26,Cardiology clinic,Dr. Isla Begum,Hackney Health Centre
+b7aca6bb,p019,2023-11-12,Heart failure clinic,Dr. Isla Walker,Camden Health Centre
+8c53dbe2,p019,2024-11-07,Hospital admission,Dr. William Johnson,Camden Health Centre
+cb249f70,p020,2024-02-01,Diabetes review,Dr. Priya Shah,Croydon Health Centre
+c374de21,p020,2024-01-26,Outpatient follow-up,Dr. David Roberts,Croydon Health Centre
+a9392a71,p020,2023-02-15,Hospital admission,Dr. Lily Roberts,Croydon Health Centre
+32a26eef,p020,2023-09-27,A&E attendance,Dr. Liam Ahmed,Croydon Health Centre
+667f80c9,p020,2023-03-05,Diabetes review,Dr. Margaret Ramanathan,Croydon Health Centre
+cf9f82c6,p020,2023-03-29,Outpatient follow-up,Dr. Amelia Thomas,Croydon Health Centre
+56a21b10,p021,2024-08-26,A&E attendance,Dr. Ella Whitcombe,Croydon Health Centre
+b0b5f8fb,p021,2024-02-01,Heart failure clinic,Dr. Amelia Williams,Croydon Health Centre
+54bee068,p021,2024-05-01,A&E attendance,Dr. Isla Wilson,Croydon Health Centre
+dfe1448b,p021,2023-03-22,Heart failure clinic,Dr. George Khan,Croydon Health Centre
+b05a129a,p021,2024-08-07,Diabetes review,Dr. Thomas Mitchell,Croydon Health Centre
+bc4541bc,p021,2024-04-04,Diabetes review,Dr. Raj Patel,Croydon Health Centre
+3e48b3d1,p021,2023-07-17,Diabetes review,Dr. George Thomas,Croydon Health Centre
+6c7344bd,p021,2023-03-22,Heart failure clinic,Dr. Michael Mahmood,Croydon Health Centre
+3a09f38f,p022,2023-06-01,Hospital admission,Dr. Charles Kaur,Croydon Health Centre
+1d5f65bb,p022,2023-03-10,Cardiology clinic,Dr. Aisha Singh,Croydon Health Centre
+a7075ff8,p022,2024-02-11,Outpatient follow-up,Dr. Liam Khan,Croydon Health Centre
+60ccbacb,p022,2024-04-14,GP consultation,Dr. Hannah Ahmed,Croydon Health Centre
+1895d65a,p022,2024-06-19,Heart failure clinic,Dr. Thomas Thomas,Croydon Health Centre
+2f143252,p022,2023-06-03,Diabetes review,Dr. Chloe Ahmed,Croydon Health Centre
+47ea5f46,p022,2024-08-19,Cardiology clinic,Dr. Harry Ahmed,Croydon Health Centre
+733b7f9f,p023,2023-04-14,Hospital admission,Dr. Amelia Shah,Camden Health Centre
+2d59d033,p023,2023-12-19,Heart failure clinic,Dr. Hassan Evans,Camden Health Centre
+04a39d59,p023,2024-11-01,Renal clinic,Dr. Chloe Hussain,Camden Health Centre
+56361272,p023,2024-04-29,GP consultation,Dr. David Brown,Camden Health Centre
+b80d6806,p023,2024-02-17,Diabetes review,Dr. Hannah Hussain,Camden Health Centre
+af2b365b,p023,2024-11-28,Heart failure clinic,Dr. George Evans,Camden Health Centre
+504851da,p023,2023-12-06,A&E attendance,Dr. James Hughes,Camden Health Centre
+e878e390,p023,2024-05-01,Hospital admission,Dr. Priya Al-Rashidi,Camden Health Centre
+0ce11e7c,p024,2023-11-07,Hospital admission,Dr. Liam Mahmood,Croydon Health Centre
+42214189,p024,2024-05-18,Cardiology clinic,Dr. Robert Henshaw,Croydon Health Centre
+8a9b0a44,p024,2023-11-04,Renal clinic,Dr. Charles Brown,Croydon Health Centre
+a9055fbc,p024,2024-03-02,Cardiology clinic,Dr. Michael Roberts,Croydon Health Centre
+bf622e9e,p025,2024-02-21,Renal clinic,Dr. Mia Begum,Croydon Health Centre
+c914033e,p025,2024-01-18,GP consultation,Dr. Ava Carter,Croydon Health Centre
+b104e9bf,p025,2023-06-12,Cardiology clinic,Dr. Ethan Jones,Croydon Health Centre
+aca45ced,p026,2024-02-18,Diabetes review,Dr. Mia Shah,Greenwich Health Centre
+67a42c96,p026,2024-08-05,GP consultation,Dr. David Patel,Greenwich Health Centre
+629eba00,p026,2023-07-25,GP consultation,Dr. Ahmed Whitcombe,Greenwich Health Centre
+adcc3bc0,p026,2024-04-12,GP consultation,Dr. Priya Jones,Greenwich Health Centre
+046d47e6,p026,2023-07-23,Hospital admission,Dr. Priya Mahmood,Greenwich Health Centre
+42b89c2a,p026,2024-04-20,Heart failure clinic,Dr. Sarah Kaur,Greenwich Health Centre
+4e3ba161,p027,2024-11-28,GP consultation,Dr. Ahmed Davies,Hackney Health Centre
+160decf2,p027,2024-05-15,Renal clinic,Dr. David Begum,Hackney Health Centre
+3b8c7624,p028,2024-08-23,Outpatient follow-up,Dr. Eleanor Bello,Camden Health Centre
+84120837,p028,2023-09-22,Cardiology clinic,Dr. Noah Al-Rashidi,Camden Health Centre
+14e5d632,p028,2024-01-31,GP consultation,Dr. Raj Begum,Camden Health Centre
+205819fa,p028,2024-08-08,A&E attendance,Dr. Robert Johnson,Camden Health Centre
+15b66f98,p028,2023-08-19,A&E attendance,Dr. Liam Johnson,Camden Health Centre
+75e73898,p029,2024-06-09,GP consultation,Dr. Elizabeth Al-Rashidi,Hackney Health Centre
+9eb9fa03,p029,2024-04-30,Diabetes review,Dr. Rebecca Bello,Hackney Health Centre
+7d3b41a7,p029,2024-09-07,GP consultation,Dr. Robert Brown,Hackney Health Centre
+13d38389,p029,2024-09-14,Hospital admission,Dr. Rebecca Brown,Hackney Health Centre
+da250e4a,p029,2024-03-09,Heart failure clinic,Dr. Eleanor Roberts,Hackney Health Centre
+4fdf3444,p030,2023-08-12,Renal clinic,Dr. Ethan Williams,Hackney Health Centre
+6258f10e,p030,2024-06-17,Heart failure clinic,Dr. Fatima Ramanathan,Hackney Health Centre
+aa51b4d7,p030,2023-01-08,Outpatient follow-up,Dr. Ella Johnson,Hackney Health Centre
+5e50d0ba,p030,2024-08-31,Hospital admission,Dr. Ethan Williams,Hackney Health Centre
+c909a119,p031,2024-05-08,Cardiology clinic,Dr. Edward Brown,Camden Health Centre
+46909afd,p031,2024-10-17,Outpatient follow-up,Dr. Liam Brown,Camden Health Centre
+c59ede23,p032,2024-12-29,Hospital admission,Dr. Michael Henshaw,Croydon Health Centre
+db75b472,p032,2024-06-13,A&E attendance,Dr. James Carter,Croydon Health Centre
+f8019c2c,p032,2024-09-06,Heart failure clinic,Dr. Margaret Taylor,Croydon Health Centre
+cb31bb79,p032,2024-11-28,Diabetes review,Dr. Jacob Johnson,Croydon Health Centre
+525b62e0,p032,2024-05-24,Hospital admission,Dr. Hassan Kaur,Croydon Health Centre
+fe8ccd6d,p032,2024-03-04,Heart failure clinic,Dr. Aisha Hughes,Croydon Health Centre
+7c863c51,p032,2023-02-06,A&E attendance,Dr. Edward Hughes,Croydon Health Centre
+04654e0b,p033,2023-08-16,Renal clinic,Dr. Margaret Davies,Greenwich Health Centre
+01c638be,p033,2024-06-03,Hospital admission,Dr. Raj Mahmood,Greenwich Health Centre
+4baddc9e,p033,2024-11-04,Diabetes review,Dr. Noah Ramanathan,Greenwich Health Centre
+9876329a,p033,2024-04-27,Diabetes review,Dr. Hassan Hughes,Greenwich Health Centre
+34cfb344,p033,2024-07-26,Diabetes review,Dr. Elizabeth Shah,Greenwich Health Centre
+e3f17109,p033,2023-12-10,Cardiology clinic,Dr. Robert Davies,Greenwich Health Centre
+bde8e14b,p033,2023-08-17,Hospital admission,Dr. Sophie Carter,Greenwich Health Centre
+79438cd9,p034,2024-01-16,Hospital admission,Dr. Fatima Wilson,Hackney Health Centre
+ff83b177,p034,2024-04-19,Cardiology clinic,Dr. Isla Whitcombe,Hackney Health Centre
+46baff9f,p034,2024-10-11,Cardiology clinic,Dr. Isla Shah,Hackney Health Centre
+3f6f9e56,p034,2023-07-19,Cardiology clinic,Dr. Elizabeth Evans,Hackney Health Centre
+8ff90a7f,p035,2023-11-02,Heart failure clinic,Dr. James Begum,Hackney Health Centre
+ed6fd1b1,p035,2023-06-04,Diabetes review,Dr. Michael Taylor,Hackney Health Centre
+b0c78f7f,p035,2024-02-24,Renal clinic,Dr. Arjun Taylor,Hackney Health Centre
+c4bbd1ee,p035,2023-07-04,Cardiology clinic,Dr. Olivia Taylor,Hackney Health Centre
+976fdd4e,p035,2024-10-08,Diabetes review,Dr. Charles Johnson,Hackney Health Centre
+f0b1c4e8,p035,2023-03-01,GP consultation,Dr. Lily Brown,Hackney Health Centre
+3b2611af,p036,2023-06-22,Diabetes review,Dr. Olivia Carter,Hackney Health Centre
+19e8f9d3,p036,2023-04-01,Diabetes review,Dr. Hannah Thomas,Hackney Health Centre
+3da95ba9,p036,2024-10-10,Heart failure clinic,Dr. Emma Thomas,Hackney Health Centre
+66401b73,p037,2024-01-28,GP consultation,Dr. George Singh,Hackney Health Centre
+cc983109,p037,2023-07-24,Outpatient follow-up,Dr. Mohammed Shah,Hackney Health Centre
+b63e1c8b,p037,2023-11-26,A&E attendance,Dr. Jacob Williams,Hackney Health Centre
+c20c93e4,p037,2023-01-05,A&E attendance,Dr. Robert Jones,Hackney Health Centre
+174b4bf7,p037,2023-12-19,Hospital admission,Dr. Daniel Ramanathan,Hackney Health Centre
+c7dbadaf,p038,2024-05-30,Hospital admission,Dr. Raj Okafor,Hackney Health Centre
+3bf32688,p038,2023-02-16,Hospital admission,Dr. Noah Roberts,Hackney Health Centre
+0a558b86,p038,2024-06-16,Outpatient follow-up,Dr. Charlotte Shah,Hackney Health Centre
+1c496cb1,p038,2024-12-04,Diabetes review,Dr. Edward Shah,Hackney Health Centre
+c079bc5d,p038,2024-05-16,Outpatient follow-up,Dr. Michael Bello,Hackney Health Centre
+585a19d7,p039,2024-02-18,GP consultation,Dr. Robert Smith,Greenwich Health Centre
+0d8234a9,p039,2023-05-15,A&E attendance,Dr. Jacob Ahmed,Greenwich Health Centre
+70935a05,p039,2024-05-31,Diabetes review,Dr. Thomas Davies,Greenwich Health Centre
+ac026cd9,p039,2024-12-29,GP consultation,Dr. Aisha Shah,Greenwich Health Centre
+1e7adf3c,p039,2024-10-17,Hospital admission,Dr. Amelia Hussain,Greenwich Health Centre
+57bbf372,p039,2023-02-19,GP consultation,Dr. Margaret Ramanathan,Greenwich Health Centre
+e8d62515,p039,2024-10-31,GP consultation,Dr. James Jones,Greenwich Health Centre
+8d8fb10a,p039,2023-04-29,Heart failure clinic,Dr. Lily Evans,Greenwich Health Centre
+ff2f749d,p040,2024-07-14,Hospital admission,Dr. Isla Jones,Hackney Health Centre
+9bc19731,p040,2023-06-06,A&E attendance,Dr. Elizabeth Johnson,Hackney Health Centre
+d607f089,p041,2023-11-05,Heart failure clinic,Dr. Margaret Ramanathan,Croydon Health Centre
+e71344bc,p041,2024-11-09,Hospital admission,Dr. Hannah Hussain,Croydon Health Centre
+6879bcdb,p042,2023-05-21,Heart failure clinic,Dr. Harry Khan,Croydon Health Centre
+7f592305,p042,2024-09-24,Cardiology clinic,Dr. Noah Ramanathan,Croydon Health Centre
+ed544e38,p042,2023-04-19,Renal clinic,Dr. Michael Hussain,Croydon Health Centre
+416ef764,p042,2023-07-24,Hospital admission,Dr. Mia Patel,Croydon Health Centre
+8a0842e6,p042,2024-01-02,Heart failure clinic,Dr. Noah Bello,Croydon Health Centre
+127157d8,p042,2023-02-10,Renal clinic,Dr. John Jones,Croydon Health Centre
+7611fd02,p042,2024-05-07,Outpatient follow-up,Dr. Ahmed Al-Rashidi,Croydon Health Centre
+66ca8160,p043,2024-11-18,Cardiology clinic,Dr. Thomas Mahmood,Greenwich Health Centre
+c2893e66,p043,2024-08-10,Renal clinic,Dr. Arjun Okafor,Greenwich Health Centre
+4343ff2f,p044,2024-06-07,Cardiology clinic,Dr. Harry Shah,Hackney Health Centre
+0de1c9e3,p044,2023-09-20,A&E attendance,Dr. Grace Wilson,Hackney Health Centre
+23a36c1b,p044,2023-09-28,Renal clinic,Dr. James Ramanathan,Hackney Health Centre
+d0174b30,p044,2023-06-28,GP consultation,Dr. Noah Davies,Hackney Health Centre
+fb55cab6,p044,2024-11-24,Outpatient follow-up,Dr. Charlotte Hughes,Hackney Health Centre
+84a2fe34,p044,2023-04-29,Cardiology clinic,Dr. George Al-Rashidi,Hackney Health Centre
+8f50b3e7,p044,2023-05-22,Diabetes review,Dr. Edward Davies,Hackney Health Centre
+220bf8a3,p044,2024-03-24,Hospital admission,Dr. William Davies,Hackney Health Centre
+440fcdb5,p045,2023-12-17,Diabetes review,Dr. Thomas Evans,Greenwich Health Centre
+156250bb,p045,2024-02-14,Renal clinic,Dr. Liam Mahmood,Greenwich Health Centre
+46ba074a,p045,2024-01-30,Renal clinic,Dr. Sophie Johnson,Greenwich Health Centre
+5a29cbbd,p045,2023-06-20,Cardiology clinic,Dr. Daniel Jones,Greenwich Health Centre
+8d11eca4,p045,2023-03-02,Diabetes review,Dr. Harry Thomas,Greenwich Health Centre
+b5375974,p045,2024-08-27,Renal clinic,Dr. Chloe Williams,Greenwich Health Centre
+f1b87f65,p045,2024-03-24,Diabetes review,Dr. Hannah Evans,Greenwich Health Centre
+8fba38a1,p045,2024-01-03,GP consultation,Dr. Elizabeth Shah,Greenwich Health Centre
+cee82e76,p046,2023-05-14,Renal clinic,Dr. Olivia Ramanathan,Hackney Health Centre
+ef5d57d8,p046,2024-02-26,Renal clinic,Dr. George Okafor,Hackney Health Centre
+26f98767,p046,2023-09-25,Outpatient follow-up,Dr. Mohammed Jones,Hackney Health Centre
+c067df2d,p046,2024-11-25,A&E attendance,Dr. Margaret Begum,Hackney Health Centre
+3b9aa014,p046,2023-12-13,Cardiology clinic,Dr. Charlotte Williams,Hackney Health Centre
+bf1d9dc2,p046,2023-09-12,Renal clinic,Dr. Eleanor Williams,Hackney Health Centre
+02d703a3,p046,2024-11-23,Heart failure clinic,Dr. Arjun Mahmood,Hackney Health Centre
+7c11a97e,p046,2024-07-25,GP consultation,Dr. Mohammed Johnson,Hackney Health Centre
+36c9031d,p047,2024-06-01,Renal clinic,Dr. Olivia Begum,Hackney Health Centre
+78b7b785,p047,2023-06-19,Cardiology clinic,Dr. Olivia Taylor,Hackney Health Centre
+a0a30031,p047,2023-09-04,Outpatient follow-up,Dr. Liam Whitcombe,Hackney Health Centre
+f0ce6b02,p048,2023-08-17,Heart failure clinic,Dr. Emma Mahmood,Croydon Health Centre
+f1c03868,p048,2023-08-29,Cardiology clinic,Dr. Grace Roberts,Croydon Health Centre
+dd529e87,p048,2024-08-09,Renal clinic,Dr. William Begum,Croydon Health Centre
+a1e332f4,p048,2024-05-25,Renal clinic,Dr. Charles Ramanathan,Croydon Health Centre
+33c82df7,p048,2024-05-24,GP consultation,Dr. Harry Evans,Croydon Health Centre
+42a54022,p048,2024-02-27,GP consultation,Dr. Ella Singh,Croydon Health Centre
+2801531e,p049,2023-04-04,Hospital admission,Dr. Ava Singh,Greenwich Health Centre
+e58d9d7b,p049,2023-07-31,Renal clinic,Dr. Edward Davies,Greenwich Health Centre
+4ad8b2f7,p050,2023-02-25,A&E attendance,Dr. Grace Taylor,Hackney Health Centre
+74f85310,p050,2024-07-27,Renal clinic,Dr. Margaret Davies,Hackney Health Centre
+3a90dd31,p050,2024-04-08,Cardiology clinic,Dr. Harry Mitchell,Hackney Health Centre
+0130eaa2,p050,2024-11-05,A&E attendance,Dr. Mohammed Taylor,Hackney Health Centre
+a0347c9d,p050,2023-12-30,Hospital admission,Dr. Ella Khan,Hackney Health Centre
+8b0d9033,p050,2024-01-18,Cardiology clinic,Dr. George Shah,Hackney Health Centre
+bc527908,p050,2023-06-18,Renal clinic,Dr. Daniel Mahmood,Hackney Health Centre
+5f4b8c1b,p050,2024-02-24,Cardiology clinic,Dr. Hassan Hussain,Hackney Health Centre
