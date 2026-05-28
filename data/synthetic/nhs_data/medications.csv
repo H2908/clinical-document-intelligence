@@ -1,0 +1,142 @@
+medication_id,patient_id,bnf_code,drug_name,dose,start_date,status,reason_code
+34e78b36,p001,03.02.00.00,Beclometasone inhaler,2 puffs BD,2020-06-16,active,J45.9
+3a3b52f0,p001,04.03.03.00,Sertraline 50 mg,50 mg OD,2022-09-12,active,F32.9
+b2e8e9cc,p001,10.01.01.00,Paracetamol 500 mg,1 g QDS,2023-09-29,active,M54.5
+5303f375,p003,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2022-12-11,active,I10
+7fe560e0,p003,02.05.05.01,Ramipril 10 mg,10 mg OD,2021-05-21,active,I10
+d385e706,p003,02.02.03.00,Spironolactone 25 mg,25 mg OD,2021-07-07,active,I10
+fea7c694,p003,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2023-02-14,active,I25.9
+976cb80e,p003,02.09.00.00,Aspirin 75 mg,75 mg OD,2023-10-24,active,I25.9
+5e9fe165,p004,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2021-12-31,active,I25.9
+a9692ea1,p004,04.03.03.00,Sertraline 50 mg,50 mg OD,2022-06-19,active,F41.1
+76819cc3,p004,02.09.00.00,Aspirin 75 mg,75 mg OD,2021-01-13,active,I25.9
+3cc0600f,p005,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2023-06-30,active,I50.0
+7438fb06,p005,02.02.02.00,Furosemide 40 mg,40 mg OD,2019-05-06,active,I50.0
+7348ea69,p005,02.02.03.00,Spironolactone 25 mg,25 mg OD,2023-09-16,active,I50.0
+04d83ebe,p005,06.01.02.02,Metformin 1 g,1 g BD,2023-02-24,active,E11.9
+725a3be8,p005,03.02.00.00,Beclometasone inhaler,2 puffs BD,2019-12-14,active,J45.9
+263db6d8,p005,02.09.00.00,Aspirin 75 mg,75 mg OD,2019-07-23,active,I25.9
+b087b294,p005,06.01.02.03,Gliclazide 80 mg,80 mg BD,2023-10-03,active,E11.9
+ad9dfdfa,p006,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2023-08-24,active,I25.9
+9c7b75e0,p006,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2024-09-29,active,J44.9
+de055d3a,p006,04.03.03.00,Sertraline 50 mg,50 mg OD,2020-03-30,active,F32.9
+5f6d5706,p006,02.09.00.00,Aspirin 75 mg,75 mg OD,2024-06-16,active,I25.9
+bfbd1f73,p007,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2023-06-07,active,E78.5
+a42780b9,p008,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2022-05-19,active,I10
+14c675dc,p008,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2020-05-06,active,E78.5
+67ce3344,p008,02.06.02.00,Amlodipine 10 mg,10 mg OD,2023-10-30,active,I10
+dc0c76a0,p008,04.03.03.00,Sertraline 50 mg,50 mg OD,2024-12-21,active,F32.9
+053a4495,p008,10.01.01.00,Paracetamol 500 mg,1 g QDS,2022-12-21,active,M54.5
+c10441be,p010,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2019-06-23,active,I50.0
+b869bc9e,p010,02.02.02.00,Furosemide 40 mg,40 mg OD,2019-11-15,active,I50.0
+3b372f7f,p010,02.05.05.01,Ramipril 10 mg,10 mg OD,2023-07-15,active,I50.0
+2f8cfedf,p010,02.02.03.00,Spironolactone 25 mg,25 mg OD,2023-07-18,active,I50.0
+2ff89e50,p011,01.03.05.00,Omeprazole 20 mg,20 mg OD,2024-02-28,active,K21.0
+5e115d24,p012,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2020-03-09,active,J45.9
+e5bd2719,p012,03.02.00.00,Beclometasone inhaler,2 puffs BD,2023-06-29,active,J45.9
+f8e64a48,p012,04.03.03.00,Sertraline 50 mg,50 mg OD,2022-06-24,active,F41.1
+15070e30,p012,01.03.05.00,Omeprazole 20 mg,20 mg OD,2020-11-19,active,K21.0
+375d4a53,p013,06.01.02.02,Metformin 1 g,1 g BD,2020-04-12,active,E11.9
+616c3380,p013,06.01.02.03,Gliclazide 80 mg,80 mg BD,2020-08-27,active,E11.9
+fd2a4ceb,p014,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2021-11-14,active,I10
+5f1335f1,p014,02.05.05.01,Ramipril 10 mg,10 mg OD,2020-09-18,active,I10
+fd27a321,p014,02.02.03.00,Spironolactone 25 mg,25 mg OD,2024-07-16,active,I10
+6162032e,p015,02.02.02.00,Furosemide 40 mg,40 mg OD,2022-08-16,active,I50.0
+1afdb15a,p015,02.05.05.01,Ramipril 10 mg,10 mg OD,2019-10-07,active,I50.0
+b26efb9e,p015,02.02.03.00,Spironolactone 25 mg,25 mg OD,2022-05-25,active,I50.0
+d97d5010,p015,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2022-12-12,active,J44.9
+54bbcef5,p015,10.01.01.00,Paracetamol 500 mg,1 g QDS,2024-01-26,active,M17.0
+09124933,p015,06.02.01.00,Levothyroxine 100 mcg,100 mcg OD,2022-03-21,active,E03.9
+f3bb8241,p016,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2020-01-05,active,J45.9
+6d04aaaf,p016,03.02.00.00,Beclometasone inhaler,2 puffs BD,2019-06-18,active,J45.9
+55ec83d2,p017,10.01.01.00,Paracetamol 500 mg,1 g QDS,2021-02-10,active,M17.0
+920f329e,p018,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2024-08-15,active,I25.9
+a3d95f74,p018,06.02.01.00,Levothyroxine 100 mcg,100 mcg OD,2022-11-07,active,E03.9
+6d3403d3,p018,02.09.00.00,Aspirin 75 mg,75 mg OD,2020-12-07,active,I25.9
+70a9bca6,p019,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2023-11-29,active,E78.5
+75fb3eae,p020,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2020-10-12,active,I10
+b92fc367,p020,02.02.02.00,Furosemide 40 mg,40 mg OD,2022-03-04,active,I50.0
+3de6fb53,p020,02.05.05.01,Ramipril 10 mg,10 mg OD,2022-10-17,active,I50.0
+9d176e00,p020,02.06.02.00,Amlodipine 10 mg,10 mg OD,2019-09-27,active,I10
+40e5ed7c,p020,10.01.01.00,Paracetamol 500 mg,1 g QDS,2023-05-03,active,M17.0
+76ff8e16,p020,06.02.01.00,Levothyroxine 100 mcg,100 mcg OD,2020-09-07,active,E03.9
+29657422,p021,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2020-08-02,active,I10
+f811c737,p021,02.05.05.01,Ramipril 10 mg,10 mg OD,2023-05-25,active,I10
+6cb71d79,p021,02.02.03.00,Spironolactone 25 mg,25 mg OD,2019-12-14,active,I10
+879b9a92,p021,06.01.02.02,Metformin 1 g,1 g BD,2022-09-07,active,E11.9
+ff2e6104,p021,02.06.02.00,Amlodipine 10 mg,10 mg OD,2024-11-26,active,I10
+f8be0c8d,p021,10.01.01.00,Paracetamol 500 mg,1 g QDS,2023-10-01,active,M54.5
+827f684e,p021,06.01.02.03,Gliclazide 80 mg,80 mg BD,2022-06-19,active,E11.9
+b2b95f6a,p022,01.03.05.00,Omeprazole 20 mg,20 mg OD,2024-06-14,active,K29.7
+012c775e,p022,02.09.00.00,Aspirin 75 mg,75 mg OD,2020-07-17,active,I25.9
+9023e48f,p023,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2020-02-19,active,I50.0
+f46bfe3a,p023,02.02.02.00,Furosemide 40 mg,40 mg OD,2020-06-20,active,I50.0
+fd34629c,p023,02.05.05.01,Ramipril 10 mg,10 mg OD,2021-01-10,active,I50.0
+8bf90bdb,p023,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2023-02-01,active,J45.9
+57ed0205,p024,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2024-01-13,active,I10
+c19c0999,p024,02.05.05.01,Ramipril 10 mg,10 mg OD,2022-06-21,active,I10
+cf414c43,p024,02.06.02.00,Amlodipine 10 mg,10 mg OD,2023-12-10,active,I10
+4410ddc5,p026,03.02.00.00,Beclometasone inhaler,2 puffs BD,2023-09-11,active,J45.9
+5a88ba10,p027,02.05.05.01,Ramipril 10 mg,10 mg OD,2021-10-21,active,I50.0
+fa8579f7,p027,02.02.03.00,Spironolactone 25 mg,25 mg OD,2023-03-01,active,I50.0
+7e09f25c,p028,01.03.05.00,Omeprazole 20 mg,20 mg OD,2020-05-25,active,K29.7
+bbf329ab,p029,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2020-10-18,active,E78.5
+2a054790,p029,01.03.05.00,Omeprazole 20 mg,20 mg OD,2024-10-03,active,K21.0
+e9a85f72,p030,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2021-06-28,active,E78.5
+18610146,p031,02.02.02.00,Furosemide 40 mg,40 mg OD,2023-06-12,active,I50.0
+d6d9911c,p031,02.05.05.01,Ramipril 10 mg,10 mg OD,2019-12-01,active,I50.0
+a0fec97f,p031,02.02.03.00,Spironolactone 25 mg,25 mg OD,2022-07-29,active,I10
+5c3213c5,p031,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2020-08-21,active,J45.9
+19a934be,p031,03.02.00.00,Beclometasone inhaler,2 puffs BD,2024-04-19,active,J45.9
+b9537a97,p032,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2019-01-22,active,I50.0
+101341e4,p032,02.02.02.00,Furosemide 40 mg,40 mg OD,2021-06-02,active,I50.0
+2bbd43fb,p032,02.05.05.01,Ramipril 10 mg,10 mg OD,2024-12-01,active,I10
+9926dc94,p032,02.02.03.00,Spironolactone 25 mg,25 mg OD,2022-03-26,active,I50.0
+e5aa18b2,p032,02.06.02.00,Amlodipine 10 mg,10 mg OD,2019-07-15,active,I10
+e2460240,p032,04.03.03.00,Sertraline 50 mg,50 mg OD,2024-02-16,active,F32.9
+ac79750e,p033,04.03.03.00,Sertraline 50 mg,50 mg OD,2024-08-09,active,F32.9
+657df24a,p034,10.01.01.00,Paracetamol 500 mg,1 g QDS,2021-09-17,active,M17.0
+6f72bcde,p035,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2019-01-07,active,I10
+acc0cacf,p035,02.05.05.01,Ramipril 10 mg,10 mg OD,2023-09-03,active,I10
+82d30caa,p035,02.02.03.00,Spironolactone 25 mg,25 mg OD,2019-12-17,active,I10
+2deecd3a,p035,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2024-11-24,active,E78.5
+a9c1450d,p035,02.06.02.00,Amlodipine 10 mg,10 mg OD,2024-04-09,active,I10
+95d523f8,p035,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2023-03-10,active,J45.9
+cdbe34b0,p036,06.01.02.02,Metformin 1 g,1 g BD,2019-10-04,active,E11.9
+3a3e63ac,p036,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2020-02-29,active,E78.5
+a62bc107,p036,06.01.02.03,Gliclazide 80 mg,80 mg BD,2022-12-14,active,E11.9
+50dfbd08,p037,02.05.05.01,Ramipril 10 mg,10 mg OD,2024-03-18,active,I10
+c7936b23,p037,02.02.03.00,Spironolactone 25 mg,25 mg OD,2020-07-06,active,I10
+0644affb,p038,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2021-04-05,active,J45.9
+b7a130f4,p039,06.02.01.00,Levothyroxine 100 mcg,100 mcg OD,2022-06-24,active,E03.9
+1f68f816,p040,04.03.03.00,Sertraline 50 mg,50 mg OD,2021-11-03,active,F41.1
+1bbaa87c,p040,06.02.01.00,Levothyroxine 100 mcg,100 mcg OD,2023-01-02,active,E03.9
+a1be2b6c,p041,06.01.02.02,Metformin 1 g,1 g BD,2020-05-24,active,E11.9
+357471d6,p041,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2023-06-27,active,J45.9
+15737245,p041,06.01.02.03,Gliclazide 80 mg,80 mg BD,2021-02-04,active,E11.9
+66011944,p042,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2023-02-13,active,I10
+5e24f985,p042,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2021-01-09,active,I25.9
+5bf912a4,p042,02.06.02.00,Amlodipine 10 mg,10 mg OD,2019-11-24,active,I10
+01b77fc6,p042,04.03.03.00,Sertraline 50 mg,50 mg OD,2022-06-09,active,F41.1
+6557c533,p042,02.09.00.00,Aspirin 75 mg,75 mg OD,2023-10-12,active,I25.9
+3309f788,p043,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2022-12-10,active,E78.5
+71c12c4c,p043,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2022-12-15,active,J44.9
+af4de3df,p044,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2019-08-23,active,I42.0
+e279cfd3,p044,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2023-07-22,active,I25.9
+910eef6b,p044,04.03.03.00,Sertraline 50 mg,50 mg OD,2020-10-17,active,F32.9
+cb766472,p044,10.01.01.00,Paracetamol 500 mg,1 g QDS,2023-11-30,active,M54.5
+bf09c606,p044,02.09.00.00,Aspirin 75 mg,75 mg OD,2021-08-24,active,I25.9
+cb11ba8e,p045,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2019-05-13,active,J45.9
+6259346d,p045,03.02.00.00,Beclometasone inhaler,2 puffs BD,2023-02-28,active,J45.9
+230a4f8f,p046,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2019-11-11,active,I25.9
+6b115083,p046,04.03.03.00,Sertraline 50 mg,50 mg OD,2023-06-19,active,F32.9
+3eb7909c,p046,01.03.05.00,Omeprazole 20 mg,20 mg OD,2021-10-19,active,K21.0
+a7eea4f8,p046,02.09.00.00,Aspirin 75 mg,75 mg OD,2021-02-01,active,I25.9
+6385bff6,p047,02.04.00.00,Bisoprolol 2.5 mg,2.5 mg OD,2020-04-27,active,I10
+1f1bbdf4,p047,02.12.00.00,Atorvastatin 40 mg,40 mg ON,2022-03-15,active,I25.9
+c20ce734,p047,02.06.02.00,Amlodipine 10 mg,10 mg OD,2020-07-09,active,I10
+3f492767,p047,10.01.01.00,Paracetamol 500 mg,1 g QDS,2023-12-29,active,M54.5
+6688ef6f,p049,03.01.01.01,Salbutamol inhaler,2 puffs PRN,2019-09-23,active,J45.9
+f46923db,p050,02.02.03.00,Spironolactone 25 mg,25 mg OD,2023-01-20,active,I10
+e95e315d,p050,02.06.02.00,Amlodipine 10 mg,10 mg OD,2021-04-03,active,I10
+513abb1f,p050,04.03.03.00,Sertraline 50 mg,50 mg OD,2024-07-16,active,F41.1

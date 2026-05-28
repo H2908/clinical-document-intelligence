@@ -1,0 +1,132 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                       ✅ SETUP SCRIPTS FIXED                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+🔧 ISSUE RESOLVED
+═══════════════════════════════════════════════════════════════════════════════
+
+PowerShell syntax error in setup-env.ps1 has been fixed.
+
+Error was: "Unexpected token '}' in expression or statement at line 13"
+
+Root cause: `$LASTEXITCODE` check on Python version command
+Solution: Replaced with Try/Catch error handling for robustness
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ TWO SETUP OPTIONS NOW AVAILABLE
+═══════════════════════════════════════════════════════════════════════════════
+
+1. BATCH SCRIPT (Recommended - simpler, fewer dependencies):
+   
+   setup.bat
+   
+   ✓ Uses native Windows batch commands
+   ✓ No PowerShell execution policy issues
+   ✓ Works in Command Prompt or PowerShell
+   ✓ Same functionality as PowerShell version
+
+2. POWERSHELL SCRIPT (Advanced users):
+   
+   .\setup-env.ps1
+   
+   ✓ Fixed syntax errors
+   ✓ Better error handling with Try/Catch
+   ✓ Colored output
+   ✓ Works in PowerShell
+
+Both scripts perform identical setup:
+  1. Verify Python 3.10+
+  2. Create virtual environment
+  3. Install all dependencies
+  4. Download scispacy model
+  5. Verify installation
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 HOW TO RUN
+═════════════════════════════════════════════════════════════════════════════
+
+Option A - Command Prompt:
+  C:\path\to\repo> setup.bat
+
+Option B - PowerShell:
+  PS C:\path\to\repo> .\setup-env.ps1
+
+Option C - Manual (if scripts don't work):
+  See SETUP.md > "Manual Installation" section
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📄 DOCUMENTATION UPDATED
+═════════════════════════════════════════════════════════════════════════════
+
+✓ SETUP.md - Updated with both script options
+✓ SETUP_QUICK.md - New quickstart guide (3.1KB)
+✓ QUICKSTART.bat - Updated with setup.bat option
+✓ setup-env.ps1 - Fixed PowerShell script
+✓ setup.bat - New batch script (2.9KB)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✨ WHAT'S READY
+═════════════════════════════════════════════════════════════════════════════
+
+✅ 17 Sample PDFs
+   Location: data/synthetic/nhs_data/pdfs/
+   Types: GP Referrals, Cardiology, DM Reviews
+
+✅ Requirements File
+   13 packages with pinned versions
+   File: requirements.txt
+
+✅ Configuration Template
+   With placeholders for all credentials
+   File: .env
+
+✅ Setup Scripts (Both tested)
+   Batch version: setup.bat
+   PowerShell version: setup-env.ps1
+   Both work identically
+
+✅ Verification Tools
+   Python: verify_env.py
+   Quick check: check_setup.py
+
+✅ Documentation
+   Comprehensive: SETUP.md (5.8KB)
+   Quick reference: SETUP_QUICK.md (3.1KB)
+   Checklist: CHECKLIST.md (3.7KB)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+⚡ NEXT IMMEDIATE STEPS
+═════════════════════════════════════════════════════════════════════════════
+
+1. Run ONE of these (choose your preference):
+   
+   setup.bat              (Recommended - simpler)
+   OR
+   .\setup-env.ps1        (If you prefer PowerShell)
+
+2. Wait for installation to complete (~3-5 minutes depending on internet)
+
+3. You should see:
+   ✓ All checks passed! Environment is ready.
+
+4. Then install Tesseract:
+   https://github.com/UB-Mannheim/tesseract/wiki
+   (Download and run Windows installer)
+
+5. Configure .env with your credentials
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ STATUS: READY TO SETUP
+═════════════════════════════════════════════════════════════════════════════
+
+All setup materials prepared and tested.
+Scripts fixed and ready to use.
+Choose batch or PowerShell based on preference.
+
+═══════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,181 @@
+doc_id,patient_id,filename,doc_type,description,document_date,uploaded_at
+b143e89d,p001,Lab_Report_03Feb2024.pdf,Lab_Report,Laboratory results,2024-02-03,2024-02-03T10:00:00
+197f6381,p001,Cardiology_Letter_07Jun2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-06-07,2024-06-07T10:00:00
+c3ca385a,p001,DM_Review_10Dec2024.pdf,DM_Review,Diabetes review note,2024-12-10,2024-12-10T10:00:00
+7257bd61,p002,Discharge_Summary_01Feb2024.pdf,Discharge_Summary,Hospital discharge summary,2024-02-01,2024-02-01T10:00:00
+02a7944f,p002,Discharge_Summary_02Dec2024.pdf,Discharge_Summary,Hospital discharge summary,2024-12-02,2024-12-02T10:00:00
+5f232a5b,p003,Lab_Report_25Feb2023.pdf,Lab_Report,Laboratory results,2023-02-25,2023-02-25T10:00:00
+b116eedb,p003,GP_Referral_15Sep2023.pdf,GP_Referral,Referral letter from GP,2023-09-15,2023-09-15T10:00:00
+4d503d3c,p003,Cardiology_Letter_27Sep2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-09-27,2024-09-27T10:00:00
+47bbed6f,p003,Discharge_Summary_19Aug2023.pdf,Discharge_Summary,Hospital discharge summary,2023-08-19,2023-08-19T10:00:00
+3e850080,p004,Lab_Report_13Jul2024.pdf,Lab_Report,Laboratory results,2024-07-13,2024-07-13T10:00:00
+5d98dd0c,p004,Lab_Report_21Jul2023.pdf,Lab_Report,Laboratory results,2023-07-21,2023-07-21T10:00:00
+4851402c,p004,Cardiology_Letter_29Oct2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-10-29,2023-10-29T10:00:00
+584624c5,p004,Discharge_Summary_01Jul2023.pdf,Discharge_Summary,Hospital discharge summary,2023-07-01,2023-07-01T10:00:00
+de9ec377,p005,Cardiology_Letter_27Jun2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-06-27,2023-06-27T10:00:00
+0cdcc5e5,p005,Lab_Report_03May2023.pdf,Lab_Report,Laboratory results,2023-05-03,2023-05-03T10:00:00
+a7d40986,p006,GP_Referral_14Mar2024.pdf,GP_Referral,Referral letter from GP,2024-03-14,2024-03-14T10:00:00
+762ac05f,p006,DM_Review_23Jul2024.pdf,DM_Review,Diabetes review note,2024-07-23,2024-07-23T10:00:00
+c9cd6683,p006,DM_Review_14May2023.pdf,DM_Review,Diabetes review note,2023-05-14,2023-05-14T10:00:00
+8e3f0670,p006,Cardiology_Letter_21Aug2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-08-21,2024-08-21T10:00:00
+4f274838,p006,DM_Review_06Jan2023.pdf,DM_Review,Diabetes review note,2023-01-06,2023-01-06T10:00:00
+85d0a150,p007,Discharge_Summary_27Dec2024.pdf,Discharge_Summary,Hospital discharge summary,2024-12-27,2024-12-27T10:00:00
+f6666496,p007,Cardiology_Letter_10Feb2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-02-10,2023-02-10T10:00:00
+3cf11256,p007,Cardiology_Letter_27Nov2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-11-27,2023-11-27T10:00:00
+1f351a52,p007,Lab_Report_22Feb2023.pdf,Lab_Report,Laboratory results,2023-02-22,2023-02-22T10:00:00
+bf296b2f,p008,Discharge_Summary_09Aug2024.pdf,Discharge_Summary,Hospital discharge summary,2024-08-09,2024-08-09T10:00:00
+71eddfe7,p008,Lab_Report_02Jan2024.pdf,Lab_Report,Laboratory results,2024-01-02,2024-01-02T10:00:00
+9fb02492,p008,GP_Referral_25Dec2024.pdf,GP_Referral,Referral letter from GP,2024-12-25,2024-12-25T10:00:00
+e109ceb0,p008,DM_Review_22Jun2024.pdf,DM_Review,Diabetes review note,2024-06-22,2024-06-22T10:00:00
+6a8ce31b,p009,Cardiology_Letter_17Jun2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-06-17,2024-06-17T10:00:00
+5538a1b4,p009,GP_Referral_01Jun2024.pdf,GP_Referral,Referral letter from GP,2024-06-01,2024-06-01T10:00:00
+03c354a7,p009,Cardiology_Letter_01Mar2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-03-01,2024-03-01T10:00:00
+9cbacf3d,p010,GP_Referral_24Dec2023.pdf,GP_Referral,Referral letter from GP,2023-12-24,2023-12-24T10:00:00
+873828e8,p010,Cardiology_Letter_07Aug2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-08-07,2023-08-07T10:00:00
+d3d38e41,p010,DM_Review_06Dec2023.pdf,DM_Review,Diabetes review note,2023-12-06,2023-12-06T10:00:00
+fb695c3c,p010,DM_Review_28Oct2023.pdf,DM_Review,Diabetes review note,2023-10-28,2023-10-28T10:00:00
+d36d6fe3,p010,Cardiology_Letter_25Sep2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-09-25,2024-09-25T10:00:00
+6caf163c,p011,Lab_Report_26Oct2024.pdf,Lab_Report,Laboratory results,2024-10-26,2024-10-26T10:00:00
+41e2d55a,p011,GP_Referral_28Apr2023.pdf,GP_Referral,Referral letter from GP,2023-04-28,2023-04-28T10:00:00
+7fecc1a0,p011,DM_Review_01Apr2024.pdf,DM_Review,Diabetes review note,2024-04-01,2024-04-01T10:00:00
+054ea610,p011,Cardiology_Letter_19Oct2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-10-19,2024-10-19T10:00:00
+14623e8a,p011,Lab_Report_28Sep2024.pdf,Lab_Report,Laboratory results,2024-09-28,2024-09-28T10:00:00
+e50a4107,p012,GP_Referral_29Nov2024.pdf,GP_Referral,Referral letter from GP,2024-11-29,2024-11-29T10:00:00
+19ba357d,p012,DM_Review_26Jan2024.pdf,DM_Review,Diabetes review note,2024-01-26,2024-01-26T10:00:00
+8f7c9819,p012,GP_Referral_31Jan2024.pdf,GP_Referral,Referral letter from GP,2024-01-31,2024-01-31T10:00:00
+75cba574,p013,Lab_Report_17Oct2023.pdf,Lab_Report,Laboratory results,2023-10-17,2023-10-17T10:00:00
+3e491bc2,p013,GP_Referral_13Jun2024.pdf,GP_Referral,Referral letter from GP,2024-06-13,2024-06-13T10:00:00
+db4ee6fd,p013,DM_Review_10Jun2024.pdf,DM_Review,Diabetes review note,2024-06-10,2024-06-10T10:00:00
+969a7c36,p013,Lab_Report_01Apr2024.pdf,Lab_Report,Laboratory results,2024-04-01,2024-04-01T10:00:00
+3790dfa2,p014,GP_Referral_31Oct2023.pdf,GP_Referral,Referral letter from GP,2023-10-31,2023-10-31T10:00:00
+efaab2e1,p014,Cardiology_Letter_25Nov2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-11-25,2023-11-25T10:00:00
+59d6c1fe,p014,Lab_Report_26Mar2023.pdf,Lab_Report,Laboratory results,2023-03-26,2023-03-26T10:00:00
+70fec54f,p014,GP_Referral_21Jun2023.pdf,GP_Referral,Referral letter from GP,2023-06-21,2023-06-21T10:00:00
+9829c045,p014,Lab_Report_30Jun2024.pdf,Lab_Report,Laboratory results,2024-06-30,2024-06-30T10:00:00
+c5f5dd62,p015,GP_Referral_04Aug2023.pdf,GP_Referral,Referral letter from GP,2023-08-04,2023-08-04T10:00:00
+3b2984a6,p015,Cardiology_Letter_02Dec2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-12-02,2024-12-02T10:00:00
+49d88354,p016,GP_Referral_30Jul2023.pdf,GP_Referral,Referral letter from GP,2023-07-30,2023-07-30T10:00:00
+678ed0d3,p016,Lab_Report_20Dec2024.pdf,Lab_Report,Laboratory results,2024-12-20,2024-12-20T10:00:00
+78b33a4a,p016,Discharge_Summary_24Oct2024.pdf,Discharge_Summary,Hospital discharge summary,2024-10-24,2024-10-24T10:00:00
+735f446d,p016,GP_Referral_03Dec2024.pdf,GP_Referral,Referral letter from GP,2024-12-03,2024-12-03T10:00:00
+15a7424f,p016,Cardiology_Letter_25Jan2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-01-25,2023-01-25T10:00:00
+362641c3,p017,DM_Review_08Feb2023.pdf,DM_Review,Diabetes review note,2023-02-08,2023-02-08T10:00:00
+b7833eb8,p017,GP_Referral_17Mar2023.pdf,GP_Referral,Referral letter from GP,2023-03-17,2023-03-17T10:00:00
+4261027a,p017,GP_Referral_02Jul2023.pdf,GP_Referral,Referral letter from GP,2023-07-02,2023-07-02T10:00:00
+71feb026,p017,DM_Review_25Jul2024.pdf,DM_Review,Diabetes review note,2024-07-25,2024-07-25T10:00:00
+57696ff5,p017,GP_Referral_11Aug2024.pdf,GP_Referral,Referral letter from GP,2024-08-11,2024-08-11T10:00:00
+1d033663,p018,DM_Review_22Feb2024.pdf,DM_Review,Diabetes review note,2024-02-22,2024-02-22T10:00:00
+c26b763a,p018,Discharge_Summary_06Apr2024.pdf,Discharge_Summary,Hospital discharge summary,2024-04-06,2024-04-06T10:00:00
+07d7bdb5,p018,Discharge_Summary_19Mar2024.pdf,Discharge_Summary,Hospital discharge summary,2024-03-19,2024-03-19T10:00:00
+092721de,p019,GP_Referral_03Feb2024.pdf,GP_Referral,Referral letter from GP,2024-02-03,2024-02-03T10:00:00
+40d748d1,p019,GP_Referral_01Jul2024.pdf,GP_Referral,Referral letter from GP,2024-07-01,2024-07-01T10:00:00
+1229bb96,p019,GP_Referral_18Oct2024.pdf,GP_Referral,Referral letter from GP,2024-10-18,2024-10-18T10:00:00
+1980d7f7,p019,Lab_Report_06Mar2023.pdf,Lab_Report,Laboratory results,2023-03-06,2023-03-06T10:00:00
+f2984eba,p020,GP_Referral_02Jan2024.pdf,GP_Referral,Referral letter from GP,2024-01-02,2024-01-02T10:00:00
+ebdd3839,p020,Lab_Report_19Apr2023.pdf,Lab_Report,Laboratory results,2023-04-19,2023-04-19T10:00:00
+9a1030e4,p021,DM_Review_13Sep2024.pdf,DM_Review,Diabetes review note,2024-09-13,2024-09-13T10:00:00
+68f3e2bf,p021,GP_Referral_16Oct2023.pdf,GP_Referral,Referral letter from GP,2023-10-16,2023-10-16T10:00:00
+5972f282,p021,Discharge_Summary_26Jan2024.pdf,Discharge_Summary,Hospital discharge summary,2024-01-26,2024-01-26T10:00:00
+14f108c6,p021,Discharge_Summary_07Nov2024.pdf,Discharge_Summary,Hospital discharge summary,2024-11-07,2024-11-07T10:00:00
+66041c87,p022,Discharge_Summary_10Jun2023.pdf,Discharge_Summary,Hospital discharge summary,2023-06-10,2023-06-10T10:00:00
+4de46774,p022,Lab_Report_14Aug2023.pdf,Lab_Report,Laboratory results,2023-08-14,2023-08-14T10:00:00
+4c34b551,p023,Discharge_Summary_12Jul2024.pdf,Discharge_Summary,Hospital discharge summary,2024-07-12,2024-07-12T10:00:00
+7366056e,p023,DM_Review_11Oct2024.pdf,DM_Review,Diabetes review note,2024-10-11,2024-10-11T10:00:00
+920540e2,p023,Cardiology_Letter_02Nov2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-11-02,2023-11-02T10:00:00
+8c05b2eb,p024,GP_Referral_20Jul2024.pdf,GP_Referral,Referral letter from GP,2024-07-20,2024-07-20T10:00:00
+fdd833df,p024,Lab_Report_25May2023.pdf,Lab_Report,Laboratory results,2023-05-25,2023-05-25T10:00:00
+e50ab732,p024,GP_Referral_12Feb2023.pdf,GP_Referral,Referral letter from GP,2023-02-12,2023-02-12T10:00:00
+55f68e50,p024,GP_Referral_09Aug2024.pdf,GP_Referral,Referral letter from GP,2024-08-09,2024-08-09T10:00:00
+5fa73ec6,p025,Lab_Report_14Jul2024.pdf,Lab_Report,Laboratory results,2024-07-14,2024-07-14T10:00:00
+9d75bfb1,p025,GP_Referral_09Nov2023.pdf,GP_Referral,Referral letter from GP,2023-11-09,2023-11-09T10:00:00
+d3f30829,p025,Cardiology_Letter_19Dec2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-12-19,2023-12-19T10:00:00
+763ca6da,p025,Cardiology_Letter_27Feb2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-02-27,2024-02-27T10:00:00
+c4058cb7,p025,Lab_Report_26May2023.pdf,Lab_Report,Laboratory results,2023-05-26,2023-05-26T10:00:00
+24f52bf4,p026,Cardiology_Letter_15Aug2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-08-15,2023-08-15T10:00:00
+7c79f1b6,p026,Lab_Report_16Sep2023.pdf,Lab_Report,Laboratory results,2023-09-16,2023-09-16T10:00:00
+a20d794b,p026,Cardiology_Letter_28Apr2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-04-28,2023-04-28T10:00:00
+7e83e081,p027,Lab_Report_25Feb2023.pdf,Lab_Report,Laboratory results,2023-02-25,2023-02-25T10:00:00
+d4e8cd06,p027,Lab_Report_17Apr2024.pdf,Lab_Report,Laboratory results,2024-04-17,2024-04-17T10:00:00
+a2b1a026,p027,Lab_Report_16Mar2023.pdf,Lab_Report,Laboratory results,2023-03-16,2023-03-16T10:00:00
+d7d1b59a,p028,GP_Referral_14Sep2023.pdf,GP_Referral,Referral letter from GP,2023-09-14,2023-09-14T10:00:00
+342573e2,p028,GP_Referral_22Jul2023.pdf,GP_Referral,Referral letter from GP,2023-07-22,2023-07-22T10:00:00
+b9be3b8f,p028,Lab_Report_13May2024.pdf,Lab_Report,Laboratory results,2024-05-13,2024-05-13T10:00:00
+eff458cb,p028,DM_Review_01Jan2024.pdf,DM_Review,Diabetes review note,2024-01-01,2024-01-01T10:00:00
+ab17c565,p029,Cardiology_Letter_13Apr2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-04-13,2023-04-13T10:00:00
+39312664,p029,DM_Review_26Sep2024.pdf,DM_Review,Diabetes review note,2024-09-26,2024-09-26T10:00:00
+11a4f7b1,p029,GP_Referral_18Jul2023.pdf,GP_Referral,Referral letter from GP,2023-07-18,2023-07-18T10:00:00
+abc05ca5,p030,Discharge_Summary_06Apr2024.pdf,Discharge_Summary,Hospital discharge summary,2024-04-06,2024-04-06T10:00:00
+2a3ff072,p030,DM_Review_23Sep2024.pdf,DM_Review,Diabetes review note,2024-09-23,2024-09-23T10:00:00
+ea0873ed,p030,DM_Review_11Dec2024.pdf,DM_Review,Diabetes review note,2024-12-11,2024-12-11T10:00:00
+75d63f79,p030,Lab_Report_06Jun2023.pdf,Lab_Report,Laboratory results,2023-06-06,2023-06-06T10:00:00
+b83ebf94,p031,DM_Review_14Mar2024.pdf,DM_Review,Diabetes review note,2024-03-14,2024-03-14T10:00:00
+9f6bf5a3,p031,Cardiology_Letter_05Jan2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-01-05,2023-01-05T10:00:00
+59960b90,p031,DM_Review_10Sep2023.pdf,DM_Review,Diabetes review note,2023-09-10,2023-09-10T10:00:00
+b107dfb5,p031,Cardiology_Letter_30Dec2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-12-30,2024-12-30T10:00:00
+cae2c37b,p032,DM_Review_04Jan2024.pdf,DM_Review,Diabetes review note,2024-01-04,2024-01-04T10:00:00
+efd28798,p032,Cardiology_Letter_26Nov2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-11-26,2024-11-26T10:00:00
+c2978493,p032,DM_Review_06May2024.pdf,DM_Review,Diabetes review note,2024-05-06,2024-05-06T10:00:00
+a5c78d05,p032,Discharge_Summary_01Apr2024.pdf,Discharge_Summary,Hospital discharge summary,2024-04-01,2024-04-01T10:00:00
+63c385a2,p032,DM_Review_09Nov2023.pdf,DM_Review,Diabetes review note,2023-11-09,2023-11-09T10:00:00
+aed9f845,p033,Lab_Report_22Apr2023.pdf,Lab_Report,Laboratory results,2023-04-22,2023-04-22T10:00:00
+8db30878,p033,Cardiology_Letter_23Oct2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-10-23,2024-10-23T10:00:00
+5d6f3965,p033,Lab_Report_25Mar2023.pdf,Lab_Report,Laboratory results,2023-03-25,2023-03-25T10:00:00
+4e014ae0,p033,DM_Review_24May2023.pdf,DM_Review,Diabetes review note,2023-05-24,2023-05-24T10:00:00
+1290071c,p033,Lab_Report_21Jul2023.pdf,Lab_Report,Laboratory results,2023-07-21,2023-07-21T10:00:00
+450f9cb9,p034,GP_Referral_19Mar2023.pdf,GP_Referral,Referral letter from GP,2023-03-19,2023-03-19T10:00:00
+2571e9e7,p034,GP_Referral_03Jun2024.pdf,GP_Referral,Referral letter from GP,2024-06-03,2024-06-03T10:00:00
+d298a5dc,p034,GP_Referral_18Aug2024.pdf,GP_Referral,Referral letter from GP,2024-08-18,2024-08-18T10:00:00
+ad30dc6a,p034,Lab_Report_19Feb2024.pdf,Lab_Report,Laboratory results,2024-02-19,2024-02-19T10:00:00
+55b4620f,p035,GP_Referral_18Jul2024.pdf,GP_Referral,Referral letter from GP,2024-07-18,2024-07-18T10:00:00
+2189b7df,p035,DM_Review_10Jul2024.pdf,DM_Review,Diabetes review note,2024-07-10,2024-07-10T10:00:00
+0d3b1755,p035,Lab_Report_28Apr2024.pdf,Lab_Report,Laboratory results,2024-04-28,2024-04-28T10:00:00
+6c7de45f,p036,DM_Review_06Feb2024.pdf,DM_Review,Diabetes review note,2024-02-06,2024-02-06T10:00:00
+65c5be6e,p036,Cardiology_Letter_26Aug2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-08-26,2024-08-26T10:00:00
+8db36aaf,p036,DM_Review_18May2023.pdf,DM_Review,Diabetes review note,2023-05-18,2023-05-18T10:00:00
+9e76e864,p037,Lab_Report_06Jun2024.pdf,Lab_Report,Laboratory results,2024-06-06,2024-06-06T10:00:00
+8ffdbb8a,p037,GP_Referral_11Feb2024.pdf,GP_Referral,Referral letter from GP,2024-02-11,2024-02-11T10:00:00
+f85f6948,p037,DM_Review_29May2024.pdf,DM_Review,Diabetes review note,2024-05-29,2024-05-29T10:00:00
+b97df460,p037,GP_Referral_09Nov2024.pdf,GP_Referral,Referral letter from GP,2024-11-09,2024-11-09T10:00:00
+0422e249,p037,Cardiology_Letter_20Sep2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-09-20,2024-09-20T10:00:00
+618b47b8,p038,Lab_Report_24May2023.pdf,Lab_Report,Laboratory results,2023-05-24,2023-05-24T10:00:00
+36bd8ee5,p038,Discharge_Summary_13Jun2023.pdf,Discharge_Summary,Hospital discharge summary,2023-06-13,2023-06-13T10:00:00
+4b7d951a,p038,Cardiology_Letter_02Aug2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-08-02,2024-08-02T10:00:00
+e974b4a4,p039,Discharge_Summary_03Jan2024.pdf,Discharge_Summary,Hospital discharge summary,2024-01-03,2024-01-03T10:00:00
+ac81f438,p039,GP_Referral_13Aug2023.pdf,GP_Referral,Referral letter from GP,2023-08-13,2023-08-13T10:00:00
+7d71691d,p039,Discharge_Summary_26Aug2023.pdf,Discharge_Summary,Hospital discharge summary,2023-08-26,2023-08-26T10:00:00
+c9f4420a,p040,DM_Review_14Jan2024.pdf,DM_Review,Diabetes review note,2024-01-14,2024-01-14T10:00:00
+01fe7d8e,p040,Cardiology_Letter_13Feb2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-02-13,2023-02-13T10:00:00
+3f58cf12,p041,Lab_Report_05Jan2024.pdf,Lab_Report,Laboratory results,2024-01-05,2024-01-05T10:00:00
+245539e3,p041,Discharge_Summary_25Apr2024.pdf,Discharge_Summary,Hospital discharge summary,2024-04-25,2024-04-25T10:00:00
+0bbdaaa8,p041,Discharge_Summary_17Feb2023.pdf,Discharge_Summary,Hospital discharge summary,2023-02-17,2023-02-17T10:00:00
+3da7cc31,p042,DM_Review_16Apr2023.pdf,DM_Review,Diabetes review note,2023-04-16,2023-04-16T10:00:00
+5a542f16,p042,Lab_Report_10Oct2024.pdf,Lab_Report,Laboratory results,2024-10-10,2024-10-10T10:00:00
+4ddf8d33,p043,DM_Review_15Aug2024.pdf,DM_Review,Diabetes review note,2024-08-15,2024-08-15T10:00:00
+4ffef43f,p043,Lab_Report_06Aug2024.pdf,Lab_Report,Laboratory results,2024-08-06,2024-08-06T10:00:00
+f8d91e68,p043,Cardiology_Letter_21Jan2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-01-21,2024-01-21T10:00:00
+044b8f55,p043,Discharge_Summary_10Jan2024.pdf,Discharge_Summary,Hospital discharge summary,2024-01-10,2024-01-10T10:00:00
+674cbd77,p044,Lab_Report_15Sep2023.pdf,Lab_Report,Laboratory results,2023-09-15,2023-09-15T10:00:00
+31523e73,p044,Discharge_Summary_17Aug2023.pdf,Discharge_Summary,Hospital discharge summary,2023-08-17,2023-08-17T10:00:00
+3cf1c77d,p045,DM_Review_20Dec2023.pdf,DM_Review,Diabetes review note,2023-12-20,2023-12-20T10:00:00
+82121f53,p045,Discharge_Summary_08May2024.pdf,Discharge_Summary,Hospital discharge summary,2024-05-08,2024-05-08T10:00:00
+87c332c5,p045,Lab_Report_07Jan2023.pdf,Lab_Report,Laboratory results,2023-01-07,2023-01-07T10:00:00
+f132320e,p045,Lab_Report_23May2023.pdf,Lab_Report,Laboratory results,2023-05-23,2023-05-23T10:00:00
+f61b8d29,p045,Discharge_Summary_19Jun2023.pdf,Discharge_Summary,Hospital discharge summary,2023-06-19,2023-06-19T10:00:00
+b1c1940d,p046,GP_Referral_10Jun2024.pdf,GP_Referral,Referral letter from GP,2024-06-10,2024-06-10T10:00:00
+afe84c69,p046,DM_Review_05Aug2023.pdf,DM_Review,Diabetes review note,2023-08-05,2023-08-05T10:00:00
+d02edaf7,p046,Cardiology_Letter_11Jul2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-07-11,2023-07-11T10:00:00
+e1d93eb4,p047,DM_Review_08Sep2024.pdf,DM_Review,Diabetes review note,2024-09-08,2024-09-08T10:00:00
+b709fa13,p047,GP_Referral_07Nov2024.pdf,GP_Referral,Referral letter from GP,2024-11-07,2024-11-07T10:00:00
+36ff2a83,p047,Cardiology_Letter_29Feb2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-02-29,2024-02-29T10:00:00
+b40314c4,p048,GP_Referral_08May2024.pdf,GP_Referral,Referral letter from GP,2024-05-08,2024-05-08T10:00:00
+7624707a,p048,Discharge_Summary_05May2024.pdf,Discharge_Summary,Hospital discharge summary,2024-05-05,2024-05-05T10:00:00
+00a2508d,p048,Cardiology_Letter_27Aug2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-08-27,2024-08-27T10:00:00
+4ddb9c32,p048,Cardiology_Letter_24Oct2024.pdf,Cardiology_Letter,Cardiology clinic letter,2024-10-24,2024-10-24T10:00:00
+239dedd9,p049,GP_Referral_07Sep2023.pdf,GP_Referral,Referral letter from GP,2023-09-07,2023-09-07T10:00:00
+dd27b3eb,p049,GP_Referral_11May2023.pdf,GP_Referral,Referral letter from GP,2023-05-11,2023-05-11T10:00:00
+e374a48a,p049,Lab_Report_29Aug2024.pdf,Lab_Report,Laboratory results,2024-08-29,2024-08-29T10:00:00
+6ef78a01,p049,Cardiology_Letter_18May2023.pdf,Cardiology_Letter,Cardiology clinic letter,2023-05-18,2023-05-18T10:00:00
+82eda13a,p049,Lab_Report_10Feb2023.pdf,Lab_Report,Laboratory results,2023-02-10,2023-02-10T10:00:00
+dd86a230,p050,GP_Referral_20Jun2023.pdf,GP_Referral,Referral letter from GP,2023-06-20,2023-06-20T10:00:00
+892c470e,p050,DM_Review_04Jul2023.pdf,DM_Review,Diabetes review note,2023-07-04,2023-07-04T10:00:00
+e28f7e98,p050,Lab_Report_20Feb2024.pdf,Lab_Report,Laboratory results,2024-02-20,2024-02-20T10:00:00

@@ -1,0 +1,565 @@
+observation_id,patient_id,observation_name,value,unit,date
+66c881f9,p001,Haemoglobin,137.7,g/L,2024-01-13
+98493543,p001,Haemoglobin,133.4,g/L,2024-07-18
+af5f4ade,p001,Haemoglobin,116.5,g/L,2023-03-30
+38b1fed6,p001,Weight,72.0,kg,2024-05-05
+6d7eca51,p001,BMI,34.3,kg/m²,2024-08-11
+ff2815d7,p001,BMI,23.2,kg/m²,2023-11-21
+702bb9ba,p001,BMI,32.3,kg/m²,2024-04-05
+4068a208,p001,BMI,29.5,kg/m²,2024-06-13
+80de24ef,p002,Haemoglobin,116.4,g/L,2024-07-18
+e41c38fb,p002,Haemoglobin,142.0,g/L,2023-07-06
+e3d554b4,p002,Haemoglobin,148.4,g/L,2023-05-13
+61727130,p002,Weight,82.7,kg,2023-02-26
+049f8787,p002,Weight,100.7,kg,2024-06-14
+61442627,p002,Weight,63.4,kg,2023-06-18
+5d5f42db,p002,Weight,63.9,kg,2024-12-27
+6ea9400b,p002,BMI,27.5,kg/m²,2024-06-15
+9ca50217,p002,BMI,36.3,kg/m²,2023-03-22
+6ab38e93,p003,Total cholesterol,4.3,mmol/L,2024-07-18
+eaba7082,p003,Total cholesterol,4.6,mmol/L,2024-10-02
+fb21b2a7,p003,Total cholesterol,4.7,mmol/L,2024-06-30
+a4539577,p003,LDL cholesterol,3.3,mmol/L,2023-06-22
+e3f5bc82,p003,Blood pressure systolic,122.0,mmHg,2024-10-01
+434da463,p003,Blood pressure systolic,160.4,mmHg,2024-09-11
+f749a1ad,p003,Blood pressure diastolic,102.1,mmHg,2024-07-31
+05a09402,p003,Blood pressure diastolic,62.1,mmHg,2023-01-30
+e9e1da47,p003,Blood pressure diastolic,64.1,mmHg,2024-10-18
+448ddd46,p003,Haemoglobin,142.6,g/L,2024-08-08
+c7a95fa3,p003,Haemoglobin,130.8,g/L,2024-10-16
+cd11a1b8,p003,Haemoglobin,111.5,g/L,2024-10-04
+8b90663c,p003,Weight,90.3,kg,2023-11-06
+dc021832,p003,Weight,81.6,kg,2024-12-02
+86292896,p003,Weight,77.3,kg,2024-04-09
+8ce56145,p003,BMI,33.0,kg/m²,2023-06-11
+b03eb8ee,p004,Haemoglobin,130.8,g/L,2024-04-20
+ec2ab1ea,p004,Haemoglobin,120.2,g/L,2024-09-13
+3141db48,p004,Haemoglobin,117.2,g/L,2023-11-23
+6bef0c42,p004,Haemoglobin,146.7,g/L,2023-12-20
+8a559ab8,p004,Weight,62.2,kg,2024-01-15
+75899236,p004,Weight,83.3,kg,2023-04-19
+acdf5d3c,p004,Weight,72.6,kg,2024-04-22
+3bd1bc6f,p004,Weight,61.7,kg,2024-04-05
+11c7fd05,p004,BMI,24.3,kg/m²,2023-02-21
+1abf7e3e,p004,BMI,26.6,kg/m²,2024-01-29
+9b24367f,p005,HbA1c,53.9,mmol/mol,2023-06-13
+068b6387,p005,HbA1c,81.0,mmol/mol,2024-08-14
+c2ef1ed8,p005,HbA1c,76.6,mmol/mol,2023-07-14
+f924abb2,p005,HbA1c,78.6,mmol/mol,2024-05-25
+35c856e2,p005,Total cholesterol,5.5,mmol/L,2023-11-12
+ac16b265,p005,Total cholesterol,5.5,mmol/L,2023-04-03
+206f6047,p005,Total cholesterol,7.3,mmol/L,2024-06-01
+9a06d3ca,p005,Total cholesterol,5.3,mmol/L,2023-09-04
+81ead6dd,p005,LDL cholesterol,3.5,mmol/L,2023-02-19
+5862ba70,p005,LDL cholesterol,1.7,mmol/L,2024-05-21
+e38d1f3d,p005,Haemoglobin,124.3,g/L,2023-01-09
+8a4de12c,p005,Haemoglobin,152.4,g/L,2024-03-17
+051014cb,p005,Haemoglobin,116.7,g/L,2023-09-28
+468f110b,p005,Haemoglobin,146.4,g/L,2024-02-17
+7eb4beff,p005,Weight,57.5,kg,2023-02-22
+31dc1903,p005,Weight,86.4,kg,2023-07-19
+be8d9cab,p005,Weight,74.9,kg,2023-10-23
+424069b4,p005,BMI,28.2,kg/m²,2024-04-06
+fed85886,p006,Haemoglobin,151.3,g/L,2024-09-30
+0968f5eb,p006,Haemoglobin,144.0,g/L,2023-05-02
+3e2b746e,p006,Haemoglobin,116.4,g/L,2023-04-10
+29b9b868,p006,Weight,75.5,kg,2023-12-14
+9f5ba1f9,p006,Weight,85.7,kg,2024-01-10
+c06cab41,p006,Weight,96.5,kg,2023-07-23
+8a85eb95,p006,Weight,88.1,kg,2024-02-16
+f7d88b67,p006,BMI,22.7,kg/m²,2023-05-21
+58df8e31,p007,Total cholesterol,6.7,mmol/L,2024-06-15
+a3f37068,p007,Total cholesterol,5.3,mmol/L,2024-09-12
+7995b005,p007,Total cholesterol,7.1,mmol/L,2023-05-24
+96010dbb,p007,LDL cholesterol,4.8,mmol/L,2023-11-23
+2d6cc59d,p007,LDL cholesterol,2.1,mmol/L,2024-09-23
+c359df98,p007,LDL cholesterol,4.1,mmol/L,2023-11-03
+07e0656a,p007,Haemoglobin,135.4,g/L,2024-06-05
+7541fef3,p007,Haemoglobin,136.6,g/L,2024-12-26
+72acc669,p007,Haemoglobin,138.1,g/L,2024-05-01
+d34e0df1,p007,Weight,75.3,kg,2024-11-20
+3b7bc669,p007,BMI,37.7,kg/m²,2024-08-20
+92220561,p008,Total cholesterol,6.7,mmol/L,2024-12-05
+df56978d,p008,Total cholesterol,6.0,mmol/L,2024-09-03
+251d199d,p008,Total cholesterol,5.4,mmol/L,2024-11-02
+b466d3a0,p008,LDL cholesterol,4.0,mmol/L,2024-08-20
+43bf4c69,p008,LDL cholesterol,3.2,mmol/L,2024-06-20
+5cca6857,p008,Blood pressure systolic,120.3,mmHg,2024-11-28
+a68a6a3d,p008,Blood pressure systolic,127.0,mmHg,2024-08-09
+5e996cd3,p008,Blood pressure systolic,176.4,mmHg,2023-04-23
+125795df,p008,Blood pressure systolic,123.4,mmHg,2024-03-27
+825c77f5,p008,Blood pressure diastolic,80.9,mmHg,2024-02-27
+bebd6fdb,p008,Blood pressure diastolic,94.5,mmHg,2024-02-25
+b5fc0b6b,p008,Blood pressure diastolic,85.1,mmHg,2024-09-18
+5bb9fdf9,p008,Haemoglobin,153.6,g/L,2023-03-05
+322beb1b,p008,Haemoglobin,145.3,g/L,2024-06-15
+b85ea020,p008,Haemoglobin,120.4,g/L,2023-11-29
+0439c4bf,p008,Haemoglobin,159.9,g/L,2024-05-04
+d2e0e40b,p008,Weight,72.3,kg,2023-06-27
+e30eb864,p008,Weight,80.3,kg,2024-06-29
+b7007ef2,p008,Weight,73.8,kg,2023-12-29
+fef697b8,p008,Weight,92.2,kg,2024-11-28
+a987ae2b,p008,BMI,31.8,kg/m²,2023-07-16
+20a2c305,p008,BMI,37.3,kg/m²,2023-10-13
+fd9723c3,p008,BMI,30.9,kg/m²,2023-08-19
+27775e6c,p009,Haemoglobin,148.6,g/L,2024-12-22
+5403d098,p009,Haemoglobin,120.4,g/L,2024-12-22
+a7c48e7b,p009,Haemoglobin,134.5,g/L,2024-05-06
+1e8ec449,p009,Weight,85.8,kg,2023-10-08
+7478bf23,p009,Weight,70.8,kg,2024-08-10
+e6772019,p009,Weight,92.2,kg,2024-01-24
+de418c95,p009,BMI,35.1,kg/m²,2023-05-30
+ad7958e4,p009,BMI,26.6,kg/m²,2023-10-22
+cae7586b,p009,BMI,37.3,kg/m²,2023-03-22
+362ce09a,p009,BMI,27.5,kg/m²,2024-03-28
+c98eab4d,p010,Haemoglobin,147.4,g/L,2023-08-08
+71f39aa6,p010,Haemoglobin,120.1,g/L,2024-07-05
+0c31f224,p010,Haemoglobin,123.6,g/L,2024-07-29
+0060b25f,p010,Weight,62.6,kg,2024-09-22
+9f462c49,p010,Weight,95.7,kg,2023-09-03
+8a2d4808,p010,Weight,68.3,kg,2024-11-16
+6c04a786,p010,BMI,32.2,kg/m²,2023-02-23
+355c9034,p010,BMI,23.6,kg/m²,2023-12-05
+e57286ee,p011,eGFR,36.0,mL/min/1.73m²,2023-05-21
+af73951e,p011,eGFR,30.3,mL/min/1.73m²,2024-07-17
+57c8c2ba,p011,eGFR,88.7,mL/min/1.73m²,2023-06-11
+e543e54b,p011,eGFR,54.4,mL/min/1.73m²,2024-05-02
+34252da9,p011,Haemoglobin,142.5,g/L,2023-10-22
+beebbfa2,p011,Haemoglobin,126.1,g/L,2024-10-23
+945c5df5,p011,Haemoglobin,113.0,g/L,2023-04-02
+4079c747,p011,Haemoglobin,142.6,g/L,2023-08-26
+4f30652c,p011,Weight,105.2,kg,2023-06-29
+2c09f0a9,p011,BMI,36.1,kg/m²,2023-06-30
+17928bad,p011,BMI,36.9,kg/m²,2023-02-07
+45357f51,p011,BMI,38.0,kg/m²,2024-02-11
+f27b96a8,p011,BMI,34.6,kg/m²,2023-07-10
+1ce18361,p012,Haemoglobin,153.8,g/L,2023-01-10
+4f17712d,p012,Haemoglobin,124.9,g/L,2024-09-09
+c2a05523,p012,Haemoglobin,115.4,g/L,2023-12-10
+f243ae65,p012,Weight,80.0,kg,2024-10-18
+53037453,p012,Weight,84.9,kg,2024-05-20
+4d7b571f,p012,Weight,103.9,kg,2023-05-18
+f9da204d,p012,BMI,26.4,kg/m²,2023-04-26
+a9aa76f2,p012,BMI,27.3,kg/m²,2024-04-14
+a1bb8e80,p012,BMI,32.4,kg/m²,2023-07-10
+b6947c03,p012,BMI,22.2,kg/m²,2023-12-12
+41e225fb,p013,HbA1c,69.3,mmol/mol,2023-07-17
+a1e748bc,p013,HbA1c,50.4,mmol/mol,2024-10-16
+9e358f8c,p013,HbA1c,85.1,mmol/mol,2024-03-13
+1fe486f6,p013,Haemoglobin,114.3,g/L,2024-11-16
+82e6b0d0,p013,Haemoglobin,114.8,g/L,2023-05-24
+4c8d80fb,p013,Haemoglobin,133.9,g/L,2023-09-12
+ae2b6100,p013,Weight,69.3,kg,2023-08-30
+f3178a87,p013,BMI,34.1,kg/m²,2023-12-04
+ede41f7f,p013,BMI,26.8,kg/m²,2024-08-09
+217a0418,p013,BMI,22.2,kg/m²,2024-10-31
+d96229c8,p013,BMI,27.8,kg/m²,2023-08-30
+87938821,p014,Blood pressure systolic,156.7,mmHg,2024-04-21
+ac4df9ef,p014,Blood pressure diastolic,68.0,mmHg,2024-12-03
+462859a0,p014,Blood pressure diastolic,85.1,mmHg,2024-12-21
+bc820ef9,p014,Blood pressure diastolic,98.5,mmHg,2024-12-07
+c866b44d,p014,Haemoglobin,141.9,g/L,2023-10-30
+37358ec8,p014,Weight,88.8,kg,2023-08-13
+9b1dd742,p014,Weight,107.7,kg,2024-05-04
+a0845814,p014,Weight,63.4,kg,2024-09-12
+87a3f9cb,p014,BMI,28.7,kg/m²,2024-07-16
+22a4f124,p014,BMI,36.6,kg/m²,2024-07-04
+57adf442,p014,BMI,34.8,kg/m²,2023-08-12
+ee5fa378,p015,TSH,5.6,mIU/L,2024-09-02
+a0488f29,p015,TSH,7.0,mIU/L,2023-03-25
+5e42b792,p015,Haemoglobin,136.4,g/L,2024-01-06
+0b5f4677,p015,Haemoglobin,113.9,g/L,2024-07-31
+ce9e59f9,p015,Haemoglobin,115.6,g/L,2024-07-14
+ecb6fc6d,p015,Haemoglobin,155.1,g/L,2023-07-27
+d7c2e996,p015,Weight,64.0,kg,2024-06-16
+df0f32aa,p015,Weight,79.3,kg,2024-11-27
+715c427c,p015,BMI,33.5,kg/m²,2024-05-15
+49565cc8,p015,BMI,23.5,kg/m²,2024-06-06
+a7094ce2,p016,Haemoglobin,150.4,g/L,2024-04-09
+b605f289,p016,Haemoglobin,116.6,g/L,2024-03-01
+04214a27,p016,Haemoglobin,132.8,g/L,2023-03-01
+1a717701,p016,Haemoglobin,137.9,g/L,2024-11-19
+13e949a7,p016,Weight,94.8,kg,2024-02-10
+2c6cdfaa,p016,Weight,69.0,kg,2023-01-04
+27aa9bd9,p016,Weight,96.0,kg,2024-08-15
+e27d8bb2,p016,BMI,22.7,kg/m²,2023-12-19
+a78dfc07,p017,Haemoglobin,137.1,g/L,2023-03-03
+710588f9,p017,Weight,109.2,kg,2024-04-28
+9148f174,p017,BMI,26.6,kg/m²,2023-07-04
+0610dd92,p018,TSH,6.2,mIU/L,2024-10-23
+f3fe07d3,p018,TSH,7.7,mIU/L,2024-01-19
+2abbc154,p018,Haemoglobin,132.4,g/L,2024-01-22
+f2b95b30,p018,Haemoglobin,128.8,g/L,2024-11-30
+87a2fafe,p018,Haemoglobin,158.2,g/L,2024-07-06
+7f5f8058,p018,Haemoglobin,116.6,g/L,2023-12-23
+36a59fa0,p018,Weight,64.8,kg,2024-07-04
+ea129292,p018,BMI,30.5,kg/m²,2023-08-17
+5cd657a7,p018,BMI,35.4,kg/m²,2023-01-24
+aa044335,p018,BMI,37.7,kg/m²,2024-04-19
+7070e3af,p018,BMI,32.8,kg/m²,2024-07-11
+e92aecd1,p019,Total cholesterol,5.6,mmol/L,2023-08-24
+af6759a1,p019,Total cholesterol,4.5,mmol/L,2023-12-21
+dbede33b,p019,Total cholesterol,4.1,mmol/L,2023-07-13
+0c581dc6,p019,Total cholesterol,7.2,mmol/L,2023-04-26
+b8910b96,p019,LDL cholesterol,4.3,mmol/L,2024-03-05
+8001b244,p019,Haemoglobin,122.0,g/L,2023-03-10
+d55f4f24,p019,Weight,87.7,kg,2024-04-02
+56967816,p019,BMI,25.9,kg/m²,2023-02-15
+7c998ee7,p020,Blood pressure systolic,140.7,mmHg,2024-07-06
+e50d345d,p020,Blood pressure systolic,125.2,mmHg,2023-02-27
+c4c3218d,p020,Blood pressure systolic,119.8,mmHg,2023-10-24
+8e75459e,p020,Blood pressure systolic,126.4,mmHg,2024-08-12
+ca0b3aa5,p020,Blood pressure diastolic,88.9,mmHg,2024-11-19
+cf95dfa1,p020,Blood pressure diastolic,100.9,mmHg,2023-08-31
+4c317f54,p020,Blood pressure diastolic,75.1,mmHg,2023-05-27
+e8c3ea82,p020,TSH,3.5,mIU/L,2023-10-09
+0ba833f3,p020,TSH,0.9,mIU/L,2024-08-28
+d8f41b1a,p020,Haemoglobin,141.3,g/L,2024-03-13
+7c888b2c,p020,Haemoglobin,137.8,g/L,2023-02-18
+9678a873,p020,Weight,106.8,kg,2024-11-18
+f5ec6995,p020,Weight,76.0,kg,2024-06-21
+cd828724,p020,Weight,72.5,kg,2024-03-02
+bc45413e,p020,BMI,24.4,kg/m²,2024-01-21
+223fe188,p020,BMI,24.9,kg/m²,2024-07-04
+de02ca0c,p020,BMI,29.6,kg/m²,2023-08-19
+214d3cfb,p020,BMI,26.8,kg/m²,2024-12-25
+078a64f4,p021,HbA1c,80.7,mmol/mol,2023-03-01
+5c686777,p021,HbA1c,69.0,mmol/mol,2024-03-02
+617d3ca5,p021,eGFR,53.3,mL/min/1.73m²,2023-09-19
+2465ea0e,p021,eGFR,42.2,mL/min/1.73m²,2024-10-24
+5d99b950,p021,Blood pressure systolic,174.6,mmHg,2024-01-15
+3db55996,p021,Blood pressure diastolic,86.8,mmHg,2023-07-15
+0f2ce3d2,p021,Haemoglobin,123.4,g/L,2024-11-20
+d47e5f70,p021,Weight,103.0,kg,2023-07-12
+335e7d04,p021,BMI,29.7,kg/m²,2023-12-07
+3c82e58d,p021,BMI,26.9,kg/m²,2023-01-16
+fcfe7e63,p022,Haemoglobin,156.9,g/L,2023-05-01
+4cf5d17a,p022,Haemoglobin,147.3,g/L,2024-05-05
+173712e5,p022,Weight,93.3,kg,2024-12-21
+188f071f,p022,Weight,66.2,kg,2023-09-03
+4d46afd4,p022,BMI,34.4,kg/m²,2024-01-25
+f2c68cae,p022,BMI,29.5,kg/m²,2024-10-26
+47dd3e15,p022,BMI,27.7,kg/m²,2023-09-25
+f447d576,p023,Haemoglobin,135.6,g/L,2024-05-24
+868f5fd1,p023,Haemoglobin,133.3,g/L,2024-04-25
+b55459d9,p023,Haemoglobin,148.1,g/L,2023-11-24
+fe26be5c,p023,Weight,75.4,kg,2024-02-28
+a75991e2,p023,Weight,57.5,kg,2023-08-15
+31230060,p023,BMI,22.3,kg/m²,2024-07-20
+3fb4d0dd,p023,BMI,37.0,kg/m²,2024-08-16
+e2107d69,p024,eGFR,47.7,mL/min/1.73m²,2023-07-20
+11a2e361,p024,eGFR,49.8,mL/min/1.73m²,2024-01-24
+fb4db452,p024,eGFR,64.2,mL/min/1.73m²,2023-09-09
+7674c08f,p024,eGFR,60.0,mL/min/1.73m²,2024-11-01
+fdea71da,p024,Blood pressure systolic,128.0,mmHg,2024-05-15
+15c7ec76,p024,Blood pressure systolic,177.7,mmHg,2024-10-19
+1e5ccdd7,p024,Blood pressure systolic,161.8,mmHg,2024-04-16
+b9b4245f,p024,Blood pressure diastolic,96.6,mmHg,2023-12-27
+fd819184,p024,Blood pressure diastolic,68.5,mmHg,2024-07-13
+d5299b05,p024,Haemoglobin,119.2,g/L,2024-07-09
+9fe395c8,p024,Haemoglobin,159.5,g/L,2023-03-02
+ecd7dee7,p024,Haemoglobin,136.2,g/L,2023-03-18
+7c173f61,p024,Haemoglobin,157.3,g/L,2024-11-15
+4d46c6fb,p024,Weight,97.0,kg,2024-02-27
+4b803bb1,p024,BMI,35.5,kg/m²,2023-08-25
+ca7ed43e,p024,BMI,23.1,kg/m²,2023-06-04
+fb37c1ba,p025,Haemoglobin,120.9,g/L,2024-04-11
+a8bf0e75,p025,Weight,58.3,kg,2024-10-15
+b631d714,p025,Weight,91.7,kg,2024-09-23
+6e32bd5d,p025,Weight,105.2,kg,2024-11-06
+503dff81,p025,BMI,22.3,kg/m²,2024-06-28
+11b9a335,p025,BMI,30.8,kg/m²,2023-01-13
+7a1e2bb4,p025,BMI,22.3,kg/m²,2023-10-09
+5c7f765f,p025,BMI,30.6,kg/m²,2023-10-21
+2c0813ee,p026,LVEF (Echo),45.1,%,2024-12-15
+cf564170,p026,Haemoglobin,150.3,g/L,2023-07-03
+778c5ab9,p026,Haemoglobin,115.4,g/L,2023-04-09
+a0a278ee,p026,Haemoglobin,136.2,g/L,2023-09-04
+c47a14a1,p026,Haemoglobin,119.6,g/L,2024-06-23
+04ce231a,p026,Weight,99.8,kg,2023-10-01
+82a7e373,p026,Weight,98.7,kg,2023-03-22
+ce8b693b,p026,Weight,75.5,kg,2024-02-20
+c0591482,p026,BMI,31.0,kg/m²,2024-12-14
+de0170d6,p026,BMI,25.6,kg/m²,2024-12-01
+37e191fa,p026,BMI,35.2,kg/m²,2023-03-24
+bb983864,p026,BMI,32.5,kg/m²,2024-10-27
+787d8327,p027,eGFR,35.6,mL/min/1.73m²,2024-01-24
+2a79c489,p027,Total cholesterol,5.7,mmol/L,2023-02-27
+76c95eee,p027,Total cholesterol,6.0,mmol/L,2024-12-20
+830a233b,p027,Total cholesterol,4.2,mmol/L,2024-05-26
+a1900588,p027,Total cholesterol,6.9,mmol/L,2024-10-22
+fc43607b,p027,LDL cholesterol,3.5,mmol/L,2023-04-08
+7ae117d6,p027,LDL cholesterol,4.6,mmol/L,2023-02-13
+5275920d,p027,LDL cholesterol,2.3,mmol/L,2024-12-09
+41e0c641,p027,Haemoglobin,123.6,g/L,2023-03-18
+6c4c7d6e,p027,Haemoglobin,144.2,g/L,2023-10-15
+8085449d,p027,Haemoglobin,155.0,g/L,2024-07-31
+88be9af5,p027,Haemoglobin,142.9,g/L,2023-07-03
+7a845a55,p027,Weight,55.9,kg,2023-08-01
+d1718a4b,p027,Weight,87.3,kg,2024-12-30
+4ba37718,p027,Weight,100.1,kg,2023-03-20
+a033ffa5,p027,BMI,24.6,kg/m²,2023-09-04
+6202c10d,p027,BMI,31.1,kg/m²,2024-02-03
+4613523f,p027,BMI,32.8,kg/m²,2024-07-07
+6dddf70c,p028,Haemoglobin,129.2,g/L,2023-05-24
+886ccd60,p028,Haemoglobin,149.5,g/L,2024-12-06
+93b0df7d,p028,Haemoglobin,146.2,g/L,2024-05-27
+f2d02c40,p028,Weight,58.0,kg,2024-03-23
+95f1193c,p028,Weight,67.8,kg,2023-03-19
+b2baf251,p028,Weight,73.7,kg,2024-09-20
+0e18767b,p028,BMI,37.5,kg/m²,2023-12-01
+e3a0fc53,p028,BMI,22.5,kg/m²,2023-10-07
+67598b38,p028,BMI,34.5,kg/m²,2024-04-06
+da9701ac,p028,BMI,29.8,kg/m²,2023-12-31
+18be1151,p029,Total cholesterol,5.2,mmol/L,2024-11-27
+15ef5cb0,p029,Total cholesterol,5.8,mmol/L,2024-01-25
+83fb66b0,p029,Total cholesterol,3.8,mmol/L,2024-09-25
+98e2aa9d,p029,Total cholesterol,4.7,mmol/L,2023-09-10
+d1795a77,p029,LDL cholesterol,1.8,mmol/L,2023-06-07
+5496bfd4,p029,Haemoglobin,145.6,g/L,2024-10-11
+4190c850,p029,Haemoglobin,117.7,g/L,2024-02-03
+607ece8d,p029,Haemoglobin,125.8,g/L,2023-04-20
+960aa771,p029,Haemoglobin,114.6,g/L,2023-11-12
+0e8cfae5,p029,Weight,74.8,kg,2023-10-04
+4ad0521a,p029,Weight,60.6,kg,2023-03-31
+e04d03a4,p029,Weight,65.3,kg,2024-04-04
+817f42aa,p029,Weight,85.6,kg,2024-06-08
+b1b713a3,p029,BMI,23.7,kg/m²,2023-04-02
+9b488e26,p029,BMI,27.7,kg/m²,2023-04-06
+2c2ab02a,p029,BMI,31.6,kg/m²,2023-11-29
+e591242e,p029,BMI,35.8,kg/m²,2023-01-13
+05ac7083,p030,Total cholesterol,5.2,mmol/L,2023-03-28
+a4c14b8c,p030,Total cholesterol,6.4,mmol/L,2024-07-26
+3ec9b69f,p030,Total cholesterol,7.1,mmol/L,2023-09-06
+385f006d,p030,LDL cholesterol,3.9,mmol/L,2023-06-23
+76bfeb7a,p030,LDL cholesterol,2.0,mmol/L,2023-11-05
+529565af,p030,LVEF (Echo),44.7,%,2023-03-06
+3a83e1b4,p030,LVEF (Echo),31.7,%,2023-10-10
+faeb34f4,p030,LVEF (Echo),41.8,%,2024-05-10
+428cbc93,p030,Haemoglobin,128.1,g/L,2023-09-10
+6827eaaa,p030,Weight,87.7,kg,2023-07-20
+d9c47ab5,p030,Weight,80.2,kg,2023-05-19
+9c66eb8a,p030,Weight,71.8,kg,2024-02-10
+86c5b57f,p030,Weight,73.3,kg,2024-09-27
+3f560133,p030,BMI,34.9,kg/m²,2023-12-04
+e3cafa1c,p030,BMI,29.0,kg/m²,2024-03-16
+68a201fc,p030,BMI,35.0,kg/m²,2024-10-28
+f92e5ece,p030,BMI,37.6,kg/m²,2023-05-20
+b719b010,p031,eGFR,49.2,mL/min/1.73m²,2024-12-12
+becab6c7,p031,eGFR,42.1,mL/min/1.73m²,2023-11-18
+6560cbdc,p031,eGFR,40.7,mL/min/1.73m²,2024-02-12
+7ca7169b,p031,Blood pressure systolic,130.4,mmHg,2024-12-12
+af9c9a36,p031,Blood pressure systolic,154.3,mmHg,2024-08-12
+299824d5,p031,Blood pressure systolic,164.7,mmHg,2023-11-30
+b73595f1,p031,Blood pressure diastolic,74.0,mmHg,2024-02-07
+7c85ccf8,p031,Blood pressure diastolic,78.3,mmHg,2024-07-31
+df17b0f7,p031,Blood pressure diastolic,70.0,mmHg,2024-07-12
+d078448c,p031,Blood pressure diastolic,69.0,mmHg,2024-07-17
+56301222,p031,Haemoglobin,157.7,g/L,2024-04-17
+0723f937,p031,Weight,79.1,kg,2023-10-26
+38e4b115,p031,Weight,100.7,kg,2023-03-12
+3bf328ac,p031,BMI,32.8,kg/m²,2023-05-23
+5dbce72f,p031,BMI,32.1,kg/m²,2023-09-05
+0552a884,p031,BMI,26.0,kg/m²,2023-06-07
+db07da28,p031,BMI,33.4,kg/m²,2024-01-22
+fe2ccd0b,p032,Blood pressure systolic,141.4,mmHg,2024-09-04
+23222c85,p032,Blood pressure diastolic,89.1,mmHg,2024-07-01
+3b5fbe87,p032,Blood pressure diastolic,85.3,mmHg,2024-12-09
+9681bb51,p032,Blood pressure diastolic,80.9,mmHg,2023-02-07
+17879dfa,p032,Blood pressure diastolic,99.5,mmHg,2024-01-04
+ee6d8c42,p032,Haemoglobin,115.5,g/L,2023-09-12
+15be3d5d,p032,Weight,64.1,kg,2024-09-19
+eff4b083,p032,Weight,57.4,kg,2024-10-22
+6b0f4b16,p032,Weight,92.3,kg,2024-02-14
+984a16a9,p032,BMI,37.5,kg/m²,2024-03-16
+d7f70578,p032,BMI,23.7,kg/m²,2023-04-11
+e1dec4d0,p032,BMI,26.1,kg/m²,2024-06-06
+ded5efc8,p033,Haemoglobin,132.3,g/L,2024-02-05
+755b17bc,p033,Haemoglobin,133.2,g/L,2024-11-26
+143336cb,p033,Weight,74.0,kg,2023-01-26
+f3cad21b,p033,Weight,81.6,kg,2023-10-30
+edc0f833,p033,BMI,36.7,kg/m²,2023-03-29
+20af1120,p033,BMI,23.9,kg/m²,2023-05-26
+d0af3058,p033,BMI,27.6,kg/m²,2023-12-18
+69bef61d,p033,BMI,29.3,kg/m²,2023-07-31
+bb7d527f,p034,Haemoglobin,127.4,g/L,2023-04-10
+d4f90e7f,p034,Haemoglobin,131.9,g/L,2024-12-14
+cbcb5c29,p034,Haemoglobin,132.6,g/L,2023-03-10
+3ce304f1,p034,Haemoglobin,125.0,g/L,2024-12-28
+20733c79,p034,Weight,56.2,kg,2023-12-18
+2161676b,p034,BMI,32.8,kg/m²,2023-06-18
+6cb29d61,p035,Total cholesterol,5.6,mmol/L,2024-07-19
+dce75fad,p035,Total cholesterol,4.1,mmol/L,2024-07-27
+1615e348,p035,LDL cholesterol,4.9,mmol/L,2023-08-26
+d108def7,p035,LDL cholesterol,4.3,mmol/L,2024-10-06
+20c00d7f,p035,LDL cholesterol,2.1,mmol/L,2024-10-17
+43e4f482,p035,LDL cholesterol,3.8,mmol/L,2024-02-10
+951325d5,p035,Blood pressure systolic,161.6,mmHg,2023-07-22
+2ac0bf6e,p035,Blood pressure diastolic,89.6,mmHg,2024-02-03
+0db42e85,p035,Blood pressure diastolic,60.2,mmHg,2023-08-08
+a1c130fb,p035,Blood pressure diastolic,70.3,mmHg,2024-12-21
+38cc7df2,p035,Blood pressure diastolic,100.4,mmHg,2023-03-06
+efb00a0b,p035,Haemoglobin,150.0,g/L,2024-07-03
+3add428e,p035,Weight,75.1,kg,2023-07-21
+722af835,p035,Weight,80.2,kg,2023-09-26
+e13b79b4,p035,BMI,30.4,kg/m²,2024-10-16
+73f00954,p035,BMI,27.0,kg/m²,2024-02-02
+e03097b4,p035,BMI,31.8,kg/m²,2024-08-24
+d18636a5,p035,BMI,23.8,kg/m²,2023-12-27
+4c28d7ea,p036,HbA1c,71.6,mmol/mol,2024-11-20
+7455b4c4,p036,HbA1c,75.9,mmol/mol,2023-11-01
+ef80a995,p036,HbA1c,86.1,mmol/mol,2024-08-27
+be62032b,p036,HbA1c,46.1,mmol/mol,2023-05-18
+ef211c5e,p036,Total cholesterol,4.0,mmol/L,2023-11-09
+1947758f,p036,Total cholesterol,4.0,mmol/L,2024-01-18
+a52ff3c9,p036,Total cholesterol,6.3,mmol/L,2024-06-07
+da2f07f9,p036,LDL cholesterol,3.0,mmol/L,2023-05-22
+9d77923c,p036,LDL cholesterol,3.5,mmol/L,2024-03-09
+4c197415,p036,LDL cholesterol,2.2,mmol/L,2024-10-12
+5d375f24,p036,LDL cholesterol,3.4,mmol/L,2024-10-22
+46f0a97e,p036,Haemoglobin,137.7,g/L,2024-05-16
+6170fb39,p036,Haemoglobin,124.4,g/L,2023-07-11
+e594c9c9,p036,Weight,101.3,kg,2024-09-26
+892748f3,p036,Weight,57.9,kg,2024-01-03
+f0e1ddeb,p036,Weight,107.4,kg,2024-05-11
+e3849f46,p036,BMI,25.1,kg/m²,2024-01-29
+3143e26a,p036,BMI,37.4,kg/m²,2024-06-01
+94b681a2,p037,Blood pressure systolic,138.6,mmHg,2024-05-18
+d84ae53a,p037,Blood pressure systolic,139.1,mmHg,2024-03-30
+2aa3a240,p037,Blood pressure systolic,144.2,mmHg,2023-03-26
+d32bf91a,p037,Blood pressure systolic,149.6,mmHg,2023-08-14
+f627a2c2,p037,Blood pressure diastolic,61.6,mmHg,2023-08-19
+669f96a8,p037,Blood pressure diastolic,86.9,mmHg,2023-06-22
+1cb0cfc9,p037,Blood pressure diastolic,99.0,mmHg,2024-08-02
+b9792eb6,p037,Haemoglobin,137.5,g/L,2023-04-26
+696cb7e6,p037,Haemoglobin,138.6,g/L,2023-10-02
+b3f6bb01,p037,Haemoglobin,148.8,g/L,2024-01-11
+fec81937,p037,Haemoglobin,137.1,g/L,2023-02-12
+a68ff4b6,p037,Weight,85.0,kg,2024-03-11
+5c904c67,p037,Weight,60.6,kg,2024-10-31
+0e2448a2,p037,Weight,96.3,kg,2023-11-01
+7d66648a,p037,Weight,103.1,kg,2023-02-03
+117762a2,p037,BMI,26.2,kg/m²,2023-03-31
+482370a6,p037,BMI,29.0,kg/m²,2023-05-01
+13f0ba20,p037,BMI,34.4,kg/m²,2023-08-31
+0bfd9da1,p037,BMI,25.4,kg/m²,2024-08-25
+b194c7c8,p038,Haemoglobin,153.1,g/L,2024-09-16
+bb5366b0,p038,Haemoglobin,141.6,g/L,2023-06-19
+9278f825,p038,Haemoglobin,140.8,g/L,2023-07-31
+a2f3a4c7,p038,Weight,99.3,kg,2024-08-06
+618e1a94,p038,Weight,74.3,kg,2023-10-15
+8a3f9a81,p038,BMI,27.2,kg/m²,2024-12-21
+a1584481,p038,BMI,26.7,kg/m²,2024-08-09
+aa8e2fc5,p039,TSH,7.6,mIU/L,2024-06-10
+5bc34745,p039,TSH,7.9,mIU/L,2024-11-26
+ad7a95f0,p039,TSH,6.6,mIU/L,2023-05-19
+4fddf3af,p039,Haemoglobin,155.9,g/L,2023-10-11
+939fbd77,p039,Haemoglobin,153.4,g/L,2023-05-10
+1edd6a78,p039,Haemoglobin,145.1,g/L,2023-05-16
+3fc61169,p039,Haemoglobin,122.5,g/L,2024-12-29
+057085ea,p039,Weight,100.6,kg,2024-11-23
+21b01bb1,p039,Weight,76.6,kg,2023-05-26
+500f5de7,p039,Weight,86.8,kg,2023-10-03
+79646bf9,p039,BMI,28.0,kg/m²,2023-03-19
+b21b04ab,p039,BMI,32.1,kg/m²,2023-04-06
+2aeed088,p039,BMI,28.4,kg/m²,2023-10-12
+a9a3ff38,p039,BMI,33.1,kg/m²,2024-01-13
+ed4c78b4,p040,LVEF (Echo),63.0,%,2023-12-02
+b89a571e,p040,LVEF (Echo),48.3,%,2023-04-06
+4f09f264,p040,LVEF (Echo),54.2,%,2024-04-14
+b43eba37,p040,LVEF (Echo),50.4,%,2024-12-15
+a4465282,p040,TSH,6.9,mIU/L,2024-07-01
+212caf37,p040,TSH,3.4,mIU/L,2024-03-15
+d130ec1d,p040,TSH,6.7,mIU/L,2024-05-21
+743640d8,p040,Haemoglobin,126.1,g/L,2023-10-18
+2cb37a85,p040,Haemoglobin,126.9,g/L,2024-08-14
+73664453,p040,Haemoglobin,116.5,g/L,2024-05-11
+8a2dec82,p040,Weight,104.2,kg,2023-02-19
+1c9ab0c5,p040,Weight,57.5,kg,2024-10-03
+b9936216,p040,Weight,98.1,kg,2024-04-15
+a10f17d4,p040,BMI,24.0,kg/m²,2023-06-11
+8b16d2ca,p041,HbA1c,63.9,mmol/mol,2024-03-14
+b57e1951,p041,HbA1c,51.7,mmol/mol,2024-12-06
+9f1558b6,p041,HbA1c,85.7,mmol/mol,2024-10-27
+37a64e3b,p041,HbA1c,56.5,mmol/mol,2023-10-08
+a19b9c58,p041,LVEF (Echo),51.2,%,2023-09-14
+16ee9102,p041,Haemoglobin,128.6,g/L,2024-10-26
+97e338c4,p041,Weight,57.8,kg,2024-10-02
+3bfce3fa,p041,Weight,71.8,kg,2024-12-17
+01cc7c1a,p041,BMI,28.9,kg/m²,2023-04-04
+36148d68,p041,BMI,33.3,kg/m²,2023-01-02
+8abc0acb,p042,Blood pressure systolic,143.4,mmHg,2023-05-16
+f2adcd31,p042,Blood pressure systolic,151.6,mmHg,2024-06-15
+f0fb0acc,p042,Blood pressure diastolic,60.5,mmHg,2024-12-13
+d5596a66,p042,Blood pressure diastolic,77.2,mmHg,2023-05-04
+6d43a089,p042,Blood pressure diastolic,109.4,mmHg,2024-03-08
+c5b003bf,p042,Blood pressure diastolic,94.7,mmHg,2024-05-04
+239fe6d8,p042,Haemoglobin,121.4,g/L,2023-04-02
+1500089d,p042,Weight,60.7,kg,2024-01-12
+801f3dcc,p042,BMI,24.2,kg/m²,2023-05-17
+17df5a98,p042,BMI,32.3,kg/m²,2024-11-24
+aaea7428,p042,BMI,24.3,kg/m²,2024-06-27
+be4cb99d,p043,Total cholesterol,5.9,mmol/L,2023-06-18
+6267452d,p043,LDL cholesterol,2.7,mmol/L,2023-08-07
+73718e38,p043,LDL cholesterol,3.7,mmol/L,2023-06-05
+a5319b49,p043,LDL cholesterol,4.7,mmol/L,2024-09-22
+c821c28a,p043,LDL cholesterol,3.9,mmol/L,2023-08-11
+748b3470,p043,Haemoglobin,154.8,g/L,2023-05-24
+b429d83f,p043,Weight,87.4,kg,2024-01-29
+eb090e55,p043,BMI,37.4,kg/m²,2023-11-19
+d96be89c,p043,BMI,34.7,kg/m²,2023-09-11
+dffc3d51,p043,BMI,26.4,kg/m²,2023-03-28
+73f731f1,p044,LVEF (Echo),47.1,%,2024-09-06
+6f13c4da,p044,LVEF (Echo),53.8,%,2023-10-19
+67dba9c2,p044,Haemoglobin,152.4,g/L,2024-11-05
+6a825402,p044,Weight,66.3,kg,2024-09-13
+33736ae8,p044,Weight,83.0,kg,2024-02-06
+7811a195,p044,Weight,71.3,kg,2023-02-25
+0ed7edd1,p044,BMI,29.9,kg/m²,2023-04-26
+979f0f8d,p044,BMI,25.9,kg/m²,2024-10-15
+44ece0ce,p045,Haemoglobin,136.4,g/L,2023-01-13
+12adf3c9,p045,Weight,106.4,kg,2023-05-16
+6aa210d3,p045,Weight,76.3,kg,2024-08-05
+23dc3065,p045,Weight,78.1,kg,2024-07-13
+daf6de39,p045,BMI,34.2,kg/m²,2023-03-16
+fd6fb31a,p045,BMI,22.3,kg/m²,2023-03-11
+1d3cd719,p046,Haemoglobin,123.1,g/L,2023-02-10
+7f274867,p046,Weight,107.2,kg,2024-02-12
+ae0c1417,p046,BMI,32.1,kg/m²,2024-05-28
+8ae39562,p046,BMI,34.3,kg/m²,2024-03-09
+622093c6,p046,BMI,33.2,kg/m²,2023-03-26
+7826ac0e,p047,Blood pressure systolic,129.4,mmHg,2023-11-14
+bec3f119,p047,Blood pressure systolic,115.5,mmHg,2023-07-28
+2f5de64e,p047,Blood pressure diastolic,86.8,mmHg,2024-02-05
+bc6e4915,p047,Blood pressure diastolic,89.3,mmHg,2024-10-27
+40a9d5de,p047,Haemoglobin,125.5,g/L,2024-03-23
+4d5b7696,p047,Weight,58.2,kg,2023-03-30
+28e456f2,p047,Weight,105.9,kg,2023-04-29
+e7d0db39,p047,BMI,31.8,kg/m²,2023-02-26
+a12818d6,p047,BMI,26.9,kg/m²,2024-11-04
+54f12c5a,p047,BMI,33.9,kg/m²,2023-05-03
+084338b3,p047,BMI,22.2,kg/m²,2023-05-21
+fbec2ff8,p048,Haemoglobin,118.2,g/L,2023-12-22
+8ac7ccff,p048,Weight,64.2,kg,2023-05-10
+ee0084de,p048,Weight,96.2,kg,2023-10-03
+73506626,p048,Weight,95.3,kg,2023-05-01
+5b8fb878,p048,BMI,27.4,kg/m²,2024-03-15
+513a75b5,p049,eGFR,61.4,mL/min/1.73m²,2023-09-27
+dc613055,p049,eGFR,72.7,mL/min/1.73m²,2024-08-13
+76683451,p049,eGFR,67.7,mL/min/1.73m²,2024-05-23
+ca5f595f,p049,Haemoglobin,135.5,g/L,2023-02-26
+3da46651,p049,Haemoglobin,135.0,g/L,2024-08-03
+df1d9f83,p049,Haemoglobin,118.3,g/L,2023-06-11
+37778cda,p049,Haemoglobin,122.8,g/L,2023-04-16
+b79ff511,p049,Weight,67.6,kg,2024-06-05
+b2fd06f4,p049,BMI,22.7,kg/m²,2023-01-13
+808a707a,p050,Blood pressure systolic,113.2,mmHg,2024-01-08
+cd28e456,p050,Blood pressure systolic,136.8,mmHg,2023-06-03
+332020ef,p050,Blood pressure diastolic,106.6,mmHg,2023-02-06
+13b8d29c,p050,Blood pressure diastolic,87.6,mmHg,2024-11-02
+0d76f234,p050,Haemoglobin,121.2,g/L,2023-09-12
+68f386aa,p050,Haemoglobin,130.8,g/L,2023-11-24
+9c48150b,p050,Haemoglobin,123.6,g/L,2023-03-21
+c1b80d4c,p050,Haemoglobin,138.6,g/L,2023-05-03
+bb8785fe,p050,Weight,64.9,kg,2024-06-12
+8df44482,p050,BMI,37.3,kg/m²,2023-03-12

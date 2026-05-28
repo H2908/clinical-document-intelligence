@@ -1,0 +1,140 @@
+condition_id,patient_id,icd10_code,description,start_date,status
+f86e6a4a,p001,M54.5,Low back pain,2024-08-07,active
+447bc9c2,p001,L40.0,Psoriasis,2023-09-12,active
+8f13118c,p001,J45.9,Asthma,2019-08-10,active
+4667a03c,p001,F32.9,Major depressive disorder,2015-06-28,active
+653f91e2,p002,F41.1,Generalized anxiety disorder,2019-04-11,active
+190d9f82,p002,H40.0,Glaucoma,2019-05-01,active
+b818a8a4,p003,I25.9,Ischaemic heart disease,2021-08-14,active
+cb9eb95f,p003,E78.5,Hyperlipidaemia,2018-09-21,active
+f79394a6,p003,I10,Essential hypertension,2024-10-02,active
+ca59c75d,p003,H40.0,Glaucoma,2016-02-16,active
+70fb94f2,p004,F32.9,Major depressive disorder,2019-08-07,active
+5406a44a,p004,F41.1,Generalized anxiety disorder,2024-10-07,active
+226edd8f,p004,I25.9,Ischaemic heart disease,2022-05-05,active
+70ed4344,p005,E11.9,Type 2 diabetes mellitus,2015-11-25,active
+792c69ab,p005,I25.9,Ischaemic heart disease,2024-07-20,active
+13cc82ff,p005,I50.0,Congestive heart failure,2018-09-07,active
+986a0224,p005,E78.5,Hyperlipidaemia,2024-07-23,active
+11e2a9a0,p005,J45.9,Asthma,2022-07-25,active
+79d64f24,p006,F32.9,Major depressive disorder,2024-10-13,active
+0cace7c4,p006,J44.9,Chronic obstructive pulmonary disease,2021-01-25,active
+7a8ce2c1,p006,I25.9,Ischaemic heart disease,2015-05-28,active
+0248b123,p006,G47.3,Sleep apnoea,2021-12-04,active
+3026e0c2,p007,E78.5,Hyperlipidaemia,2018-03-23,active
+87b7ca4c,p008,G47.3,Sleep apnoea,2019-12-23,active
+e25b48bc,p008,F32.9,Major depressive disorder,2016-11-12,active
+6562c918,p008,I10,Essential hypertension,2022-10-13,active
+e545b87d,p008,E78.5,Hyperlipidaemia,2018-05-11,active
+44dde905,p008,M54.5,Low back pain,2015-04-29,active
+b748ae23,p009,G47.3,Sleep apnoea,2018-04-16,active
+a6d3b572,p010,J44.9,Chronic obstructive pulmonary disease,2019-08-15,active
+feb65c4e,p010,I50.0,Congestive heart failure,2021-05-07,active
+d0543646,p011,N18.3,"Chronic kidney disease, stage 3a",2019-04-16,active
+a47c9e58,p011,K21.0,Gastro-oesophageal reflux disease,2021-12-13,active
+18bcaa93,p012,F41.1,Generalized anxiety disorder,2022-02-25,active
+8f341884,p012,K21.0,Gastro-oesophageal reflux disease,2017-11-06,active
+864bd929,p012,J45.9,Asthma,2020-02-26,active
+b4a4d541,p013,E11.9,Type 2 diabetes mellitus,2018-03-24,active
+5e446dd2,p013,K29.7,Gastritis,2022-08-07,active
+63895a6b,p014,I10,Essential hypertension,2018-05-10,active
+56a48448,p014,L40.0,Psoriasis,2022-03-02,active
+80131669,p015,M17.0,Osteoarthritis of knee,2016-03-12,active
+70161d77,p015,J44.9,Chronic obstructive pulmonary disease,2017-08-29,active
+ba61d549,p015,I50.0,Congestive heart failure,2019-04-12,active
+f8513a61,p015,L40.0,Psoriasis,2021-05-31,active
+87b85f45,p015,E03.9,Hypothyroidism,2019-01-10,active
+b8ed33af,p016,L40.0,Psoriasis,2022-05-20,active
+b2048761,p016,J45.9,Asthma,2019-06-10,active
+55cfd0e5,p017,K21.0,Gastro-oesophageal reflux disease,2023-05-09,active
+75ec58c0,p017,M17.0,Osteoarthritis of knee,2015-07-20,active
+40e9dcdc,p018,I25.9,Ischaemic heart disease,2017-07-31,active
+28ba68b7,p018,E03.9,Hypothyroidism,2021-10-22,active
+44a121e1,p018,M54.5,Low back pain,2023-12-29,active
+5ecd43bb,p019,E78.5,Hyperlipidaemia,2022-08-08,active
+7e2b401e,p020,E03.9,Hypothyroidism,2022-01-14,active
+29b73e1d,p020,M17.0,Osteoarthritis of knee,2022-04-01,active
+4b53f66c,p020,I50.0,Congestive heart failure,2015-06-11,active
+be644e89,p020,I10,Essential hypertension,2018-06-19,active
+750b4c4e,p021,E11.9,Type 2 diabetes mellitus,2018-08-31,active
+cf050822,p021,N18.3,"Chronic kidney disease, stage 3a",2023-05-20,active
+575043b6,p021,I10,Essential hypertension,2019-08-29,active
+bd84b036,p021,M54.5,Low back pain,2016-12-20,active
+40e9906d,p022,I25.9,Ischaemic heart disease,2019-02-07,active
+566d62dd,p022,K29.7,Gastritis,2020-12-14,active
+edf31560,p023,J45.9,Asthma,2020-05-27,active
+a913ff7b,p023,I50.0,Congestive heart failure,2024-01-17,active
+c9bfeafa,p023,H40.0,Glaucoma,2018-04-23,active
+6af73649,p024,N18.3,"Chronic kidney disease, stage 3a",2017-07-13,active
+842d9a52,p024,I10,Essential hypertension,2024-08-24,active
+4963011f,p024,H40.0,Glaucoma,2022-08-02,active
+e2c76d01,p025,L40.0,Psoriasis,2019-02-07,active
+27786cb2,p025,H40.0,Glaucoma,2016-01-05,active
+7099a593,p025,G47.3,Sleep apnoea,2023-11-13,active
+de1698e9,p026,J45.9,Asthma,2019-02-18,active
+dad07235,p026,I42.0,Dilated cardiomyopathy,2022-07-18,active
+e431f4c8,p027,I50.0,Congestive heart failure,2022-07-27,active
+75725d96,p027,N18.3,"Chronic kidney disease, stage 3a",2017-08-15,active
+59b5f636,p027,E78.5,Hyperlipidaemia,2020-04-15,active
+224ece66,p028,K29.7,Gastritis,2021-04-18,active
+857425c9,p029,K21.0,Gastro-oesophageal reflux disease,2022-02-15,active
+f21c7e6f,p029,E78.5,Hyperlipidaemia,2024-03-28,active
+a9c64707,p030,I25.9,Ischaemic heart disease,2015-07-05,active
+46c041a8,p030,E78.5,Hyperlipidaemia,2015-06-02,active
+4eabf62d,p030,I42.0,Dilated cardiomyopathy,2018-05-31,active
+b05d2147,p031,I10,Essential hypertension,2023-05-02,active
+cc322016,p031,I50.0,Congestive heart failure,2022-10-23,active
+7e126817,p031,F41.1,Generalized anxiety disorder,2021-01-21,active
+aa6f2e8b,p031,J45.9,Asthma,2019-09-13,active
+0f486798,p031,N18.3,"Chronic kidney disease, stage 3a",2021-08-02,active
+289dfd07,p032,I50.0,Congestive heart failure,2019-07-30,active
+b094d873,p032,F32.9,Major depressive disorder,2018-02-19,active
+0333dd0d,p032,I10,Essential hypertension,2015-05-15,active
+1368e62b,p032,F41.1,Generalized anxiety disorder,2022-09-28,active
+a09e27bd,p033,F32.9,Major depressive disorder,2024-08-04,active
+a11d4d8f,p033,L40.0,Psoriasis,2019-01-25,active
+da9b390b,p034,M17.0,Osteoarthritis of knee,2021-02-08,active
+6a070961,p035,E78.5,Hyperlipidaemia,2024-07-05,active
+3af9c280,p035,I10,Essential hypertension,2024-03-29,active
+f2b42c90,p035,J45.9,Asthma,2020-02-06,active
+37919c6b,p035,L40.0,Psoriasis,2016-01-11,active
+ed026769,p036,E78.5,Hyperlipidaemia,2023-10-28,active
+ce7a22f3,p036,E11.9,Type 2 diabetes mellitus,2018-09-28,active
+1438ca6e,p037,I10,Essential hypertension,2015-10-09,active
+7edb7dfe,p037,K21.0,Gastro-oesophageal reflux disease,2024-04-21,active
+b8db57cd,p038,J45.9,Asthma,2016-08-27,active
+64927d72,p038,M54.5,Low back pain,2023-11-05,active
+60d108fc,p038,J44.9,Chronic obstructive pulmonary disease,2021-09-07,active
+e9513d8d,p039,E03.9,Hypothyroidism,2016-08-15,active
+4b667dcf,p040,F41.1,Generalized anxiety disorder,2019-01-07,active
+61610866,p040,E03.9,Hypothyroidism,2023-11-10,active
+2449ce04,p040,I42.0,Dilated cardiomyopathy,2023-11-04,active
+8f1fd718,p040,M54.5,Low back pain,2017-09-01,active
+7bddd5e5,p041,E11.9,Type 2 diabetes mellitus,2019-09-21,active
+0c02fafa,p041,J45.9,Asthma,2020-11-24,active
+793eb6d4,p041,I42.0,Dilated cardiomyopathy,2016-04-10,active
+f5efe237,p042,M79.3,Panniculitis,2020-08-25,active
+ce86dbb7,p042,I25.9,Ischaemic heart disease,2017-06-26,active
+250589bb,p042,F41.1,Generalized anxiety disorder,2021-11-24,active
+1564cbad,p042,I10,Essential hypertension,2015-06-27,active
+fb611dec,p043,H40.0,Glaucoma,2022-03-20,active
+0e64dd34,p043,E78.5,Hyperlipidaemia,2015-05-08,active
+797fd7b5,p043,J44.9,Chronic obstructive pulmonary disease,2015-09-07,active
+9232556e,p044,M54.5,Low back pain,2015-11-27,active
+dbcfd730,p044,F32.9,Major depressive disorder,2018-08-12,active
+5834cf41,p044,I42.0,Dilated cardiomyopathy,2021-10-27,active
+1fb1a833,p044,I25.9,Ischaemic heart disease,2016-08-30,active
+9e8b90e3,p045,J45.9,Asthma,2022-02-06,active
+6a829775,p046,I25.9,Ischaemic heart disease,2018-04-22,active
+83482a38,p046,F32.9,Major depressive disorder,2020-02-02,active
+9b1f638d,p046,K21.0,Gastro-oesophageal reflux disease,2020-09-01,active
+901305d8,p047,I10,Essential hypertension,2022-04-20,active
+d04e9b4c,p047,I25.9,Ischaemic heart disease,2024-11-04,active
+07ca66f6,p047,M54.5,Low back pain,2023-08-16,active
+ea7ab643,p048,M54.5,Low back pain,2019-08-22,active
+5f3ee1c7,p048,F32.9,Major depressive disorder,2018-10-20,active
+c7b4a2d6,p049,J45.9,Asthma,2017-11-10,active
+54704cec,p049,M17.0,Osteoarthritis of knee,2019-03-14,active
+28b99040,p049,N18.3,"Chronic kidney disease, stage 3a",2016-09-17,active
+55eef97d,p050,F41.1,Generalized anxiety disorder,2019-11-04,active
+96214ab0,p050,I10,Essential hypertension,2016-01-31,active
