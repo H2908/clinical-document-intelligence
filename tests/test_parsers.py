@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from parsers.pdf_parser import parse_pdf
+from parsers.text_cleaner import clean_text
 
 
 # Pick the first synthetic PDF that exists, so this test runs anywhere
@@ -49,3 +50,53 @@ def test_parse_pdf_directory_raises(tmp_path: Path):
     """A directory path should fail too."""
     with pytest.raises(ValueError):
         parse_pdf(tmp_path)
+
+# -------------------- text_cleaner tests --------------------
+
+def test_clean_empty_string():
+    assert clean_text("") == ""
+
+
+def test_clean_collapses_multiple_spaces():
+    assert clean_text("Patient   has    diabetes") == "Patient has diabetes"
+
+
+def test_clean_strips_trailing_whitespace_per_line():
+    assert clean_text("line one   \nline two   ") == "line one\nline two"
+
+
+def test_clean_normalises_line_endings():
+    assert clean_text("a\r\nb\rc") == "a\nb\nc"
+
+
+def test_clean_collapses_many_newlines_to_paragraph():
+    assert clean_text("para one\n\n\n\npara two") == "para one\n\npara two"
+
+
+def test_clean_preserves_paragraph_breaks():
+    assert clean_text("para one\n\npara two") == "para one\n\npara two"
+
+
+def test_clean_replaces_nbsp_with_space():
+    # U+00A0 = non-breaking space; PyMuPDF emits these often
+    assert clean_text("2.5\u00a0mg") == "2.5 mg"
+
+
+def test_clean_preserves_greek_beta():
+    """β-lactams must survive — critical for allergy/drug detection."""
+    assert "β" in clean_text("Avoid β-lactams")
+
+
+def test_clean_preserves_clinical_numbers():
+    text = "Metformin 1 g BD, eGFR 42, BP 128/78"
+    cleaned = clean_text(text)
+    assert "1 g" in cleaned
+    assert "42" in cleaned
+    assert "128/78" in cleaned
+
+
+def test_clean_is_idempotent():
+    raw = "Patient    has\r\n\r\n\r\ndiabetes   "
+    once = clean_text(raw)
+    twice = clean_text(once)
+    assert once == twice        
