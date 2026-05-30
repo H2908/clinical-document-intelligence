@@ -55,7 +55,9 @@ DRUG_NAMES: set[str] = {
 }
 
 CONFLICT_MARKERS: set[str] = {
-    "allergy", "allergic", "nkda", "intolerance",
+    "allerg",         # matches: allergy, allergies, allergic
+    "nkda",
+    "intoleran",      # matches: intolerance, intolerant
 }
 
 ICD10_RE = re.compile(r"\b([A-Z]\d{2}(?:\.\d{1,2})?)\b")
@@ -144,6 +146,35 @@ def _find_drugs_by_dictionary(text: str) -> list[Entity]:
             ))
     return found
 
+def _find_conflicts_by_dictionary(text: str) -> list[Entity]:
+    """
+    Independent conflict/allergy pass — catches what scispaCy misses.
+    Matches allergy-related terms directly so the negation detector has
+    something to mark in 'no known drug allergies' sentences.
+    """
+    # Words that, when found, mean this span is allergy/conflict-related.
+    CONFLICT_PHRASES = [
+        r"drug\s+allerg\w*",       # 'drug allergy', 'drug allergies'
+        r"\ballerg\w+",            # 'allergy', 'allergies', 'allergic'
+        r"\bintoleran\w+",         # 'intolerance', 'intolerant'
+        r"\bNKDA\b",
+        r"\bNKA\b",
+    ]
+    found: list[Entity] = []
+    for pat in CONFLICT_PHRASES:
+        for match in re.finditer(pat, text, flags=re.IGNORECASE):
+            start, end = match.start(), match.end()
+            found.append(Entity(
+                entity_type="Conflict",
+                text=text[start:end],
+                start_offset=start,
+                end_offset=end,
+                negated=False,
+                icd10_code=None,
+                normalised_value=None,
+            ))
+    return found
+
 
 def _find_dates(text: str) -> list[Entity]:
     found: list[Entity] = []
@@ -222,7 +253,8 @@ def extract_entities(text: str) -> list[Entity]:
 
     # Pass 2: dictionary-based drug detection (catches what scispaCy misses)
     entities.extend(_find_drugs_by_dictionary(text))
-
+    # Pass 2.5: dictionary-based conflict/allergy detection
+    entities.extend(_find_conflicts_by_dictionary(text))
     # Pass 3: dates via regex
     entities.extend(_find_dates(text))
 
