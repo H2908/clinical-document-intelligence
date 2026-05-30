@@ -1,40 +1,52 @@
 -- 01_raw.sql — clinical-intelligence
--- RAW layer: Snowpipe lands here. Minimal typing, maximum fidelity.
--- The binary document stays in S3; what lands here is the upload
--- manifest (a small JSON written alongside the file) describing it.
--- ───────────────────────────────────────────────────────────────
+-- RAW layer: landing zone and job queue.
+-- Matches DB_SCHEMA.md v1 (locked).
+-- Run as: ACCOUNTADMIN or clinical_role
+-- ─────────────────────────────────────────────────────────────────
 
 USE DATABASE clinical_db;
 USE SCHEMA raw;
 
--- ── Document landing ────────────────────────────────────────────
--- Snowpipe COPY target. One row per uploaded document manifest.
--- raw_payload holds the whole JSON untyped; the metadata columns are
--- populated from Snowflake's METADATA$ pseudo-columns at COPY time so
--- we can trace every row back to its S3 object.
-CREATE TABLE IF NOT EXISTS document_landing (
-    raw_payload        VARIANT          NOT NULL,
-    s3_file_name       VARCHAR,
-    s3_file_row_number NUMBER,
-    ingested_at        TIMESTAMP_NTZ    DEFAULT CURRENT_TIMESTAMP()
+-- ── raw_documents ────────────────────────────────────────────────
+-- Upload landing record AND the GTV job queue (status column).
+-- One row per uploaded document. Snowpipe writes here on upload.
+-- The worker reads status = 'pending', processes, then updates to
+-- 'processed' or 'failed'.
+CREATE TABLE IF NOT EXISTS raw_documents (
+    document_id     STRING          NOT NULL,   -- PK. doc_<uuid>. Set by API.
+    patient_id      STRING          NOT NULL,   -- FK → CORE.patient
+    file_name       STRING          NOT NULL,   -- original filename
+    doc_type        STRING          NOT NULL,   -- referral|clinic_letter|gp_note|
+                                                -- clinician_note|lab_report|imaging
+    source          STRING,                     -- e.g. "Trust EPR". Nullable.
+    document_date   DATE,                       -- clinical date of the document
+    s3_key          STRING          NOT NULL,   -- location of raw file in S3
+    status          STRING          NOT NULL DEFAULT 'pending',
+                                                -- pending|processing|processed|failed
+    error_message   STRING,                     -- set when status = failed. Nullable.
+    uploaded_at     TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    processed_at    TIMESTAMP_NTZ,              -- set when worker finishes. Nullable.
+    PRIMARY KEY (document_id)
 )
-COMMENT = 'Snowpipe landing zone for upload manifests (JSON).';
+COMMENT = 'Upload landing record and GTV job queue. One row per document.';
 
--- ── HL7 landing (L2 — phase 3) ──────────────────────────────────
--- Raw HL7 messages land here as text; parsed downstream.
--- Stubbed now so the contract is fixed; populated in Phase 3.
-CREATE TABLE IF NOT EXISTS raw_hl7 (
-    raw_message        VARCHAR          NOT NULL,
-    s3_file_name       VARCHAR,
-    ingested_at        TIMESTAMP_NTZ    DEFAULT CURRENT_TIMESTAMP()
+-- ── nlp_output ───────────────────────────────────────────────────
+-- Raw NLP JSON stored verbatim before unpacking into CORE.
+-- One row per document. Keeping this enables reprocessing without
+-- re-running the NLP pipeline.
+CREATE TABLE IF NOT EXISTS nlp_output (
+    document_id     STRING          NOT NULL,   -- PK / FK → raw_documents
+    patient_id      STRING          NOT NULL,   -- FK → CORE.patient
+    payload         VARIANT         NOT NULL,   -- full NLP JSON (see NLP_OUTPUT.md)
+    nlp_version     STRING          NOT NULL,   -- version of pipeline that produced it
+    created_at      TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    PRIMARY KEY (document_id)
 )
-COMMENT = 'Raw HL7 v2 messages — L2 integration layer.';
+COMMENT = 'Verbatim NLP JSON blob. One row per document. Enables reprocessing.';
 
--- ── Verification ────────────────────────────────────────────────
--- After an upload, this should return rows:
---   SELECT raw_payload:document_id::STRING AS document_id,
---          raw_payload:patient_id::STRING  AS patient_id,
---          raw_payload:s3_key::STRING      AS s3_key,
---          ingested_at
---   FROM document_landing
---   ORDER BY ingested_at DESC;
+-- ── Verification ─────────────────────────────────────────────────
+-- After an upload, confirm rows land here:
+--   SELECT document_id, patient_id, status, uploaded_at
+--   FROM raw_documents
+--   ORDER BY uploaded_at DESC
+--   LIMIT 10;
