@@ -63,14 +63,21 @@ CONFLICT_MARKERS: set[str] = {
 ICD10_RE = re.compile(r"\b([A-Z]\d{2}(?:\.\d{1,2})?)\b")
 
 DATE_PATTERNS = [
-    re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),
-    re.compile(r"\b\d{1,2}/\d{1,2}/\d{2,4}\b"),
+    re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),                       # 2024-02-28
+    re.compile(r"\b\d{1,2}/\d{1,2}/\d{2,4}\b"),                 # 14/01/2024
     re.compile(
         r"\b\d{1,2}\s+"
         r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
         r"[a-z]*\s+\d{4}\b",
         re.IGNORECASE,
-    ),
+    ),                                                          # 28 Feb 2024
+    # Relative phrases — resolved by date_normaliser using document_date
+    re.compile(
+    r"\b(?:in\s+)?\d+\s+"
+    r"(?:days|weeks|months|years|day|week|month|year)"   # plurals FIRST
+    r"(?:\s+ago)?\b",
+    re.IGNORECASE,
+),
 ]
 
 NON_MEDICAL_STOPWORDS = {
@@ -193,23 +200,57 @@ def _find_dates(text: str) -> list[Entity]:
 
 
 def _deduplicate(entities: list[Entity]) -> list[Entity]:
-    """If two entities overlap, keep the one with the larger span."""
+    """
+    Resolve overlapping entities.
+
+    Rule: Date entities are preserved over non-Date entities (otherwise a
+    long scispaCy diagnosis span can silently eat a short Date entity).
+    Among entities of the same type, the longer span wins.
+    """
     if not entities:
         return []
+
+    # Pass 1: Dates are sacred. Keep all of them first.
+    dates = [e for e in entities if e["entity_type"] == "Date"]
+    date_spans = [(d["start_offset"], d["end_offset"]) for d in dates]
+
+    # Pass 2: Non-Date entities. Drop any that overlap a Date.
+    non_dates = [e for e in entities if e["entity_type"] != "Date"]
+
+    def overlaps_a_date(s: int, e: int) -> bool:
+        return any(not (e <= ds or s >= de) for ds, de in date_spans)
+
+    non_dates_no_date_overlap = [
+        e for e in non_dates
+        if not overlaps_a_date(e["start_offset"], e["end_offset"])
+    ]
+
+    # Pass 3: Among non-Date survivors, longer span wins on overlap.
     by_length = sorted(
-        entities,
+        non_dates_no_date_overlap,
         key=lambda e: (e["end_offset"] - e["start_offset"]),
         reverse=True,
     )
-    kept: list[Entity] = []
+    kept_non_dates: list[Entity] = []
     occupied: list[tuple[int, int]] = []
     for ent in by_length:
         s, e = ent["start_offset"], ent["end_offset"]
         if any(not (e <= os or s >= oe) for os, oe in occupied):
             continue
-        kept.append(ent)
+        kept_non_dates.append(ent)
         occupied.append((s, e))
-    return kept
+
+    # Pass 4: Among Dates, also dedupe (regex can match overlapping forms).
+    kept_dates: list[Entity] = []
+    occupied_dates: list[tuple[int, int]] = []
+    for ent in sorted(dates, key=lambda e: (e["end_offset"] - e["start_offset"]), reverse=True):
+        s, e = ent["start_offset"], ent["end_offset"]
+        if any(not (e <= os or s >= oe) for os, oe in occupied_dates):
+            continue
+        kept_dates.append(ent)
+        occupied_dates.append((s, e))
+
+    return kept_non_dates + kept_dates
 
 
 # ---------------------------------------------------------------------------
