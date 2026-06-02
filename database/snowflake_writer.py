@@ -31,7 +31,44 @@ def _get_connection():
         warehouse = "clinical_wh",
         role      = os.environ["SNOWFLAKE_ROLE"],
     )
-
+# ── insert_raw_document ──────────────────────────────────────────
+def insert_raw_document(
+    document_id: str,
+    patient_id: str,
+    s3_key: str,
+    doc_type: str,
+    document_date,           # datetime.date
+    source: str | None = None,
+) -> None:
+    """
+    Insert one row into RAW.raw_documents with status='pending'.
+    Called by api/routes/documents.py after the S3 upload succeeds.
+    """
+    conn = snowflake.connector.connect(
+        account   = os.environ["SNOWFLAKE_ACCOUNT"],
+        user      = os.environ["SNOWFLAKE_USER"],
+        password  = os.environ["SNOWFLAKE_PASSWORD"],
+        database  = "clinical_db",
+        schema    = "raw",                 # <-- raw, not core
+        warehouse = "clinical_wh",
+        role      = os.environ["SNOWFLAKE_ROLE"],
+    )
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO clinical_db.raw.raw_documents
+                (document_id, patient_id, s3_key, doc_type,
+                 document_date, source, status)
+            VALUES (%s, %s, %s, %s, %s, %s, 'pending')
+        """, (document_id, patient_id, s3_key, doc_type,
+              document_date, source))
+        conn.commit()
+    except Exception as e:
+        raise RuntimeError(
+            f"insert_raw_document failed for {document_id}: {e}"
+        ) from e
+    finally:
+        conn.close()
 
 # ── write_entities ───────────────────────────────────────────────
 def write_entities(document_id: str, patient_id: str, entities: list) -> None:
