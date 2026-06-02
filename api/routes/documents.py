@@ -1,8 +1,11 @@
-from fastapi import APIRouter, UploadFile, File, Form, status
+import uuid
+from pathlib import Path
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
 from datetime import date
 
-router = APIRouter()
+from ingestion.s3_uploader import upload
 
+router = APIRouter()
 
 @router.get("/patients/{patient_id}/documents")
 def list_patient_documents(patient_id: str) -> dict:
@@ -55,9 +58,25 @@ async def upload_document(
     type: str = Form(...),
     source: str | None = Form(None),
 ) -> dict:
-    # Phase 2: push to S3 + enqueue worker job here
+    """Upload a clinical document. Pushes to S3, returns 202 immediately."""
+    document_id = f"doc_{uuid.uuid4().hex[:8]}"
+    original_ext = Path(file.filename or "").suffix or ".pdf"
+    s3_key = f"uploads/{patient_id}/{document_id}{original_ext}"
+
+    try:
+        upload(file.file, s3_key)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={"error": {
+                "code": "internal_error",
+                "message": f"S3 upload failed: {e}",
+            }},
+        )
+
     return {
-        "document_id": "doc_new1",
+        "document_id": document_id,
         "status": "pending",
         "message": "Added to record - processing entities.",
+        "_debug_s3_key": s3_key,
     }
