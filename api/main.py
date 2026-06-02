@@ -4,7 +4,8 @@ Clinical Document Intelligence — FastAPI entry point.
 Phase 1: routes return mock JSON in the shapes defined by docs/API_CONTRACT.md.
 Phase 2 will replace the mocks with real Snowflake reads and S3 uploads.
 """
-
+from dotenv import load_dotenv
+load_dotenv()
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
