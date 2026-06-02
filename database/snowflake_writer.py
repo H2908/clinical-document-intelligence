@@ -36,6 +36,7 @@ def insert_raw_document(
     document_id: str,
     patient_id: str,
     s3_key: str,
+    file_name:str,
     doc_type: str,
     document_date,           # datetime.date
     source: str | None = None,
