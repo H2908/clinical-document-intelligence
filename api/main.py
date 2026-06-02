@@ -113,7 +113,13 @@ async def server_error_handler(_: Request, exc):
         content=error_body("internal_error", "An internal error occurred."),
     )
 
-
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    log.exception("Unhandled exception on %s %s", request.method, request.url.path, exc_info=exc)
+    return JSONResponse(
+        status_code=500,
+        content={"error": {"code": "internal_error", "message": "An internal error occurred."}},
+    )
 # ----------------------------------------------------------------------
 # Routers
 # ----------------------------------------------------------------------
