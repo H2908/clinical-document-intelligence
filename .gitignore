@@ -9,3 +9,8 @@ node_modules/
 venv/
 *.log
 .DS_Store
+
+venv/
+.venv/
+
+.env

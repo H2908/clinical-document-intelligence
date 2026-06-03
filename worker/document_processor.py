@@ -176,6 +176,56 @@ def write_to_disk(payload: dict[str, Any], output_dir: str | Path) -> Path:
     log.info("Wrote %s", out_path)
     return out_path
 
+def process_from_s3(
+    document_id: str,
+    patient_id: str,
+    s3_key: str,
+    document_date: date,
+    doc_type: str,
+) -> dict[str, Any]:
+    """
+    Phase 2 Together Task 3 entrypoint.
+    Downloads file from S3, runs the NLP pipeline, writes entities to CORE.
+    """
+    import os
+    import tempfile
+    import boto3
+    from database.snowflake_writer import write_entities
+
+    log.info("Processing %s from S3 (%s)", document_id, s3_key)
+
+    s3 = boto3.client(
+        "s3",
+        region_name=os.environ["AWS_REGION"],
+        aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+    )
+
+    ext = Path(s3_key).suffix or ".pdf"
+    tmp = tempfile.NamedTemporaryFile(suffix=ext, delete=False)
+    tmp.close()
+
+    try:
+        s3.download_file(os.environ["AWS_S3_BUCKET"], s3_key, tmp.name)
+
+        payload = process_document(
+            file_path=tmp.name,
+            document_id=document_id,
+            patient_id=patient_id,
+            document_date=document_date,
+            doc_type=doc_type,
+        )
+
+        if payload["status"] == "processed" and payload["entities"]:
+            write_entities(document_id, patient_id, payload["entities"])
+
+        return payload
+    finally:
+        try:
+            os.unlink(tmp.name)
+        except Exception:
+            pass
+
 # ---------------------------------------------------------------------------
 # CLI for manual testing
 # ---------------------------------------------------------------------------
