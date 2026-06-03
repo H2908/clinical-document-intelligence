@@ -237,18 +237,20 @@ Each view is shaped to match an `API_CONTRACT.md` response so the API can
 The worker never writes tables directly — it calls these. Fixed signatures =
 part of the seam.
 
-| Procedure | Signature (conceptual) | Writes |
-|---|---|---|
-| `SP_WRITE_DOCUMENT` | `(document_id, ...fields, extracted_text)` | CORE.document |
-| `SP_WRITE_ENTITIES` | `(document_id, patient_id, entities_json)` | CORE.entity (bulk) |
-| `SP_WRITE_CLINICAL` | `(document_id, patient_id, conditions_json, meds_json, observations_json)` | condition / medication / observation |
-| `SP_WRITE_FLAGS` | `(patient_id, flags_json)` | CORE.flag (bulk) |
-| `SP_WRITE_CONTRADICTIONS` | `(patient_id, contradictions_json)` | CORE.contradiction (bulk) |
-| `SP_WRITE_TIMELINE` | `(patient_id, events_json)` | CORE.timeline_event (bulk) |
-| `SP_REFRESH_SUMMARY` | `(patient_id)` | MART.patient_summary |
-| `SP_SET_FLAG_STATUS` | `(flag_id, status)` | CORE.flag |
-| `SP_SET_CONTRADICTION_STATUS` | `(contradiction_id, status)` | CORE.contradiction |
-| `SP_DELETE_PATIENT` | `(patient_id)` | cascades all tables + returns S3 keys to delete |
+
+
+| Procedure | Parameters | Returns | Writes |
+|---|---|---|---|
+| `SP_WRITE_DOCUMENT` | `document_id VARCHAR, patient_id VARCHAR, doc_type VARCHAR, file_name VARCHAR, s3_key VARCHAR, source VARCHAR, document_date DATE, extracted_text VARCHAR, image_url VARCHAR, status VARCHAR` | `STRING` | CORE.document |
+| `SP_WRITE_ENTITIES` | `document_id VARCHAR, patient_id VARCHAR, entities VARIANT` | `STRING` | CORE.entity |
+| `SP_WRITE_CLINICAL` | `document_id VARCHAR, patient_id VARCHAR, conditions VARIANT, medications VARIANT, observations VARIANT` | `STRING` | condition / medication / observation |
+| `SP_WRITE_FLAGS` | `patient_id VARCHAR, flags VARIANT` | `STRING` | CORE.flag |
+| `SP_WRITE_CONTRADICTIONS` | `patient_id VARCHAR, contradictions VARIANT` | `STRING` | CORE.contradiction |
+| `SP_WRITE_TIMELINE` | `patient_id VARCHAR, events VARIANT` | `STRING` | CORE.timeline_event |
+| `SP_REFRESH_SUMMARY` | `patient_id VARCHAR` | `STRING` | MART.patient_summary |
+| `SP_SET_FLAG_STATUS` | `flag_id VARCHAR, status VARCHAR` | `STRING` | CORE.flag |
+| `SP_SET_CONTRADICTION_STATUS` | `contradiction_id VARCHAR, status VARCHAR` | `STRING` | CORE.contradiction |
+| `SP_DELETE_PATIENT` | `patient_id VARCHAR` | `VARIANT` | cascades all tables + returns S3 keys |
 
 ---
 

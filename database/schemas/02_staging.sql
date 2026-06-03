@@ -1,55 +1,62 @@
 -- 02_staging.sql — clinical-intelligence
--- STAGING layer: flatten and type the RAW VARIANT, validate, dedupe.
--- Nothing here is a source of truth — it's the typed bridge between
--- raw.document_landing and core.document. Entities/flags/observations
--- do NOT pass through staging: they arrive via stored procedures from
--- the NLP pipeline and write straight to CORE.
--- ───────────────────────────────────────────────────────────────
+-- STAGING layer: typed view over RAW.raw_documents.
+-- Matches DB_SCHEMA.md v1 (locked).
+-- ─────────────────────────────────────────────────────────────────
+-- Note: entities, flags, contradictions, conditions, medications,
+-- observations, and timeline_events do NOT pass through staging.
+-- They arrive via stored procedures writing straight to CORE.
+-- ─────────────────────────────────────────────────────────────────
 
 USE DATABASE clinical_db;
 USE SCHEMA staging;
 
--- ── Typed document view over RAW ────────────────────────────────
--- One typed row per landed manifest. Implemented as a view so it
--- always reflects the latest RAW contents with no extra load step.
--- The worker / a MERGE task reads this to upsert into core.document.
+-- ── stg_document ─────────────────────────────────────────────────
+-- Typed view over RAW.raw_documents. Drops malformed rows and dedupes
+-- on document_id. The worker reads this to upsert into CORE.document.
+-- Implemented as a view so it always reflects latest RAW contents
+-- with no extra load step.
 CREATE OR REPLACE VIEW stg_document AS
 SELECT
-    raw_payload:document_id::STRING       AS document_id,
-    raw_payload:patient_id::STRING        AS patient_id,
-    raw_payload:s3_key::STRING            AS s3_key,
-    raw_payload:doc_type::STRING          AS doc_type,
-    raw_payload:source_filename::STRING   AS source_filename,
-    raw_payload:content_type::STRING      AS content_type,
-    raw_payload:size_bytes::NUMBER        AS size_bytes,
-    raw_payload:uploaded_at::TIMESTAMP_NTZ AS uploaded_at,
-    ingested_at
-FROM raw.document_landing
--- guard against malformed manifests missing the required keys
-WHERE raw_payload:document_id IS NOT NULL
-  AND raw_payload:patient_id  IS NOT NULL
-  AND raw_payload:s3_key      IS NOT NULL
--- if the same document_id lands twice, keep the most recent
+    document_id,
+    patient_id,
+    file_name,
+    doc_type,
+    source,
+    document_date,
+    s3_key,
+    status,
+    error_message,
+    uploaded_at,
+    processed_at
+FROM raw.raw_documents
+-- guard against rows missing required fields
+WHERE document_id  IS NOT NULL
+  AND patient_id   IS NOT NULL
+  AND s3_key       IS NOT NULL
+  AND file_name    IS NOT NULL
+-- if same document_id appears twice, keep the most recent
 QUALIFY ROW_NUMBER() OVER (
-    PARTITION BY raw_payload:document_id::STRING
-    ORDER BY ingested_at DESC
+    PARTITION BY document_id
+    ORDER BY uploaded_at DESC
 ) = 1;
 
--- ── Allowed document types (reference) ──────────────────────────
--- Small reference table the staging/validation layer can join against.
+-- ── doc_type reference ───────────────────────────────────────────
+-- Allowed document types. Used for validation joins.
+-- Matches doc_type enum in API_CONTRACT.md and DB_SCHEMA.md.
 CREATE TABLE IF NOT EXISTS doc_type_ref (
-    doc_type     VARCHAR PRIMARY KEY,
-    description  VARCHAR
+    doc_type    STRING  NOT NULL PRIMARY KEY,
+    description STRING
 )
-COMMENT = 'Valid document types for validation joins.';
+COMMENT = 'Valid document types — validation reference.';
 
 MERGE INTO doc_type_ref t
 USING (
-    SELECT 'pdf'   AS doc_type, 'PDF clinical document'        AS description UNION ALL
-    SELECT 'note',  'Free-text clinical note'                                 UNION ALL
-    SELECT 'lab',   'Lab report (HL7 / CSV / PDF)'                            UNION ALL
-    SELECT 'image', 'Medical image (e.g. X-ray)'
-) s
-ON t.doc_type = s.doc_type
+    SELECT 'referral'        AS doc_type, 'GP or specialist referral letter'  AS description UNION ALL
+    SELECT 'clinic_letter',               'Outpatient clinic letter'                         UNION ALL
+    SELECT 'gp_note',                     'GP consultation note'                             UNION ALL
+    SELECT 'clinician_note',              'Free-text clinician note (typed directly)'        UNION ALL
+    SELECT 'lab_report',                  'Lab report (HL7 / CSV / manual entry)'            UNION ALL
+    SELECT 'imaging',                     'Medical image (X-ray, MRI, etc.)'
+) s ON t.doc_type = s.doc_type
 WHEN NOT MATCHED THEN
     INSERT (doc_type, description) VALUES (s.doc_type, s.description);

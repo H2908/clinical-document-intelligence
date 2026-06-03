@@ -1,129 +1,242 @@
 -- 03_core.sql — clinical-intelligence
--- CORE layer: the source of truth. patient, document, entity,
--- observation, flag, contradiction.
+-- CORE + MART layers: source of truth.
+-- Matches DB_SCHEMA.md v1 (locked).
+-- Run AFTER 01_raw.sql and 02_staging.sql.
 --
--- Key contract decisions (confirm with ML member before committing):
---   * patient_id / document_id are app-generated STRINGs (UUIDs) —
---     supplied in the {document_id, patient_id, s3_key} job payload.
---   * entity_id / observation_id / flag_id / contradiction_id are
---     DB-generated via IDENTITY (the write happens inside Snowflake).
---   * entity.is_negated is NOT NULL — negation is patient-safety
---     critical, so it must always be explicit, never assumed.
---   * Snowflake does not enforce PK/FK, but they are declared as
---     documentation and as hints to the optimizer.
--- ───────────────────────────────────────────────────────────────
+-- Table creation order (respects FK dependencies):
+--   1. patient
+--   2. document
+--   3. entity
+--   4. condition
+--   5. medication
+--   6. observation
+--   7. flag
+--   8. contradiction
+--   9. timeline_event
+--   10. MART.patient_summary
+--
+-- Note: Snowflake does not enforce FK constraints but they are
+-- declared as documentation and optimizer hints.
+-- ─────────────────────────────────────────────────────────────────
 
 USE DATABASE clinical_db;
+
+-- ══════════════════════════════════════════════════════════════════
+-- CORE LAYER
+-- ══════════════════════════════════════════════════════════════════
+
 USE SCHEMA core;
 
--- ── patient ─────────────────────────────────────────────────────
+-- ── 1. patient ───────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS patient (
-    patient_id    STRING        NOT NULL PRIMARY KEY,
-    mrn           STRING,                    -- medical record number (business key)
-    first_name    STRING,
-    last_name     STRING,
-    date_of_birth DATE,
-    sex           STRING,                    -- 'M' | 'F' | 'O' | NULL
-    created_at    TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
-    updated_at    TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
+    patient_id      STRING          NOT NULL,   -- PK. pat_<uuid>. Set by API.
+    name            STRING          NOT NULL,
+    dob             DATE            NOT NULL,
+    nhs_number      STRING          NOT NULL,   -- stored with spaces e.g. "485 621 3847"
+    sex             STRING          NOT NULL,   -- M | F | Other
+    created_at      TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    last_updated    TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+                                                -- bumped on every document processed
+    PRIMARY KEY (patient_id),
+    UNIQUE (nhs_number)
 )
 COMMENT = 'One row per patient.';
 
--- ── document ────────────────────────────────────────────────────
+-- ── 2. document ──────────────────────────────────────────────────
+-- Promoted from RAW once processed. The clean record the API reads.
 CREATE TABLE IF NOT EXISTS document (
-    document_id     STRING        NOT NULL PRIMARY KEY,
-    patient_id      STRING        NOT NULL,
-    s3_key          STRING        NOT NULL,
-    doc_type        STRING,                  -- pdf | note | lab | image
-    source_filename STRING,
-    status          STRING        DEFAULT 'uploaded', -- uploaded|parsing|processed|failed
-    uploaded_at     TIMESTAMP_NTZ,
-    processed_at    TIMESTAMP_NTZ,
-    created_at      TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    document_id     STRING          NOT NULL,   -- PK. doc_<uuid>. Set by API.
+    patient_id      STRING          NOT NULL,   -- FK → patient
+    file_name       STRING          NOT NULL,
+    doc_type        STRING          NOT NULL,   -- referral|clinic_letter|gp_note|
+                                                -- clinician_note|lab_report|imaging
+    source          STRING,                     -- nullable. e.g. "Trust EPR"
+    document_date   DATE,
+    s3_key          STRING          NOT NULL,
+    image_url       STRING,                     -- presigned URL for imaging docs. Nullable.
+    extracted_text  STRING,                     -- clean full text. Empty for pure-image docs.
+    status          STRING          NOT NULL DEFAULT 'processed',
+                                                -- processed | failed
+    created_at      TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    PRIMARY KEY (document_id),
     FOREIGN KEY (patient_id) REFERENCES patient (patient_id)
 )
-COMMENT = 'One row per uploaded document. status tracks the worker pipeline.';
+COMMENT = 'Clean document record promoted from RAW after processing.';
 
--- ── entity ──────────────────────────────────────────────────────
--- Output of the NLP pipeline (medical_ner + negation + date_normaliser).
--- Written by write_entities(). cui is nullable (filled by L2 mapping).
+-- ── 3. entity ────────────────────────────────────────────────────
+-- One row per NLP-extracted span.
+-- start_offset/end_offset index into document.extracted_text —
+-- powers source highlighting in the Documents page.
 CREATE TABLE IF NOT EXISTS entity (
-    entity_id       NUMBER        IDENTITY(1,1) PRIMARY KEY,
-    document_id     STRING        NOT NULL,
-    patient_id      STRING        NOT NULL,   -- denormalised for fast patient queries
-    entity_text     STRING        NOT NULL,   -- surface form from the document
-    entity_type     STRING        NOT NULL,   -- problem|medication|test|anatomy|...
-    cui             STRING,                    -- UMLS concept id (L2, nullable)
-    is_negated      BOOLEAN       NOT NULL,    -- from negation_detector — never assume
-    normalized_date DATE,                      -- from date_normaliser (nullable)
-    char_start      NUMBER,                    -- offset in cleaned source text
-    char_end        NUMBER,
-    confidence      FLOAT,
-    created_at      TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    entity_id       STRING          NOT NULL,   -- PK. ent_<uuid>. Set by SP.
+    document_id     STRING          NOT NULL,   -- FK → document. Provenance.
+    patient_id      STRING          NOT NULL,   -- FK → patient. Denormalised for speed.
+    entity_type     STRING          NOT NULL,   -- Diagnosis | Drug | Date | Conflict
+    text            STRING          NOT NULL,   -- exact span text
+    start_offset    INT             NOT NULL,   -- char offset into extracted_text
+    end_offset      INT             NOT NULL,   -- char offset into extracted_text
+    negated         BOOLEAN         NOT NULL,   -- PATIENT-SAFETY CRITICAL. Never nullable.
+                                                -- TRUE = "no chest pain", must NOT become
+                                                -- a condition/flag
+    icd10_code      STRING,                     -- for Diagnosis entities. Nullable.
+    normalised_value STRING,                    -- ISO date for Date; drug name for Drug.
+    created_at      TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    PRIMARY KEY (entity_id),
     FOREIGN KEY (document_id) REFERENCES document (document_id),
     FOREIGN KEY (patient_id)  REFERENCES patient  (patient_id)
 )
-COMMENT = 'Extracted medical entities. is_negated is mandatory (patient safety).';
+COMMENT = 'NLP-extracted spans. negated is NOT NULL — patient-safety critical.';
 
--- ── observation ─────────────────────────────────────────────────
--- Structured lab / measurement rows (lab_parser output).
--- Written by write_entities() or a dedicated lab write path.
+-- ── 4. condition ─────────────────────────────────────────────────
+-- Active conditions, deduplicated per patient.
+-- Derived from non-negated Diagnosis entities only.
+CREATE TABLE IF NOT EXISTS condition (
+    condition_id        STRING          NOT NULL,   -- PK. cond_<uuid>.
+    patient_id          STRING          NOT NULL,   -- FK → patient
+    name                STRING          NOT NULL,
+    icd10_code          STRING,                     -- nullable
+    source_document_id  STRING          NOT NULL,   -- FK → document. First doc it appeared in.
+    created_at          TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    PRIMARY KEY (condition_id),
+    FOREIGN KEY (patient_id)         REFERENCES patient  (patient_id),
+    FOREIGN KEY (source_document_id) REFERENCES document (document_id)
+)
+COMMENT = 'Active conditions per patient. Derived from non-negated Diagnosis entities only.';
+
+-- ── 5. medication ────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS medication (
+    medication_id       STRING          NOT NULL,   -- PK. med_<uuid>.
+    patient_id          STRING          NOT NULL,   -- FK → patient
+    drug                STRING          NOT NULL,
+    dose                STRING,                     -- e.g. "1 g BD". Nullable.
+    started             DATE,                       -- nullable
+    flag_text           STRING,                     -- amber warning. e.g. "eGFR below threshold".
+                                                    -- Nullable.
+    source_document_id  STRING          NOT NULL,   -- FK → document
+    created_at          TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    PRIMARY KEY (medication_id),
+    FOREIGN KEY (patient_id)         REFERENCES patient  (patient_id),
+    FOREIGN KEY (source_document_id) REFERENCES document (document_id)
+)
+COMMENT = 'Medications per patient.';
+
+-- ── 6. observation ───────────────────────────────────────────────
+-- Lab values and clinical observations.
+-- Feeds the Briefing page "Recent results" section.
+-- value stored as STRING to handle "32%", "480", "<0.1" etc.
 CREATE TABLE IF NOT EXISTS observation (
-    observation_id   NUMBER        IDENTITY(1,1) PRIMARY KEY,
-    patient_id       STRING        NOT NULL,
-    document_id      STRING        NOT NULL,
-    observation_type STRING        NOT NULL,   -- e.g. 'glucose', 'hba1c'
-    code             STRING,                    -- LOINC / local code (nullable)
-    value_numeric    FLOAT,
-    value_text       STRING,                    -- for non-numeric results
-    unit             STRING,
-    ref_range_low    FLOAT,
-    ref_range_high   FLOAT,
-    abnormal_flag    STRING,                    -- 'H' | 'L' | 'N' | NULL
-    observed_at      TIMESTAMP_NTZ,
-    created_at       TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
-    FOREIGN KEY (patient_id)  REFERENCES patient  (patient_id),
-    FOREIGN KEY (document_id) REFERENCES document (document_id)
+    observation_id      STRING          NOT NULL,   -- PK. obs_<uuid>.
+    patient_id          STRING          NOT NULL,   -- FK → patient
+    test                STRING          NOT NULL,   -- e.g. "eGFR"
+    value               STRING          NOT NULL,   -- kept as string: "32%", "480"
+    unit                STRING,                     -- nullable. e.g. "mL/min/1.73m2"
+    observation_date    DATE            NOT NULL,
+    source_document_id  STRING          NOT NULL,   -- FK → document
+    created_at          TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    PRIMARY KEY (observation_id),
+    FOREIGN KEY (patient_id)         REFERENCES patient  (patient_id),
+    FOREIGN KEY (source_document_id) REFERENCES document (document_id)
 )
-COMMENT = 'Structured lab/measurement rows.';
+COMMENT = 'Lab values and clinical observations. value is STRING to handle all formats.';
 
--- ── flag ────────────────────────────────────────────────────────
--- Risk flags and overdue referrals (flag_agent output).
--- Written by write_flags().
+-- ── 7. flag ──────────────────────────────────────────────────────
+-- Risk flags produced by the flag agent (Claude).
 CREATE TABLE IF NOT EXISTS flag (
-    flag_id          NUMBER        IDENTITY(1,1) PRIMARY KEY,
-    patient_id       STRING        NOT NULL,
-    document_id      STRING,                    -- nullable: may be cross-document
-    flag_type        STRING        NOT NULL,    -- risk | overdue_referral | ...
-    severity         STRING        NOT NULL,    -- low | medium | high | critical
-    title            STRING        NOT NULL,
-    description      STRING,
-    status           STRING        DEFAULT 'active', -- active | resolved | dismissed
-    created_by_agent STRING,                     -- which agent raised it
-    created_at       TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
-    resolved_at      TIMESTAMP_NTZ,
-    FOREIGN KEY (patient_id)  REFERENCES patient  (patient_id),
-    FOREIGN KEY (document_id) REFERENCES document (document_id)
+    flag_id             STRING          NOT NULL,   -- PK. flag_<uuid>.
+    patient_id          STRING          NOT NULL,   -- FK → patient
+    severity            STRING          NOT NULL,   -- HIGH | MEDIUM | LOW
+    category            STRING          NOT NULL,   -- e.g. "ALLERGY CONFLICT"
+    description         STRING          NOT NULL,
+    source_document_id  STRING          NOT NULL,   -- FK → document. Provenance — required.
+    status              STRING          NOT NULL DEFAULT 'open',
+                                                    -- open | resolved
+    created_at          TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    resolved_at         TIMESTAMP_NTZ,              -- nullable
+    PRIMARY KEY (flag_id),
+    FOREIGN KEY (patient_id)         REFERENCES patient  (patient_id),
+    FOREIGN KEY (source_document_id) REFERENCES document (document_id)
 )
-COMMENT = 'Clinical risk flags / overdue referrals.';
+COMMENT = 'Risk flags from the flag agent. status: open | resolved.';
 
--- ── contradiction ───────────────────────────────────────────────
--- Conflicts found across documents (contradiction_agent output).
--- Written by write_contradictions(). References two entities/docs.
+-- ── 8. contradiction ─────────────────────────────────────────────
+-- Cross-document conflicts found by the contradiction agent (Claude).
+-- References two documents (doc_a and doc_b).
 CREATE TABLE IF NOT EXISTS contradiction (
-    contradiction_id NUMBER        IDENTITY(1,1) PRIMARY KEY,
-    patient_id       STRING        NOT NULL,
-    document_id_a    STRING,                    -- the two sources in conflict
-    document_id_b    STRING,
-    claim_a          STRING        NOT NULL,    -- what source A asserts
-    claim_b          STRING        NOT NULL,    -- what source B asserts
-    contradiction_type STRING,                  -- medication | diagnosis | allergy | ...
-    severity         STRING,                    -- low | medium | high | critical
-    status           STRING        DEFAULT 'active',
-    created_by_agent STRING,
-    created_at       TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
-    FOREIGN KEY (patient_id)   REFERENCES patient  (patient_id),
-    FOREIGN KEY (document_id_a) REFERENCES document (document_id),
-    FOREIGN KEY (document_id_b) REFERENCES document (document_id)
+    contradiction_id    STRING          NOT NULL,   -- PK. con_<uuid>.
+    patient_id          STRING          NOT NULL,   -- FK → patient
+    severity            STRING          NOT NULL,   -- HIGH | MEDIUM | LOW
+    category            STRING          NOT NULL,   -- e.g. "ALLERGY"
+    doc_a_id            STRING          NOT NULL,   -- FK → document
+    doc_a_statement     STRING          NOT NULL,   -- conflicting claim from doc A
+    doc_b_id            STRING          NOT NULL,   -- FK → document
+    doc_b_statement     STRING          NOT NULL,   -- conflicting claim from doc B
+    explanation         STRING          NOT NULL,   -- agent reasoning + recommendation
+    status              STRING          NOT NULL DEFAULT 'open',
+                                                    -- open | resolved
+    created_at          TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    resolved_at         TIMESTAMP_NTZ,              -- nullable
+    PRIMARY KEY (contradiction_id),
+    FOREIGN KEY (patient_id) REFERENCES patient  (patient_id),
+    FOREIGN KEY (doc_a_id)   REFERENCES document (document_id),
+    FOREIGN KEY (doc_b_id)   REFERENCES document (document_id)
 )
-COMMENT = 'Cross-document clinical contradictions.';
+COMMENT = 'Cross-document contradictions from the contradiction agent.';
+
+-- ── 9. timeline_event ────────────────────────────────────────────
+-- Pre-flattened timeline rows. Table (not view) for speed and so
+-- the worker can write events directly.
+CREATE TABLE IF NOT EXISTS timeline_event (
+    event_id            STRING          NOT NULL,   -- PK. evt_<uuid>.
+    patient_id          STRING          NOT NULL,   -- FK → patient
+    event_date          DATE            NOT NULL,
+    event_type          STRING          NOT NULL,   -- Diagnosis | Medication | Flag |
+                                                    -- Referral | Observation | Lab | Imaging
+    title               STRING          NOT NULL,
+    icd10_code          STRING,                     -- nullable
+    source_document_id  STRING          NOT NULL,   -- FK → document. Provenance — required.
+    created_at          TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    PRIMARY KEY (event_id),
+    FOREIGN KEY (patient_id)         REFERENCES patient  (patient_id),
+    FOREIGN KEY (source_document_id) REFERENCES document (document_id)
+)
+COMMENT = 'Pre-flattened timeline. Table for speed; worker writes directly.';
+
+-- ══════════════════════════════════════════════════════════════════
+-- MART LAYER
+-- ══════════════════════════════════════════════════════════════════
+
+USE SCHEMA mart;
+
+-- ── patient_summary ──────────────────────────────────────────────
+-- Pre-computed briefing. One row per patient.
+-- GET /briefing reads only this — no LLM call on the read path.
+-- The worker rewrites this row whenever a new document for that
+-- patient finishes processing.
+-- Refresh rule:
+--   1. Worker finishes document → sets is_stale = TRUE
+--   2. briefing_agent rebuilds summary → sets is_stale = FALSE
+CREATE TABLE IF NOT EXISTS patient_summary (
+    patient_id      STRING          NOT NULL,   -- PK / FK → CORE.patient
+    summary         VARIANT         NOT NULL,   -- full briefing JSON —
+                                                -- matches GET /briefing response body
+    generated_at    TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    is_stale        BOOLEAN         NOT NULL DEFAULT FALSE,
+                                                -- TRUE = new doc landed, not yet rebuilt
+    PRIMARY KEY (patient_id)
+)
+COMMENT = 'Pre-computed briefing. One row per patient. is_stale drives refresh.';
+
+-- ══════════════════════════════════════════════════════════════════
+-- VERIFICATION
+-- ══════════════════════════════════════════════════════════════════
+-- Run after executing this file to confirm all tables exist:
+--
+--   SHOW TABLES IN SCHEMA clinical_db.core;
+--   -- expect: patient, document, entity, condition, medication,
+--   --         observation, flag, contradiction, timeline_event
+--
+--   SHOW TABLES IN SCHEMA clinical_db.mart;
+--   -- expect: patient_summary
+--
+--   DESC TABLE clinical_db.core.entity;
+--   -- confirm: negated → BOOLEAN, null? = N (NOT NULL enforced)
