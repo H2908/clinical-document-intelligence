@@ -1,0 +1,454 @@
+{
+  "nlp_version": "1.0.0",
+  "document_id": "doc_Cardiology_Evans_p006",
+  "patient_id": "pat_demo",
+  "processed_at": "2026-06-03T12:47:26Z",
+  "status": "processed",
+  "error_message": null,
+  "document": {
+    "doc_type": "clinic_letter",
+    "extracted_text": "NHS Foundation Trust\nCardiology Department\nDate: 22 May 2026\nCARDIOLOGY CLINIC LETTER\nPatient: Sarah Evans\nDOB: 1987-03-23 (age 39)\nNHS Number: 101 226 9166\nAddress: 131 Mill Lane, Bristol, BS1 1AB\nClinical Findings:\nEchocardiogram confirms ischaemic heart disease (ICD-10: I25.9). LVEF measured at 32%. Patient\nreports symptoms consistent with NYHA class II.\nCurrent Cardiac Medications:\n\u2022 Atorvastatin 40 mg \u2014 40 mg ON\n\u2022 Aspirin 75 mg \u2014 75 mg OD\nAllergies: Patient reports penicillin allergy \u2014 rash on exposure in 2019. Avoid \u03b2-lactams. Aspirin\ntolerated.\nPlan:\n1. Continue current heart failure therapy\n2. Refer to heart failure nurse for medication titration within 2 weeks\n3. Repeat echocardiogram in 6 months\n4. Routine bloods including U&E;, eGFR in 4 weeks\nDr. James Mitchell\nConsultant Cardiologist",
+    "image_url": null
+  },
+  "entities": [
+    {
+      "entity_type": "Diagnosis",
+      "text": "NHS Foundation Trust\nCardiology Department\n",
+      "start_offset": 0,
+      "end_offset": 43,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Date",
+      "text": "22 May 2026",
+      "start_offset": 49,
+      "end_offset": 60,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": "2026-05-22"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Sarah Evans\n",
+      "start_offset": 95,
+      "end_offset": 107,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Date",
+      "text": "1987-03-23",
+      "start_offset": 112,
+      "end_offset": 122,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": "1987-03-23"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Mill Lane",
+      "start_offset": 170,
+      "end_offset": 179,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Bristol",
+      "start_offset": 181,
+      "end_offset": 188,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "ischaemic heart disease",
+      "start_offset": 241,
+      "end_offset": 264,
+      "negated": false,
+      "icd10_code": "I25.9",
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "ICD-10",
+      "start_offset": 266,
+      "end_offset": 272,
+      "negated": false,
+      "icd10_code": "I25.9",
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "I25.9",
+      "start_offset": 274,
+      "end_offset": 279,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "LVEF",
+      "start_offset": 282,
+      "end_offset": 286,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "measured",
+      "start_offset": 287,
+      "end_offset": 295,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "consistent with",
+      "start_offset": 329,
+      "end_offset": 344,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "NYHA class II",
+      "start_offset": 345,
+      "end_offset": 358,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Cardiac Medications",
+      "start_offset": 368,
+      "end_offset": 387,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Atorvastatin",
+      "start_offset": 391,
+      "end_offset": 403,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": "atorvastatin"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "ON\n\u2022 Aspirin 75 mg",
+      "start_offset": 418,
+      "end_offset": 436,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "Allergies",
+      "start_offset": 448,
+      "end_offset": 457,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Patient reports",
+      "start_offset": 459,
+      "end_offset": 474,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "penicillin allergy",
+      "start_offset": 475,
+      "end_offset": 493,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "rash",
+      "start_offset": 496,
+      "end_offset": 500,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "exposure",
+      "start_offset": 504,
+      "end_offset": 512,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "\u03b2-lactams",
+      "start_offset": 528,
+      "end_offset": 537,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Aspirin\n",
+      "start_offset": 539,
+      "end_offset": 547,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": "aspirin"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "tolerated",
+      "start_offset": 547,
+      "end_offset": 556,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "heart failure therapy",
+      "start_offset": 584,
+      "end_offset": 605,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "heart failure",
+      "start_offset": 618,
+      "end_offset": 631,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "nurse",
+      "start_offset": 632,
+      "end_offset": 637,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "medication titration",
+      "start_offset": 642,
+      "end_offset": 662,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Date",
+      "text": "2 weeks",
+      "start_offset": 670,
+      "end_offset": 677,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": "2026-06-17"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "echocardiogram",
+      "start_offset": 688,
+      "end_offset": 702,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Date",
+      "text": "in 6 months",
+      "start_offset": 703,
+      "end_offset": 714,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": "2026-11-30"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "bloods",
+      "start_offset": 726,
+      "end_offset": 732,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "eGFR",
+      "start_offset": 749,
+      "end_offset": 753,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Date",
+      "text": "in 4 weeks",
+      "start_offset": 754,
+      "end_offset": 764,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": "2026-07-01"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Mitchell\nConsultant Cardiologist",
+      "start_offset": 775,
+      "end_offset": 807,
+      "negated": false,
+      "icd10_code": null,
+      "normalised_value": null
+    }
+  ],
+  "conditions": [
+    {
+      "name": "NHS Foundation Trust\nCardiology Department\n",
+      "icd10_code": null
+    },
+    {
+      "name": "Sarah Evans\n",
+      "icd10_code": null
+    },
+    {
+      "name": "Mill Lane",
+      "icd10_code": null
+    },
+    {
+      "name": "Bristol",
+      "icd10_code": null
+    },
+    {
+      "name": "ischaemic heart disease",
+      "icd10_code": "I25.9"
+    },
+    {
+      "name": "ICD-10",
+      "icd10_code": "I25.9"
+    },
+    {
+      "name": "I25.9",
+      "icd10_code": null
+    },
+    {
+      "name": "LVEF",
+      "icd10_code": null
+    },
+    {
+      "name": "measured",
+      "icd10_code": null
+    },
+    {
+      "name": "consistent with",
+      "icd10_code": null
+    },
+    {
+      "name": "NYHA class II",
+      "icd10_code": null
+    },
+    {
+      "name": "Cardiac Medications",
+      "icd10_code": null
+    },
+    {
+      "name": "ON\n\u2022 Aspirin 75 mg",
+      "icd10_code": null
+    },
+    {
+      "name": "Patient reports",
+      "icd10_code": null
+    },
+    {
+      "name": "rash",
+      "icd10_code": null
+    },
+    {
+      "name": "exposure",
+      "icd10_code": null
+    },
+    {
+      "name": "\u03b2-lactams",
+      "icd10_code": null
+    },
+    {
+      "name": "tolerated",
+      "icd10_code": null
+    },
+    {
+      "name": "heart failure therapy",
+      "icd10_code": null
+    },
+    {
+      "name": "heart failure",
+      "icd10_code": null
+    },
+    {
+      "name": "nurse",
+      "icd10_code": null
+    },
+    {
+      "name": "medication titration",
+      "icd10_code": null
+    },
+    {
+      "name": "echocardiogram",
+      "icd10_code": null
+    },
+    {
+      "name": "bloods",
+      "icd10_code": null
+    },
+    {
+      "name": "eGFR",
+      "icd10_code": null
+    },
+    {
+      "name": "Mitchell\nConsultant Cardiologist",
+      "icd10_code": null
+    }
+  ],
+  "medications": [
+    {
+      "drug": "Atorvastatin",
+      "dose": "",
+      "started": null,
+      "flag_text": null
+    },
+    {
+      "drug": "Aspirin\n",
+      "dose": "",
+      "started": null,
+      "flag_text": null
+    }
+  ],
+  "observations": [],
+  "flags": [],
+  "contradictions": [],
+  "timeline_events": []
+}
