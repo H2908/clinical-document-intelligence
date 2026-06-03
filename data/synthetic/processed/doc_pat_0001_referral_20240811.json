@@ -1,0 +1,20 @@
+{
+  "nlp_version": "1.0.0",
+  "document_id": "doc_pat_0001_referral_20240811",
+  "patient_id": "pat_demo",
+  "processed_at": "2026-06-01T15:02:37Z",
+  "status": "failed",
+  "error_message": "PDF not found: data\\synthetic\\documents\\pat_0001_referral_20240811.pdf",
+  "document": {
+    "doc_type": "clinic_letter",
+    "extracted_text": "",
+    "image_url": null
+  },
+  "entities": [],
+  "conditions": [],
+  "medications": [],
+  "observations": [],
+  "flags": [],
+  "contradictions": [],
+  "timeline_events": []
+}

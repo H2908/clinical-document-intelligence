@@ -1,3 +1,4 @@
+from cmath import log
 import uuid
 from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
@@ -89,9 +90,31 @@ async def upload_document(
             detail={"error": {"code": "internal_error",
                               "message": f"S3 ok but DB insert failed: {e}"}},
         )
+    # 3. Run NLP pipeline synchronously (Phase 2 milestone — Phase 3 will move
+    # this to a background worker polling raw_documents).
+    from worker.document_processor import process_from_s3
+    try:
+        result = process_from_s3(
+            document_id=document_id,
+            patient_id=patient_id,
+            s3_key=s3_key,
+            document_date=document_date,
+            doc_type=type,
+        )
+        final_status = result["status"]
+        entity_count = len(result["entities"])
+    except Exception as e:
+        log.exception("Worker pipeline failed for %s", document_id)
+        final_status = "failed"
+        entity_count = 0
 
     return {
         "document_id": document_id,
-        "status": "pending",
-        "message": "Added to record - processing entities.",
+        "status": final_status,
+        "entity_count": entity_count,
+        "message": (
+            f"Document processed — {entity_count} entities extracted."
+            if final_status == "processed"
+            else "Document received but processing failed - check logs."
+        ),
     }
