@@ -254,6 +254,44 @@ part of the seam.
 
 ---
 
+### 6.1 SP_WRITE_ENTITIES — LOCKED (Phase 2)
+
+*Python signature* (in database/snowflake_writer.py):
+
+python
+def write_entities(
+    document_id: str,          # 'doc_'
+    patient_id: str,           # 'pat_'
+    entities: list[dict],      # each dict matches NLP_OUTPUT.md §3
+) -> None
+
+
+*Behaviour*
+- Calls SP_WRITE_ENTITIES(document_id, patient_id, entities_json) in Snowflake
+- Entity dicts are JSON-serialised and passed via PARSE_JSON
+- Idempotent: re-processing the same document_id does not create duplicate rows
+  (stored procedure does DELETE-then-INSERT keyed on document_id)
+
+*Errors*
+- Raises RuntimeError if the stored procedure fails for any reason
+- The worker catches this and marks raw_documents.status = 'failed'
+
+*Caller*
+- worker/document_processor.py::process_from_s3 (Phase 2)
+- worker/main.py queue-polling loop (Phase 3+)
+
+*Owner* — DE member
+
+### 6.2 Other procedures
+Signatures sketched in the table above. Will be locked in Phase 3 task list as
+each is implemented and used end-to-end.
+
+
+
+
+
+
+
 ## 7. Provenance rule
 
 Every `entity`, `flag`, `contradiction`, `timeline_event`, `condition`,
