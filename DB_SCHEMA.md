@@ -252,6 +252,37 @@ part of the seam.
 | `SP_SET_CONTRADICTION_STATUS` | `contradiction_id VARCHAR, status VARCHAR` | `STRING` | CORE.contradiction |
 | `SP_DELETE_PATIENT` | `patient_id VARCHAR` | `VARIANT` | cascades all tables + returns S3 keys |
 
+### 6.1 SP_WRITE_ENTITIES — LOCKED (Phase 2)
+
+**Python signature** (in `database/snowflake_writer.py`):
+
+```python
+def write_entities(
+    document_id: str,          # 'doc_'
+    patient_id: str,           # 'pat_'
+    entities: list[dict],      # each dict matches NLP_OUTPUT.md §3
+) -> None
+```
+
+**Behaviour**
+- Calls `SP_WRITE_ENTITIES(document_id, patient_id, entities_json)` in Snowflake
+- Entity dicts are JSON-serialised and passed via `PARSE_JSON`
+- Idempotent: re-processing the same `document_id` does not create duplicate rows
+  (stored procedure does DELETE-then-INSERT keyed on `document_id`)
+
+**Errors**
+- Raises `RuntimeError` if the stored procedure fails for any reason
+- The worker catches this and marks `raw_documents.status = 'failed'`
+
+**Caller**
+- `worker/document_processor.py::process_from_s3` (Phase 2)
+- `worker/main.py` queue-polling loop (Phase 3+)
+
+**Owner** — DE member
+
+### 6.2 Other procedures
+Signatures sketched in the table above. Will be locked in Phase 3 task list as
+each is implemented and used end-to-end.
 ---
 
 ### 6.1 SP_WRITE_ENTITIES — LOCKED (Phase 2)
@@ -299,3 +330,30 @@ Every `entity`, `flag`, `contradiction`, `timeline_event`, `condition`,
 always be able to click any item back to the document — and for entities, the
 exact `start_offset`/`end_offset` span — it came from. Do not add a derived
 table without a source link.
+## 7. Read API (called by the agent orchestrator)
+
+The orchestrator reads patient state via `database/snowflake_reader.py`.
+Two functions, locked signatures:
+
+### 7.1 read_entities_for_patient
+
+```python
+def read_entities_for_patient(patient_id: str) -> list[dict]:
+    """Returns every entity for this patient, joined with its document metadata."""
+```
+
+Each returned dict:
+- entity_type, text, start_offset, end_offset, negated, icd10_code, normalised_value (from CORE.entity)
+- document_id, document_date, doc_type (from CORE.document, joined)
+
+### 7.2 read_documents_for_patient
+
+```python
+def read_documents_for_patient(patient_id: str) -> list[dict]:
+    """Returns documents for this patient, newest first."""
+```
+
+Each dict: document_id, doc_type, document_date, source, status.
+
+Owner: DE member.
+Caller: agents/orchestrator.py::_read_patient_state.
