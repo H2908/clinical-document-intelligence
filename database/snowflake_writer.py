@@ -58,6 +58,7 @@ def insert_raw_document(
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO clinical_db.raw.raw_documents
+
                 (document_id, patient_id, s3_key, file_name, doc_type,
                  document_date, source, status)
             VALUES (%s, %s, %s, %s, %s, %s, %s, 'pending')
