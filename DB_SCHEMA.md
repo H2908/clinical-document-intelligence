@@ -290,3 +290,30 @@ Every `entity`, `flag`, `contradiction`, `timeline_event`, `condition`,
 always be able to click any item back to the document — and for entities, the
 exact `start_offset`/`end_offset` span — it came from. Do not add a derived
 table without a source link.
+## 7. Read API (called by the agent orchestrator)
+
+The orchestrator reads patient state via `database/snowflake_reader.py`.
+Two functions, locked signatures:
+
+### 7.1 read_entities_for_patient
+
+```python
+def read_entities_for_patient(patient_id: str) -> list[dict]:
+    """Returns every entity for this patient, joined with its document metadata."""
+```
+
+Each returned dict:
+- entity_type, text, start_offset, end_offset, negated, icd10_code, normalised_value (from CORE.entity)
+- document_id, document_date, doc_type (from CORE.document, joined)
+
+### 7.2 read_documents_for_patient
+
+```python
+def read_documents_for_patient(patient_id: str) -> list[dict]:
+    """Returns documents for this patient, newest first."""
+```
+
+Each dict: document_id, doc_type, document_date, source, status.
+
+Owner: DE member.
+Caller: agents/orchestrator.py::_read_patient_state.
