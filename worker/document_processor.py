@@ -217,6 +217,20 @@ def process_from_s3(
         )
 
         if payload["status"] == "processed" and payload["entities"]:
+            # Promote the document to CORE first (so FK from entities is valid)
+            from database.snowflake_writer import insert_core_document
+            insert_core_document(
+            document_id=document_id,
+            patient_id=patient_id,
+            file_name=Path(s3_key).name,
+            doc_type=doc_type,
+            s3_key=s3_key,
+            document_date=document_date,
+            source=None,  # could thread through from the API if needed
+            extracted_text=payload.get("extracted_text"),
+            status="processed",
+        )
+        if payload["entities"]:
             write_entities(document_id, patient_id, payload["entities"])
 
         return payload
