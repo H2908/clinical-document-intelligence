@@ -4,7 +4,8 @@ Clinical Document Intelligence — FastAPI entry point.
 Phase 1: routes return mock JSON in the shapes defined by docs/API_CONTRACT.md.
 Phase 2 will replace the mocks with real Snowflake reads and S3 uploads.
 """
-
+from dotenv import load_dotenv
+load_dotenv()
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -112,7 +113,13 @@ async def server_error_handler(_: Request, exc):
         content=error_body("internal_error", "An internal error occurred."),
     )
 
-
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    log.exception("Unhandled exception on %s %s", request.method, request.url.path, exc_info=exc)
+    return JSONResponse(
+        status_code=500,
+        content={"error": {"code": "internal_error", "message": "An internal error occurred."}},
+    )
 # ----------------------------------------------------------------------
 # Routers
 # ----------------------------------------------------------------------

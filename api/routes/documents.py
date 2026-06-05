@@ -1,8 +1,12 @@
-from fastapi import APIRouter, UploadFile, File, Form, status
+from cmath import log
+import uuid
+from pathlib import Path
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
 from datetime import date
+from database.snowflake_writer import insert_raw_document
+from ingestion.s3_uploader import upload
 
 router = APIRouter()
-
 
 @router.get("/patients/{patient_id}/documents")
 def list_patient_documents(patient_id: str) -> dict:
@@ -46,6 +50,7 @@ def get_document(document_id: str) -> dict:
     }
 
 
+
 @router.post("/patients/{patient_id}/documents",
              status_code=status.HTTP_202_ACCEPTED)
 async def upload_document(
@@ -55,9 +60,61 @@ async def upload_document(
     type: str = Form(...),
     source: str | None = Form(None),
 ) -> dict:
-    # Phase 2: push to S3 + enqueue worker job here
+    document_id = f"doc_{uuid.uuid4().hex[:8]}"
+    original_ext = Path(file.filename or "").suffix or ".pdf"
+    s3_key = f"uploads/{patient_id}/{document_id}{original_ext}"
+    file_name = file.filename or f"{document_id}{original_ext}"
+
+    try:
+        upload(file.file, s3_key)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={"error": {"code": "internal_error",
+                              "message": f"S3 upload failed: {e}"}},
+        )
+
+    try:
+        insert_raw_document(
+            document_id=document_id,
+            patient_id=patient_id,
+            s3_key=s3_key,
+            file_name=file_name,
+            doc_type=type,
+            document_date=document_date,
+            source=source,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={"error": {"code": "internal_error",
+                              "message": f"S3 ok but DB insert failed: {e}"}},
+        )
+    # 3. Run NLP pipeline synchronously (Phase 2 milestone — Phase 3 will move
+    # this to a background worker polling raw_documents).
+    from worker.document_processor import process_from_s3
+    try:
+        result = process_from_s3(
+            document_id=document_id,
+            patient_id=patient_id,
+            s3_key=s3_key,
+            document_date=document_date,
+            doc_type=type,
+        )
+        final_status = result["status"]
+        entity_count = len(result["entities"])
+    except Exception as e:
+        log.exception("Worker pipeline failed for %s", document_id)
+        final_status = "failed"
+        entity_count = 0
+
     return {
-        "document_id": "doc_new1",
-        "status": "pending",
-        "message": "Added to record - processing entities.",
+        "document_id": document_id,
+        "status": final_status,
+        "entity_count": entity_count,
+        "message": (
+            f"Document processed — {entity_count} entities extracted."
+            if final_status == "processed"
+            else "Document received but processing failed - check logs."
+        ),
     }

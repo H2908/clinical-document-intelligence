@@ -115,10 +115,10 @@ def read_documents_for_patient(patient_id: str) -> list[dict[str, Any]]:
                 status,
                 file_name,
                 s3_key,
-                uploaded_at
+                created_at
             FROM clinical_db.core.document
             WHERE patient_id = %s
-            ORDER BY document_date DESC, uploaded_at DESC
+            ORDER BY document_date DESC, created_at DESC
         """, (patient_id,))
         rows = _rows_to_dicts(cur)
         log.info("Found %d documents for %s", len(rows), patient_id)
