@@ -27,6 +27,7 @@ import json
 import logging
 from datetime import datetime
 from collections import OrderedDict
+from agents.prompts import build_briefing_summary, get_prompt_version
 
 from anthropic import Anthropic
 
@@ -220,28 +221,8 @@ def _generate_summary(
         "contradiction_count": len(contradictions),
     }
 
-    prompt = f"""You are writing the opening line of an ADMINISTRATIVE pre-appointment briefing for an NHS doctor. This is NOT clinical advice — it is a factual summary of what the patient's chart contains.
-
-PATIENT FACTS (extracted from documents):
-{json.dumps(facts, indent=2)}
-
-WRITE: 2-3 short sentences (max 60 words total) summarising what is in the chart.
-
-STRICT RULES:
-1. Plain factual statements only. No clinical opinions. No "well-managed", no "stable", no "appropriate".
-2. Reference only what is in the facts above. Do not invent.
-3. Use neutral verbs: "documented", "recorded", "noted", "listed".
-4. If contradictions or HIGH-severity flags exist, mention the count — do not interpret.
-5. No advice, no recommendations, no judgement.
-6. Output ONLY the summary text. No quotes, no preamble, no markdown.
-
-EXAMPLE OF GOOD OUTPUT:
-"Chart contains 3 documented conditions, 2 current medications recorded across 4 documents. 1 HIGH-severity flag and 0 contradictions noted for review."
-
-EXAMPLE OF BAD OUTPUT (do not write this):
-"Patient appears stable with well-managed cardiovascular disease on appropriate therapy."
-
-OUTPUT:"""
+    prompt = build_briefing_summary(facts)
+    log.info("briefing_agent: using prompt version %s", get_prompt_version("briefing_summary"))
 
     client = _get_client()
     response = client.messages.create(

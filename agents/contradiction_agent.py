@@ -28,6 +28,7 @@ import json
 import logging
 from collections import defaultdict
 from datetime import date
+from agents.prompts import build_contradiction, get_prompt_version
 
 from anthropic import Anthropic
 
@@ -117,7 +118,8 @@ def _llm_find_contradictions(
 ) -> list[dict]:
     valid_doc_ids = {d["document_id"] for d in documents}
 
-    prompt = _build_prompt(doc_summaries)
+    prompt = build_contradiction(doc_summaries)
+    log.info("contradiction_agent: using prompt version %s", get_prompt_version("contradiction"))
     client = _get_client()
     response = client.messages.create(
         model="claude-sonnet-4-6",
