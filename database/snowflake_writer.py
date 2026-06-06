@@ -77,6 +77,71 @@ def insert_raw_document(
     finally:
         conn.close()
 
+# ── insert_core_document ─────────────────────────────────────────
+def insert_core_document(
+    document_id: str,
+    patient_id: str,
+    file_name: str,
+    doc_type: str,
+    s3_key: str,
+    document_date,            # datetime.date
+    source: str | None = None,
+    extracted_text: str | None = None,
+    status: str = "processed",
+) -> None:
+    """
+    Promote a document from RAW to CORE after processing succeeds.
+    Idempotent via MERGE — re-processing the same document_id updates
+    the existing row rather than failing or duplicating.
+    """
+    conn = _get_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            MERGE INTO clinical_db.core.document AS t
+            USING (
+                SELECT
+                    %s AS document_id,
+                    %s AS patient_id,
+                    %s AS file_name,
+                    %s AS doc_type,
+                    %s AS source,
+                    %s AS document_date,
+                    %s AS s3_key,
+                    %s AS extracted_text,
+                    %s AS status
+            ) AS s
+            ON t.document_id = s.document_id
+            WHEN MATCHED THEN UPDATE SET
+                file_name       = s.file_name,
+                doc_type        = s.doc_type,
+                source          = s.source,
+                document_date   = s.document_date,
+                s3_key          = s.s3_key,
+                extracted_text  = s.extracted_text,
+                status          = s.status
+            WHEN NOT MATCHED THEN INSERT (
+                document_id, patient_id, file_name, doc_type, source,
+                document_date, s3_key, extracted_text, status
+            )
+            VALUES (
+                s.document_id, s.patient_id, s.file_name, s.doc_type, s.source,
+                s.document_date, s.s3_key, s.extracted_text, s.status
+            )
+        """, (document_id, patient_id, file_name, doc_type, source,
+              document_date, s3_key, extracted_text, status))
+        conn.commit()
+    except Exception as e:
+        raise RuntimeError(
+            f"insert_core_document failed for {document_id}: {e}"
+        ) from e
+    finally:
+        conn.close()
+
+# ── write_entities ───────────────────────────────────────────────
+def write_entities(document_id: str, patient_id: str, entities: list) -> None:
+    """
+    Write NLP-extracted entities to CORE.entity via SP_WRITE_ENTITIES.
 
 # ── insert_core_document ─────────────────────────────────────────
 def insert_core_document(
