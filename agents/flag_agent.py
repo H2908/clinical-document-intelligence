@@ -21,6 +21,7 @@ import json
 import logging
 from datetime import date, timedelta
 from collections import defaultdict
+from agents.prompts import build_flag_second_pass, get_prompt_version
 
 from anthropic import Anthropic
 
@@ -237,7 +238,8 @@ def _llm_second_pass(
     ]
     valid_doc_ids = {d["document_id"] for d in documents}
 
-    prompt = _build_flag_prompt(entity_summary, existing_flags)
+    prompt = build_flag_second_pass(entity_summary, existing_flags)
+    log.info("flag_agent: using prompt version %s", get_prompt_version("flag_second_pass"))
 
     client = _get_client()
     response = client.messages.create(
