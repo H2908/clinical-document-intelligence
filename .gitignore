@@ -1,0 +1,22 @@
+﻿# Secrets
+.env
+*.env
+*.csv
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.log
+
+# Node / Next.js
+node_modules/
+.next/
+
+# Data
+data/mimic/
+
+# OS / editor
+.DS_Store
+.vscode/
