@@ -56,12 +56,38 @@ def _is_noise(text: str) -> bool:
     if not text:
         return True
     t = text.strip().lower()
+
+    # Explicit noise list
     if t in _NOISE_TERMS:
         return True
-    if "\n" in t:  # multi-line means it captured a header
+
+    # Multi-line text means it captured a header
+    if "\n" in t:
         return True
+
+    # Too short
     if len(t) <= 3:
         return True
+
+    # Pure ICD-10 code (e.g. "i25.9") — these are codes, not conditions
+    import re
+    if re.fullmatch(r"[a-z]\d{1,2}(\.\d{1,2})?", t):
+        return True
+
+    # Person-name pattern: 2-3 capitalised words, no medical-condition keywords
+    raw = text.strip()
+    words = raw.split()
+    if 2 <= len(words) <= 3 and all(w[0].isupper() for w in words if w):
+        medical_keywords = (
+            "syndrome", "disease", "disorder", "failure", "deficiency",
+            "infection", "fracture", "carcinoma", "tumour", "tumor",
+            "cardiomyopathy", "neuropathy", "stenosis", "embolism",
+            "ischaemia", "ischemia", "fibrillation", "thrombosis",
+            "hypertension", "diabetes", "asthma", "copd",
+        )
+        if not any(k in t for k in medical_keywords):
+            return True
+
     return False
 
 
