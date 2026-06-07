@@ -44,6 +44,38 @@ CREATE TABLE IF NOT EXISTS nlp_output (
 )
 COMMENT = 'Verbatim NLP JSON blob. One row per document. Enables reprocessing.';
 
+
+
+
+
+-- ── raw_hl7 ──────────────────────────────────────────────────────
+-- ADD THIS to 01_raw.sql (after the nlp_output table).
+--
+-- Landing zone for raw HL7 v2 lab messages. Stored verbatim — the
+-- ML partner's lab_parser.py reads raw_message from here and parses
+-- it into structured observation rows. Same job-queue pattern as
+-- raw_documents (status column drives the worker).
+CREATE TABLE IF NOT EXISTS raw_hl7 (
+    hl7_id          STRING          NOT NULL,   -- PK. hl7_<uuid>. Set by API/ingest.
+    patient_id      STRING,                     -- FK → CORE.patient. Nullable until parsed.
+    raw_message     STRING          NOT NULL,   -- the full HL7 v2 message, verbatim
+    s3_key          STRING,                     -- location in S3 if uploaded as a file. Nullable.
+    source          STRING,                     -- e.g. "Trust LIMS". Nullable.
+    status          STRING          NOT NULL DEFAULT 'pending',
+                                                -- pending|processing|processed|failed
+    error_message   STRING,                     -- set when status = failed. Nullable.
+    received_at     TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    processed_at    TIMESTAMP_NTZ,              -- set when parser finishes. Nullable.
+    PRIMARY KEY (hl7_id)
+)
+COMMENT = 'Raw HL7 v2 lab messages stored verbatim. lab_parser reads from here.';
+
+-- ── Verification ─────────────────────────────────────────────────
+--   SELECT hl7_id, patient_id, status, received_at
+--   FROM raw_hl7
+--   ORDER BY received_at DESC
+--   LIMIT 10;
+
 -- ── Verification ─────────────────────────────────────────────────
 -- After an upload, confirm rows land here:
 --   SELECT document_id, patient_id, status, uploaded_at
