@@ -115,7 +115,8 @@ def read_documents_for_patient(patient_id: str) -> list[dict[str, Any]]:
                 status,
                 file_name,
                 s3_key,
-                created_at
+                created_at,
+                extracted_text
             FROM clinical_db.core.document
             WHERE patient_id = %s
             ORDER BY document_date DESC, created_at DESC

@@ -226,12 +226,51 @@ def process_from_s3(
             doc_type=doc_type,
             s3_key=s3_key,
             document_date=document_date,
-            source=None,  # could thread through from the API if needed
-            extracted_text=payload.get("extracted_text"),
+            source=None,
+            extracted_text=payload.get("document", {}).get("extracted_text"),
             status="processed",
         )
         if payload["entities"]:
             write_entities(document_id, patient_id, payload["entities"])
+
+        # ─── Run the agent orchestrator ──────────────────────────────
+        # Generates timeline events, flags, contradictions, briefing.
+        # Errors are captured in agent_state["errors"] — the pipeline does
+        # not fail the document if individual agents fail.
+        try:
+            from agents.orchestrator import run_agents
+            agent_state = run_agents(
+                patient_id=patient_id,
+                document_id=document_id,
+            )
+            agent_errors = agent_state.get("errors", [])
+            if agent_errors:
+                log.warning(
+                    "Agent orchestrator finished with %d errors: %s",
+                    len(agent_errors), agent_errors,
+                )
+            else:
+                log.info(
+                    "Agent orchestrator finished: %d timeline, %d flags, "
+                    "%d contradictions, briefing %s",
+                    len(agent_state.get("timeline_events", [])),
+                    len(agent_state.get("flags", [])),
+                    len(agent_state.get("contradictions", [])),
+                    "present" if agent_state.get("briefing") else "missing",
+                )
+            # Surface counts in the payload for the API response
+            payload["agent_counts"] = {
+                "timeline_events": len(agent_state.get("timeline_events", [])),
+                "flags": len(agent_state.get("flags", [])),
+                "contradictions": len(agent_state.get("contradictions", [])),
+                "briefing": agent_state.get("briefing") is not None,
+                "errors": len(agent_errors),
+            }
+        except Exception as e:
+            # Agent failure must NOT fail the document. The entities are
+            # already in CORE; agents can be re-run later.
+            log.exception("Agent orchestrator crashed for %s", document_id)
+            payload["agent_counts"] = {"error": str(e)}    
 
         return payload
     finally:

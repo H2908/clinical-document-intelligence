@@ -3,14 +3,14 @@ LangGraph orchestrator — chains the four agents into one runnable graph.
 
 State flows:
     read_entities  ->  timeline_agent
-                  ->  flag_agent
-                  ->  contradiction_agent  (depends on timeline + flags)
-                  ->  briefing_agent       (depends on everything)
+                  ->  flag_agent             (returns flags + metadata)
+                  ->  contradiction_agent    (returns contradictions + metadata)
+                  ->  briefing_agent
                   ->  write_outputs
 
-Task 1 (this file): the graph structure + reads + writes. Each agent is
-imported from agents/<name>_agent.py — for now they are thin stubs that
-return empty lists. Tasks 2-5 implement them properly.
+Phase 3 + ablation switches:
+    Each LLM-using agent returns (output, metadata). Metadata records
+    which mode/configuration produced the output, for evaluation logging.
 """
 
 from __future__ import annotations
@@ -27,8 +27,6 @@ from database.snowflake_reader import (
     read_entities_for_patient,
     read_documents_for_patient,
 )
-# Note: snowflake_reader is a new file your partner will need to write.
-# For Task 1 we'll add it as a placeholder.
 
 log = logging.getLogger(__name__)
 
@@ -53,8 +51,10 @@ class OrchestrationState(TypedDict):
     # Filled in by each agent
     timeline_events: list[dict]
     flags: list[dict]
+    flag_metadata: dict       # mode, n_rule_flags, n_llm_flags, prompt_version, etc.
     contradictions: list[dict]
-    briefing: dict | None     # one summary object, see NLP_OUTPUT.md / MART.patient_summary
+    contradiction_metadata: dict  # validate_provenance, n_parsed, n_rejected, etc.
+    briefing: dict | None     # see NLP_OUTPUT.md / MART.patient_summary
 
     # Diagnostics (optional)
     errors: list[str]
@@ -101,32 +101,59 @@ def _timeline_node(state: OrchestrationState) -> OrchestrationState:
 
 
 def _flag_node(state: OrchestrationState) -> OrchestrationState:
+    """
+    Calls flag_agent.detect_flags which now returns (flags, metadata).
+    Metadata records: mode, n_rule_flags, n_llm_flags, prompt_version, etc.
+    """
     try:
-        state["flags"] = detect_flags(
+        flags, metadata = detect_flags(
             patient_id=state["patient_id"],
             entities=state["entities"],
             documents=state["documents"],
         )
-        log.info("Flags: %d found", len(state["flags"]))
+        state["flags"] = flags
+        state["flag_metadata"] = metadata
+        log.info(
+            "Flags: %d found (mode=%s, rule=%d, llm=%d)",
+            len(flags),
+            metadata.get("mode"),
+            metadata.get("n_rule_flags", 0),
+            metadata.get("n_llm_flags", 0),
+        )
     except Exception as e:
         log.exception("flag_agent failed")
         state["errors"].append(f"flag: {e}")
         state["flags"] = []
+        state["flag_metadata"] = {"error": str(e)}
     return state
 
 
 def _contradiction_node(state: OrchestrationState) -> OrchestrationState:
+    """
+    Calls contradiction_agent.find_contradictions which now returns
+    (contradictions, metadata). Metadata records: validate_provenance,
+    n_parsed, n_returned, n_would_be_rejected, rejection_reasons.
+    """
     try:
-        state["contradictions"] = find_contradictions(
+        contradictions, metadata = find_contradictions(
             patient_id=state["patient_id"],
             entities=state["entities"],
             documents=state["documents"],
         )
-        log.info("Contradictions: %d found", len(state["contradictions"]))
+        state["contradictions"] = contradictions
+        state["contradiction_metadata"] = metadata
+        log.info(
+            "Contradictions: %d found (validate=%s, parsed=%d, would_reject=%d)",
+            len(contradictions),
+            metadata.get("validate_provenance"),
+            metadata.get("n_parsed", 0),
+            metadata.get("n_would_be_rejected", 0),
+        )
     except Exception as e:
         log.exception("contradiction_agent failed")
         state["errors"].append(f"contradiction: {e}")
         state["contradictions"] = []
+        state["contradiction_metadata"] = {"error": str(e)}
     return state
 
 
@@ -157,8 +184,8 @@ def _write_outputs(state: OrchestrationState) -> OrchestrationState:
     patient_id = state["patient_id"]
     log.info("Writing outputs for %s", patient_id)
 
-    # Imports are local to defer dependency on partner's writer module
-    # until it's ready. These names match docs/DB_SCHEMA.md §6.
+    # Imports are local to defer dependency on the writer module.
+    # These names match docs/DB_SCHEMA.md §6.
     from database.snowflake_writer import (
         write_timeline,
         write_flags,
@@ -247,7 +274,7 @@ def run_agents(patient_id: str, document_id: str) -> OrchestrationState:
                      the agents see the full patient state, not just this doc).
 
     Returns:
-        Final OrchestrationState dict with all agent outputs.
+        Final OrchestrationState dict with all agent outputs + metadata.
     """
     global _graph
     if _graph is None:
@@ -260,7 +287,9 @@ def run_agents(patient_id: str, document_id: str) -> OrchestrationState:
         "documents": [],
         "timeline_events": [],
         "flags": [],
+        "flag_metadata": {},
         "contradictions": [],
+        "contradiction_metadata": {},
         "briefing": None,
         "errors": [],
     }
@@ -295,5 +324,7 @@ if __name__ == "__main__":
             "contradictions": len(state["contradictions"]),
             "briefing": "present" if state["briefing"] else "missing",
         },
+        "flag_metadata": state.get("flag_metadata", {}),
+        "contradiction_metadata": state.get("contradiction_metadata", {}),
         "errors": state["errors"],
-    }, indent=2))
+    }, indent=2, default=str))
