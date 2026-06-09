@@ -28,15 +28,6 @@ from anthropic import Anthropic
 log = logging.getLogger(__name__)
 
 # Claude client — initialised lazily so import-time failures don't kill the orchestrator
-_client: Anthropic | None = None
-
-
-def _get_client() -> Anthropic:
-    global _client
-    if _client is None:
-        _client = Anthropic()  # picks up ANTHROPIC_API_KEY from env
-    return _client
-
 
 # ─── Known-dangerous patterns (extend over time) ────────────────────
 # Map: documented allergy term -> drug-name fragments to flag if present
@@ -63,36 +54,104 @@ FOLLOWUP_DAYS_THRESHOLD = 90
 
 # ─── Public API ──────────────────────────────────────────────────────
 
+from typing import Literal
+from anthropic import Anthropic
+
+FlagMode = Literal["rules_only", "llm_naive", "llm_thoughtful", "hybrid"]
+DEFAULT_FLAG_MODE: FlagMode = "hybrid"
+VALID_FLAG_MODES = ("rules_only", "llm_naive", "llm_thoughtful", "hybrid")
+
+
 def detect_flags(
     patient_id: str,
     entities: list[dict],
     documents: list[dict],
-) -> list[dict]:
+    mode: FlagMode | None = None,
+    llm_client: Anthropic | None = None,
+) -> tuple[list[dict], dict]:
     """
-    Detect risk flags for one patient. Combines deterministic rules
-    with an LLM second-pass for edge cases.
-    """
-    flags: list[dict] = []
+    Detect risk flags. Four modes:
 
-    # Filter out negated entities — patient safety
+        rules_only       — deterministic rules only, zero LLM calls
+        llm_naive        — naive LLM-only baseline on raw document text
+        llm_thoughtful   — carefully prompted LLM-only baseline on raw doc text
+        hybrid           — rules + constrained LLM second-pass (PRODUCTION)
+
+    Returns (flags, metadata).
+
+    Mode resolution order:
+        explicit arg → FLAG_AGENT_MODE env var → DEFAULT_FLAG_MODE ('hybrid')
+    """
+    if mode is None:
+        mode = os.environ.get("FLAG_AGENT_MODE", DEFAULT_FLAG_MODE)
+    if mode not in VALID_FLAG_MODES:
+        raise ValueError(
+            f"Invalid FLAG_AGENT_MODE: {mode!r}. "
+            f"Must be one of {VALID_FLAG_MODES}"
+        )
+
+    # Patient-safety: negated entities filtered for rules pipeline.
+    # CRITICAL: llm_naive and llm_thoughtful do NOT use `active` —
+    # they receive raw document text, not the entity list, to ensure
+    # they're genuinely independent of the upstream NLP pipeline.
     active = [e for e in entities if not e.get("negated")]
 
-    # Run each deterministic rule
-    flags.extend(_check_allergy_drug_conflicts(active))
-    flags.extend(_check_duplicate_medications(active))
-    flags.extend(_check_overdue_followups(active, documents))
+    rule_flags: list[dict] = []
+    llm_flags: list[dict] = []
 
-    # LLM second-pass — only if we have data and an API key
-    if active and os.environ.get("ANTHROPIC_API_KEY"):
+    # Rules branch — runs for rules_only and hybrid only
+    if mode in ("rules_only", "hybrid"):
+        rule_flags.extend(_check_allergy_drug_conflicts(active))
+        rule_flags.extend(_check_duplicate_medications(active))
+        rule_flags.extend(_check_overdue_followups(active, documents))
+
+    # LLM branches — never seen entity list except in hybrid mode
+    if mode == "hybrid" and active:
         try:
-            llm_flags = _llm_second_pass(active, documents, existing_flags=flags)
-            flags.extend(llm_flags)
+            llm_flags = _llm_second_pass(
+                active, documents,
+                existing_flags=rule_flags,
+                client=llm_client,
+            )
         except Exception as e:
-            log.exception("LLM second-pass failed; continuing with deterministic flags only")
+            log.exception("LLM second-pass failed in mode=hybrid")
+            llm_flags = []
 
-    log.info("flag_agent: produced %d flags (%d active entities)",
-             len(flags), len(active))
-    return flags
+    elif mode == "llm_naive":
+        try:
+            llm_flags = _llm_only_naive_pass(documents, client=llm_client)
+        except Exception as e:
+            log.exception("LLM naive pass failed")
+            llm_flags = []
+
+    elif mode == "llm_thoughtful":
+        try:
+            llm_flags = _llm_only_thoughtful_pass(documents, client=llm_client)
+        except Exception as e:
+            log.exception("LLM thoughtful pass failed")
+            llm_flags = []
+
+    flags = rule_flags + llm_flags
+    metadata = {
+        "mode": mode,
+        "n_rule_flags": len(rule_flags),
+        "n_llm_flags": len(llm_flags),
+        "n_active_entities": len(active),
+        "n_total_entities": len(entities),
+        "n_documents": len(documents),
+        "prompt_version": (
+            get_prompt_version("flag_second_pass")
+            if mode in ("hybrid", "llm_naive", "llm_thoughtful")
+            else None
+        ),
+    }
+
+    log.info(
+        "flag_agent: mode=%s rule_flags=%d llm_flags=%d total=%d",
+        mode, len(rule_flags), len(llm_flags), len(flags),
+    )
+
+    return flags, metadata
 
 
 # ─── Rule 1 — Allergy vs drug conflicts ──────────────────────────────
@@ -219,6 +278,7 @@ def _llm_second_pass(
     entities: list[dict],
     documents: list[dict],
     existing_flags: list[dict],
+    client: Anthropic | None = None,
 ) -> list[dict]:
     """
     Ask Claude to identify additional flags the rules missed.
@@ -239,12 +299,19 @@ def _llm_second_pass(
     valid_doc_ids = {d["document_id"] for d in documents}
 
     prompt = build_flag_second_pass(entity_summary, existing_flags)
-    log.info("flag_agent: using prompt version %s", get_prompt_version("flag_second_pass"))
+    log.info(
+        "flag_agent: using prompt version %s",
+        get_prompt_version("flag_second_pass"),
+    )
 
-    client = _get_client()
+    # Build client fresh if not injected (no module-level cache)
+    if client is None:
+        client = Anthropic()
+
     response = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=1500,
+        temperature=0.7,
         messages=[{"role": "user", "content": prompt}],
     )
     raw = response.content[0].text.strip()
@@ -286,33 +353,92 @@ def _llm_second_pass(
     log.info("LLM second-pass produced %d validated flags", len(validated))
     return validated
 
+def _llm_only_naive_pass(
+    documents: list[dict],
+    client: Anthropic | None = None,
+) -> list[dict]:
+    """
+    Naive LLM-only baseline. Receives raw cleaned document text only.
+    NO entity extraction. NO negation filtering. NO rule context.
+    NO provenance enforcement.
 
-def _build_flag_prompt(entity_summary: list[dict], existing_flags: list[dict]) -> str:
-    return f"""You are a clinical safety reviewer assisting an NHS doctor reviewing a patient's chart before an appointment. You DO NOT provide medical advice — you only surface patterns the doctor should verify.
+    This is what unguarded prompting produces — the strawman baseline.
 
-PATIENT ENTITIES (extracted from documents):
-{json.dumps(entity_summary, indent=2, default=str)}
+    REQUIRES: documents must include 'extracted_text' field.
+              Gated on the reader SELECT fix + worker text-population fix.
+    """
+    if client is None:
+        client = Anthropic()
 
-FLAGS ALREADY DETECTED BY RULES (do not duplicate these):
-{json.dumps([{"category": f["category"], "description": f["description"]} for f in existing_flags], indent=2)}
+    # Build raw corpus, tagged by document_id for citation tracking
+    blocks = []
+    for d in documents:
+        text = d.get("extracted_text") or ""
+        if not text.strip():
+            continue
+        blocks.append(
+            f"--- Document {d['document_id']} "
+            f"({d.get('doc_type', 'unknown')}, "
+            f"{d.get('document_date', 'undated')}) ---\n{text}"
+        )
 
-YOUR TASK:
-Identify any additional clinically relevant patterns the doctor should verify. Examples:
-- Inconsistent medication regimens across documents
-- Patterns suggesting medication non-adherence
-- Conditions documented without corresponding treatment
-- Investigations ordered but no result documented
+    if not blocks:
+        log.warning("llm_naive: no document text available; returning []")
+        return []
 
-STRICT RULES:
-1. Output ONLY a JSON array of flag objects. No prose, no markdown fences.
-2. Each flag: {{"severity": "HIGH"|"MEDIUM"|"LOW", "category": "SHORT_CODE", "description": "natural language for doctor", "source_document_id": "doc_..."}}
-3. source_document_id MUST be one that appears in the entities above. Never invent.
-4. Do not invent drug names, interactions, or conditions not present in the entities.
-5. If nothing additional to flag, return [].
-6. Maximum 5 flags. Be conservative — false positives waste doctor time.
-7. Use clinical language but keep descriptions under 30 words.
+    raw_corpus = "\n\n".join(blocks)
 
-OUTPUT (JSON array only):"""
+    # TODO (after gate): build_llm_naive_prompt() in agents/prompts.py
+    # TODO (after gate): call Claude with naive prompt
+    # TODO (after gate): parse, return — NO validation
+    raise NotImplementedError(
+        "llm_naive prompt + call to be finalised after extracted_text "
+        "plumbing is verified. See spec review Gap 1."
+    )
+
+
+def _llm_only_thoughtful_pass(
+    documents: list[dict],
+    client: Anthropic | None = None,
+) -> list[dict]:
+    """
+    Thoughtful LLM-only baseline. Same input as naive (raw text, no entities),
+    but with a carefully written prompt: asks Claude to identify risks AND
+    quote the supporting sentence from the source document.
+
+    This is the 'fair' LLM baseline. A reviewer asking 'did you compare
+    against a well-prompted LLM?' is answered by this condition.
+
+    REQUIRES: documents must include 'extracted_text' field.
+    """
+    if client is None:
+        client = Anthropic()
+
+    blocks = []
+    for d in documents:
+        text = d.get("extracted_text") or ""
+        if not text.strip():
+            continue
+        blocks.append(
+            f"--- Document {d['document_id']} "
+            f"({d.get('doc_type', 'unknown')}, "
+            f"{d.get('document_date', 'undated')}) ---\n{text}"
+        )
+
+    if not blocks:
+        log.warning("llm_thoughtful: no document text available; returning []")
+        return []
+
+    raw_corpus = "\n\n".join(blocks)
+
+    # TODO (after gate): build_llm_thoughtful_prompt() in agents/prompts.py
+    # TODO (after gate): call Claude with quote-anchored prompt
+    # TODO (after gate): parse, return — NO validation (validation belongs to hybrid)
+    raise NotImplementedError(
+        "llm_thoughtful prompt + call to be finalised after extracted_text "
+        "plumbing is verified. See spec review Gap 1."
+    )
+
 
 
 # ─── CLI test ────────────────────────────────────────────────────────

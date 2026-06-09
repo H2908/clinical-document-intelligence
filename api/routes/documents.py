@@ -1,13 +1,26 @@
-from cmath import log
+"""
+Document upload + retrieval endpoints.
+
+Phase 1: GET mocks for list and detail views.
+Phase 2: POST endpoint — uploads file to S3, inserts RAW row, runs NLP worker.
+Phase 3: Worker invokes the agent orchestrator after entities land.
+"""
+
+import logging
 import uuid
 from pathlib import Path
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
 from datetime import date
+
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
+
 from database.snowflake_writer import insert_raw_document
 from ingestion.s3_uploader import upload
 
+log = logging.getLogger(__name__)
 router = APIRouter()
 
+
+# ─── GET /patients/{patient_id}/documents (Phase 1 mock) ────────────
 @router.get("/patients/{patient_id}/documents")
 def list_patient_documents(patient_id: str) -> dict:
     return {
@@ -25,6 +38,7 @@ def list_patient_documents(patient_id: str) -> dict:
     }
 
 
+# ─── GET /documents/{document_id} (Phase 1 mock) ────────────────────
 @router.get("/documents/{document_id}")
 def get_document(document_id: str) -> dict:
     return {
@@ -50,9 +64,11 @@ def get_document(document_id: str) -> dict:
     }
 
 
-
-@router.post("/patients/{patient_id}/documents",
-             status_code=status.HTTP_202_ACCEPTED)
+# ─── POST /patients/{patient_id}/documents (Phase 2 + 3) ────────────
+@router.post(
+    "/patients/{patient_id}/documents",
+    status_code=status.HTTP_202_ACCEPTED,
+)
 async def upload_document(
     patient_id: str,
     file: UploadFile = File(...),
@@ -60,20 +76,31 @@ async def upload_document(
     type: str = Form(...),
     source: str | None = Form(None),
 ) -> dict:
+    """
+    Upload flow:
+      1. Push file to S3
+      2. Insert row into RAW.raw_documents (status='pending')
+      3. Run NLP worker synchronously — parses, extracts entities, writes to CORE
+      4. Worker invokes agent orchestrator — timeline, flags, contradictions, briefing
+      5. Return summary counts to caller
+    """
     document_id = f"doc_{uuid.uuid4().hex[:8]}"
     original_ext = Path(file.filename or "").suffix or ".pdf"
     s3_key = f"uploads/{patient_id}/{document_id}{original_ext}"
     file_name = file.filename or f"{document_id}{original_ext}"
 
+    # 1. S3 upload
     try:
         upload(file.file, s3_key)
     except Exception as e:
+        log.exception("S3 upload failed for %s", document_id)
         raise HTTPException(
             status_code=500,
             detail={"error": {"code": "internal_error",
                               "message": f"S3 upload failed: {e}"}},
         )
 
+    # 2. RAW row
     try:
         insert_raw_document(
             document_id=document_id,
@@ -85,13 +112,14 @@ async def upload_document(
             source=source,
         )
     except Exception as e:
+        log.exception("RAW insert failed for %s", document_id)
         raise HTTPException(
             status_code=500,
             detail={"error": {"code": "internal_error",
                               "message": f"S3 ok but DB insert failed: {e}"}},
         )
-    # 3. Run NLP pipeline synchronously (Phase 2 milestone — Phase 3 will move
-    # this to a background worker polling raw_documents).
+
+    # 3 + 4. Worker + orchestrator (synchronous for Phase 3; async in Phase 5)
     from worker.document_processor import process_from_s3
     try:
         result = process_from_s3(
@@ -102,19 +130,28 @@ async def upload_document(
             doc_type=type,
         )
         final_status = result["status"]
-        entity_count = len(result["entities"])
+        entity_count = len(result.get("entities", []))
+        agent_counts = result.get("agent_counts", {})
     except Exception as e:
         log.exception("Worker pipeline failed for %s", document_id)
         final_status = "failed"
         entity_count = 0
+        agent_counts = {}
+
+    # 5. Build response
+    if final_status == "processed":
+        message = (
+            f"Document processed — {entity_count} entities extracted, "
+            f"{agent_counts.get('flags', 0)} flags, "
+            f"{agent_counts.get('contradictions', 0)} contradictions."
+        )
+    else:
+        message = "Document received but processing failed — check logs."
 
     return {
         "document_id": document_id,
         "status": final_status,
         "entity_count": entity_count,
-        "message": (
-            f"Document processed — {entity_count} entities extracted."
-            if final_status == "processed"
-            else "Document received but processing failed - check logs."
-        ),
+        "agent_counts": agent_counts,
+        "message": message,
     }
