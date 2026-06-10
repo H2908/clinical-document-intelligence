@@ -2,34 +2,36 @@
 Worker — chains the pipeline for one document.
 
 Pipeline:
-  PDF -> parse -> clean -> NER -> negation -> dates
+  PDF -> parse -> clean -> NER -> negation -> dates -> lab parsing
        -> assemble NLP_OUTPUT.md JSON
        -> write JSON to disk (Phase 2)
-       -> (Phase 3: call snowflake_writer instead)
+       -> write entities + observations to Snowflake (Phase 3)
+       -> run agent orchestrator (Phase 3)
 
 This is the single function your worker thread will call per job.
 """
 
-from __future__ import annotations 
+from __future__ import annotations
 import json
 import logging
-from datetime import datetime,date
+from datetime import datetime, date
 from pathlib import Path
-from typing import Optional,Any
+from typing import Optional, Any
 
 from parsers.pdf_parser import parse_pdf
 from parsers.text_cleaner import clean_text
 from nlp.medical_ner import extract_entities, Entity
+from nlp.lab_parser import parse_labs
 from nlp.negation_detector import detect_negation
 from nlp.date_normaliser import normalise_dates
 
 log = logging.getLogger(__name__)
-NLP_VERSION="1.0.0"
+NLP_VERSION = "1.0.0"
+
 
 # ---------------------------------------------------------------------------
-# Derivations — entities -> conditions / medications / observations
+# Derivations - entities -> conditions / medications
 # ---------------------------------------------------------------------------
-
 
 def _derive_conditions(entities: list[Entity]) -> list[dict[str, Any]]:
     """
@@ -53,11 +55,11 @@ def _derive_conditions(entities: list[Entity]) -> list[dict[str, Any]]:
         })
     return out
 
+
 def _derive_medications(entities: list[Entity]) -> list[dict[str, Any]]:
     """
     From non-negated Drug entities, build the medications[] list.
     Deduplicated by normalised_value (lowercase base drug name).
-    Phase 2 leaves dose/started/flag blank; Phase 3's briefing agent fills them.
     """
     seen: set[str] = set()
     out: list[dict[str, Any]] = []
@@ -72,11 +74,12 @@ def _derive_medications(entities: list[Entity]) -> list[dict[str, Any]]:
         seen.add(key)
         out.append({
             "drug": e["text"],
-            "dose": "",          # Phase 3 — pair drug with following dose token
+            "dose": "",
             "started": None,
             "flag_text": None,
         })
     return out
+
 
 # ---------------------------------------------------------------------------
 # Public API
@@ -102,11 +105,11 @@ def process_document(
                   / lab_report / imaging / clinician_note.
 
     Returns:
-        One dict matching NLP_OUTPUT.md §2.
+        One dict matching NLP_OUTPUT.md section 2.
     """
     log.info("Processing %s for %s", file_path, patient_id)
     processed_at = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
-    # Skeleton matching NLP_OUTPUT.md §2 — populated below.
+
     payload: dict[str, Any] = {
         "nlp_version": NLP_VERSION,
         "document_id": document_id,
@@ -122,10 +125,10 @@ def process_document(
         "entities": [],
         "conditions": [],
         "medications": [],
-        "observations": [],     # Phase 3 — extracted from lab parsers
-        "flags": [],            # Phase 3 — risk_flag_agent
-        "contradictions": [],   # Phase 3 — contradiction_agent
-        "timeline_events": [],  # Phase 3 — timeline_agent
+        "observations": [],
+        "flags": [],
+        "contradictions": [],
+        "timeline_events": [],
     }
 
     # --- Pipeline ---------------------------------------------------------
@@ -138,25 +141,32 @@ def process_document(
         detect_negation(cleaned, entities)
         normalise_dates(entities, document_date)
 
+        observations = parse_labs(
+            text=cleaned,
+            document_id=document_id,
+            document_date=document_date,
+        )
+        payload["observations"] = observations
+        log.info("Extracted %d lab observations from %s", len(observations), document_id)
+
         payload["entities"] = entities
         payload["conditions"] = _derive_conditions(entities)
         payload["medications"] = _derive_medications(entities)
 
     except (FileNotFoundError, ValueError) as e:
         # Known parser failures (missing file, not a PDF, encrypted, no text).
-        # NLP_OUTPUT.md §5 says: status=failed, all arrays remain [], log it.
         log.warning("Document %s failed: %s", document_id, e)
         payload["status"] = "failed"
         payload["error_message"] = str(e)
 
     except Exception as e:
-        # Unknown failure — still emit a valid payload so the document
-        # doesn't silently vanish from the worker queue.
         log.exception("Document %s unexpected error", document_id)
         payload["status"] = "failed"
         payload["error_message"] = f"Unexpected error: {e}"
 
-    return payload    
+    return payload
+
+
 # ---------------------------------------------------------------------------
 # Disk sink (Phase 2). Phase 3 replaces this with snowflake_writer calls.
 # ---------------------------------------------------------------------------
@@ -164,17 +174,19 @@ def process_document(
 def write_to_disk(payload: dict[str, Any], output_dir: str | Path) -> Path:
     """
     Phase 2 sink: write the payload JSON to disk so the rest of the
-    pipeline (frontend, future agents) can be developed against real
-    output before the storage layer is ready.
-
-    Returns the path written.
+    pipeline can be developed against real output.
     """
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     out_path = output_dir / f"{payload['document_id']}.json"
-    out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    out_path.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
     log.info("Wrote %s", out_path)
     return out_path
+
+
+# ---------------------------------------------------------------------------
+# S3 + Snowflake entrypoint (Phase 3)
+# ---------------------------------------------------------------------------
 
 def process_from_s3(
     document_id: str,
@@ -184,13 +196,13 @@ def process_from_s3(
     doc_type: str,
 ) -> dict[str, Any]:
     """
-    Phase 2 Together Task 3 entrypoint.
-    Downloads file from S3, runs the NLP pipeline, writes entities to CORE.
+    Phase 3 entrypoint: downloads from S3, runs NLP pipeline, writes entities
+    AND observations to CORE, runs agent orchestrator.
     """
     import os
     import tempfile
     import boto3
-    from database.snowflake_writer import write_entities
+    from database.snowflake_writer import write_entities, write_observations
 
     log.info("Processing %s from S3 (%s)", document_id, s3_key)
 
@@ -216,27 +228,34 @@ def process_from_s3(
             doc_type=doc_type,
         )
 
-        if payload["status"] == "processed" and payload["entities"]:
-            # Promote the document to CORE first (so FK from entities is valid)
+        # Promote to CORE + write entities and observations, only if processing succeeded
+        if payload["status"] == "processed":
             from database.snowflake_writer import insert_core_document
             insert_core_document(
-            document_id=document_id,
-            patient_id=patient_id,
-            file_name=Path(s3_key).name,
-            doc_type=doc_type,
-            s3_key=s3_key,
-            document_date=document_date,
-            source=None,
-            extracted_text=payload.get("document", {}).get("extracted_text"),
-            status="processed",
-        )
-        if payload["entities"]:
-            write_entities(document_id, patient_id, payload["entities"])
+                document_id=document_id,
+                patient_id=patient_id,
+                file_name=Path(s3_key).name,
+                doc_type=doc_type,
+                s3_key=s3_key,
+                document_date=document_date,
+                source=None,
+                extracted_text=payload.get("document", {}).get("extracted_text"),
+                status="processed",
+            )
 
-        # ─── Run the agent orchestrator ──────────────────────────────
-        # Generates timeline events, flags, contradictions, briefing.
-        # Errors are captured in agent_state["errors"] — the pipeline does
-        # not fail the document if individual agents fail.
+            if payload["entities"]:
+                try:
+                    write_entities(document_id, patient_id, payload["entities"])
+                except Exception:
+                    log.exception("write_entities failed for %s", document_id)
+
+            if payload.get("observations"):
+                try:
+                    write_observations(document_id, patient_id, payload["observations"])
+                except Exception:
+                    log.exception("write_observations failed for %s", document_id)
+
+        # --- Run the agent orchestrator -------------------------------
         try:
             from agents.orchestrator import run_agents
             agent_state = run_agents(
@@ -258,7 +277,6 @@ def process_from_s3(
                     len(agent_state.get("contradictions", [])),
                     "present" if agent_state.get("briefing") else "missing",
                 )
-            # Surface counts in the payload for the API response
             payload["agent_counts"] = {
                 "timeline_events": len(agent_state.get("timeline_events", [])),
                 "flags": len(agent_state.get("flags", [])),
@@ -267,17 +285,17 @@ def process_from_s3(
                 "errors": len(agent_errors),
             }
         except Exception as e:
-            # Agent failure must NOT fail the document. The entities are
-            # already in CORE; agents can be re-run later.
             log.exception("Agent orchestrator crashed for %s", document_id)
-            payload["agent_counts"] = {"error": str(e)}    
+            payload["agent_counts"] = {"error": str(e)}
 
         return payload
+
     finally:
         try:
             os.unlink(tmp.name)
         except Exception:
             pass
+
 
 # ---------------------------------------------------------------------------
 # CLI for manual testing
@@ -308,6 +326,7 @@ if __name__ == "__main__":
     out_path = write_to_disk(result, out_dir)
     print(f"Status: {result['status']}")
     print(f"Entities: {len(result['entities'])}")
+    print(f"Observations: {len(result['observations'])}")
     print(f"Conditions: {len(result['conditions'])}")
     print(f"Medications: {len(result['medications'])}")
     print(f"Wrote: {out_path}")
