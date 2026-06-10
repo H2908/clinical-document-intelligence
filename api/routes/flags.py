@@ -1,54 +1,102 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
-from typing import Optional, Literal
+"""
+Flags endpoint - reads risk flags from CORE.flag.
 
+The flag_agent re-runs on every upload and persistence is idempotent at
+the row level, not the (category, description) level. We dedupe in the
+read query, keeping the newest row per (category, description) pair.
+"""
+
+import os
+import logging
+
+import snowflake.connector
+from fastapi import APIRouter, HTTPException, Query
+from dotenv import load_dotenv
+
+load_dotenv()
+log = logging.getLogger(__name__)
 router = APIRouter()
 
-MOCK_FLAGS = [
-    {
-        "id": "flag_4c1d", "severity": "HIGH", "category": "ALLERGY CONFLICT",
-        "description": ("Allergy status conflicts between GP letter (NKDA) and "
-                        "cardiology letter (penicillin allergy). Verify before "
-                        "prescribing antibiotics."),
-        "source_document_id": "doc_77ab",
-        "source_document_name": "Cardiology_28Feb2024.pdf",
-        "status": "open", "created_at": "2024-02-28T00:00:00Z",
-    },
-    {
-        "id": "flag_5e2a", "severity": "HIGH", "category": "OVERDUE REFERRAL",
-        "description": ("Heart failure nurse follow-up was due 4 weeks ago. "
-                        "No record of appointment or attendance."),
-        "source_document_id": "doc_77ab",
-        "source_document_name": "Cardiology_28Feb2024.pdf",
-        "status": "open", "created_at": "2024-02-28T00:00:00Z",
-    },
-    {
-        "id": "flag_8f33", "severity": "MEDIUM", "category": "DRUG SAFETY",
-        "description": ("Metformin 1 g BD continues despite eGFR of "
-                        "42 mL/min/1.73m2. Consider dose reduction per NICE."),
-        "source_document_id": "doc_91",
-        "source_document_name": "DM_Review_10Apr2024.pdf",
-        "status": "open", "created_at": "2024-04-10T00:00:00Z",
-    },
-]
 
-
-class FlagPatch(BaseModel):
-    status: Literal["open", "resolved"]
+def _conn():
+    return snowflake.connector.connect(
+        account=os.environ["SNOWFLAKE_ACCOUNT"],
+        user=os.environ["SNOWFLAKE_USER"],
+        password=os.environ["SNOWFLAKE_PASSWORD"],
+        database="clinical_db",
+        warehouse="clinical_wh",
+        role=os.environ["SNOWFLAKE_ROLE"],
+    )
 
 
 @router.get("/patients/{patient_id}/flags")
-def list_flags(patient_id: str, status: Optional[str] = None) -> dict:
-    items = MOCK_FLAGS
+def list_flags(
+    patient_id: str,
+    status: str | None = Query(None, description="Filter by status (open/resolved). Omit for all."),
+) -> dict:
+    """
+    Return distinct flags for a patient. Dedupes on (category, description),
+    keeping the most recent row.
+    """
+    try:
+        conn = _conn()
+    except Exception:
+        log.exception("Snowflake connect failed for flags read")
+        raise HTTPException(
+            status_code=503,
+            detail={"error": {"code": "database_unavailable",
+                              "message": "Could not connect to data warehouse"}},
+        )
+
+    sql = """
+        SELECT flag_id, severity, category, description,
+               source_document_id, status, created_at, resolved_at
+        FROM (
+            SELECT *,
+                   ROW_NUMBER() OVER (
+                       PARTITION BY category, description
+                       ORDER BY created_at DESC
+                   ) AS rn
+            FROM clinical_db.core.flag
+            WHERE patient_id = %s
+        )
+        WHERE rn = 1
+    """
+    params: list = [patient_id]
     if status:
-        items = [f for f in items if f["status"] == status]
+        sql += " AND status = %s"
+        params.append(status)
+    sql += " ORDER BY CASE severity WHEN 'HIGH' THEN 1 WHEN 'MEDIUM' THEN 2 ELSE 3 END, created_at DESC"
+
+    try:
+        cur = conn.cursor()
+        cur.execute(sql, tuple(params))
+        rows = cur.fetchall()
+        cols = [c[0].lower() for c in cur.description]
+        flags = [dict(zip(cols, r)) for r in rows]
+    except Exception as e:
+        log.exception("CORE.flag read failed for %s", patient_id)
+        raise HTTPException(
+            status_code=500,
+            detail={"error": {"code": "internal_error",
+                              "message": f"Query failed: {e}"}},
+        )
+    finally:
+        conn.close()
+
+    # Serialise timestamps
+    for f in flags:
+        if f.get("created_at"):
+            f["created_at"] = f["created_at"].isoformat()
+        if f.get("resolved_at"):
+            f["resolved_at"] = f["resolved_at"].isoformat()
+
+    open_count = sum(1 for f in flags if f.get("status", "open") == "open")
+    resolved_count = sum(1 for f in flags if f.get("status") == "resolved")
+
     return {
-        "open_count": sum(1 for f in MOCK_FLAGS if f["status"] == "open"),
-        "resolved_count": sum(1 for f in MOCK_FLAGS if f["status"] == "resolved"),
-        "flags": items,
+        "patient_id": patient_id,
+        "open_count": open_count,
+        "resolved_count": resolved_count,
+        "flags": flags,
     }
-
-
-@router.patch("/flags/{flag_id}")
-def update_flag(flag_id: str, body: FlagPatch) -> dict:
-    return {**MOCK_FLAGS[0], "id": flag_id, "status": body.status}
