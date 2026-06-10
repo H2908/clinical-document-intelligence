@@ -289,9 +289,18 @@ def _llm_second_pass(
 ) -> list[dict]:
     """
     Ask Claude to identify additional flags the rules missed.
-    Strict prompt: must return JSON, must cite source_document_id from the
-    provided list, must not invent drug interactions not in the entities.
+    Hybrid v1.2 validator with four guards:
+        1. cited_document_id must be in patient's documents
+        2. source_quote must meet minimum length (>= 30 chars AND >= 6 words)
+        3. source_quote must appear verbatim in cited document text
+        4. source_quote must share at least one clinical subject word with
+           the flag's own description (closes the padding loophole)
+
+    All four guards emit distinct VERDICT log lines for downstream bucket
+    analysis (paper Day 2 instrument-hardening).
     """
+    import re
+
     # Build a compact summary for the prompt
     entity_summary = [
         {
@@ -339,57 +348,175 @@ def _llm_second_pass(
     if not isinstance(parsed, list):
         return []
 
-    # Validate every flag the LLM produced
     # Build a map of document_id -> extracted_text for quote validation
     doc_text_by_id = {
         d["document_id"]: (d.get("extracted_text") or "")
         for d in documents
     }
 
-    # Validate every flag the LLM produced
-    validated = []
+    # Minimum quote requirements (Day 2 instrument-hardening, v1.2)
+    MIN_QUOTE_CHARS = 30
+    MIN_QUOTE_WORDS = 6
+    MIN_QUOTE_WORDS_SOFT = 3  # soft branch word floor (with subject-overlap)
+
     required_fields = (
         "severity", "category", "description",
         "cited_document_id", "source_quote",
     )
+
+    # Stopwords stripped before checking quote-vs-flag subject overlap.
+    # Locked instrument: spaCy's en_core_web_sm STOP_WORDS (pinned version)
+    # plus a small, paper-declared clinical-generic set.
+    # The declared set:
+    #   patient    - universal in clinical docs, never the subject
+    #   documented - provenance verb
+    #   noted      - provenance verb
+    #   listed     - provenance verb
+    #   verify     - instruction-to-clinician verb
+    #   confirm    - instruction verb
+    #   doctor     - actor word, never the subject
+    CLINICAL_GENERIC = {
+        "patient", "documented", "noted", "listed",
+        "verify", "confirm", "doctor",
+    }
+    from spacy.lang.en.stop_words import STOP_WORDS
+    STOPWORDS_AND_GENERIC = STOP_WORDS | CLINICAL_GENERIC
+
+    # Log the full pre-validation population (for bucket analysis across N runs)
+    for f in parsed:
+        if isinstance(f, dict):
+            log.info(
+                "HYBRID PRE-VALIDATION quote=%r cited=%r category=%r",
+                (f.get("source_quote") or "")[:200],
+                f.get("cited_document_id"),
+                f.get("category"),
+            )
+
+    validated = []
     for f in parsed:
         if not isinstance(f, dict):
             continue
         if not all(k in f for k in required_fields):
-            log.warning("LLM flag missing required field; rejecting: %s", f)
+            log.warning("=" * 70)
+            log.warning("HYBRID VALIDATOR REJECTION: missing required field")
+            log.warning("flag: %r", f)
+            log.warning("VERDICT: schema-failure")
+            log.warning("=" * 70)
             continue
         if f["severity"] not in ("HIGH", "MEDIUM", "LOW"):
             continue
-        # cited_document_id MUST be in the patient's actual docs
+
         cited = f["cited_document_id"]
-        if cited not in valid_doc_ids:
-            log.warning("LLM cited unknown doc %s; rejecting flag", cited)
-            continue
-        # source_quote MUST appear verbatim in the cited document's text
         quote = (f.get("source_quote") or "").strip()
+        description = f.get("description", "")
+        category = f.get("category", "")
         doc_text = doc_text_by_id.get(cited, "")
-        if not quote:
-            log.warning("LLM flag has empty source_quote; rejecting")
+
+        # GUARD 1 - cited_document_id must be in patient's actual docs
+        if cited not in valid_doc_ids:
+            log.warning("=" * 70)
+            log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
+            log.warning("LLM quote: %r", quote[:200])
+            log.warning("VERDICT: phantom-citation (doc_id not in patient's records)")
+            log.warning("=" * 70)
             continue
+
+        # GUARD 2 - quote must be non-trivial in length
+       # GUARD 2 - quote must be non-trivial. OR'd predicate (advisor-locked):
+        #   Strict branch:  (chars>=30 AND words>=6)
+        #   Soft branch:    (words>=3 AND quote_shares_subject_with_flag)
+        # The soft branch admits terse-but-grounded clinical instructions
+        # (e.g. "Repeat echocardiogram in 6 months") while rejecting single
+        # and double keyword quotes.
+        word_count = len(re.findall(r"\w+", quote))
+        # Pre-compute subject overlap once (used by both Guard 2 soft branch
+        # and Guard 4 below; cheaper to compute once)
+        subject_text = f"{category} {description}".lower()
+        subject_text = re.sub(r"\bai[_ ]", " ", subject_text)
+        raw_subject_words = set(re.findall(r"[a-z]{4,}", subject_text))
+        subject_words = raw_subject_words - STOPWORDS_AND_GENERIC
+        quote_words_for_overlap = set(re.findall(r"[a-z]{4,}", quote.lower()))
+        quote_shares_subject = bool(subject_words and (subject_words & quote_words_for_overlap))
+
+        strict_pass = (len(quote) >= MIN_QUOTE_CHARS and word_count >= MIN_QUOTE_WORDS)
+        soft_pass = (word_count >= MIN_QUOTE_WORDS_SOFT and quote_shares_subject)
+
+        if not (strict_pass or soft_pass):
+            log.warning("=" * 70)
+            log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
+            log.warning("LLM quote: %r", quote)
+            log.warning(
+                "VERDICT: trivial-quote (chars=%d, words=%d; "
+                "strict needs chars>=%d AND words>=%d; "
+                "soft needs words>=%d AND subject-overlap; "
+                "subject_shared=%s)",
+                len(quote), word_count,
+                MIN_QUOTE_CHARS, MIN_QUOTE_WORDS,
+                MIN_QUOTE_WORDS_SOFT, quote_shares_subject,
+            )
+            log.warning("=" * 70)
+            continue
+
+        # GUARD 3 - quote must appear verbatim in cited document
         if quote not in doc_text:
-            # Soft check: normalise whitespace before final reject
-            import re
-            quote_norm = re.sub(r"\s+", " ", quote)
-            doc_norm = re.sub(r"\s+", " ", doc_text)
+            quote_norm = re.sub(r"\s+", " ", quote).strip()
+            doc_norm = re.sub(r"\s+", " ", doc_text).strip()
             if quote_norm not in doc_norm:
-                log.warning(
-                    "LLM source_quote not found in cited document %s; rejecting (quote=%r)",
-                    cited, quote[:80],
-                )
+                log.warning("=" * 70)
+                log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
+                log.warning("LLM quote (raw):       %r", quote)
+                log.warning("LLM quote (normalised): %r", quote_norm)
+                log.warning("LLM description: %r", description[:120])
+                ql = quote_norm.lower()
+                dl = doc_norm.lower()
+                if ql in dl:
+                    log.warning("VERDICT: case-mismatch (validator too case-strict)")
+                else:
+                    quote_words = set(re.findall(r"\w+", quote_norm.lower()))
+                    doc_words = set(re.findall(r"\w+", doc_norm.lower()))
+                    overlap = quote_words & doc_words
+                    if len(overlap) >= max(3, len(quote_words) // 2):
+                        log.warning(
+                            "VERDICT: paraphrase-or-boundary "
+                            "(%d/%d quote-words present in doc)",
+                            len(overlap), len(quote_words),
+                        )
+                    else:
+                        log.warning(
+                            "VERDICT: fabrication "
+                            "(only %d/%d quote-words present in doc)",
+                            len(overlap), len(quote_words),
+                        )
+                log.warning("=" * 70)
                 continue
-        # Reserve grounding_status field; metric module will populate later
+
+        # GUARD 4 - quote must mention the clinical subject of its own flag.
+        # Closes the padding loophole. Uses subject_words and
+        # quote_shares_subject already computed for Guard 2 above.
+        if subject_words and not quote_shares_subject:
+            log.warning("=" * 70)
+            log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
+            log.warning("LLM quote: %r", quote[:200])
+            log.warning("LLM description: %r", description[:120])
+            log.warning(
+                "VERDICT: irrelevant-padding "
+                "(quote shares zero clinical subject words with flag's own "
+                "description; subject_words=%s)",
+                sorted(subject_words)[:10],
+            )
+            log.warning("=" * 70)
+            continue
+
+        # All guards passed
         f.setdefault("grounding_status", None)
-        # Tag as AI-detected so the doctor knows
         if not f["category"].startswith("AI_"):
             f["category"] = f"AI_{f['category']}"
         validated.append(f)
 
-    log.info("LLM second-pass produced %d validated flags", len(validated))
+    log.info(
+        "LLM second-pass produced %d validated flags (from %d parsed)",
+        len(validated), len(parsed),
+    )
     return validated
 
 def _llm_only_naive_pass(

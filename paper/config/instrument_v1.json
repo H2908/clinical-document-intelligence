@@ -1,0 +1,58 @@
+{
+  "instrument_version": "v1.2",
+  "frozen_at_utc": "2026-06-10T07:00:00Z",
+  "pre_registration_note": "This config defines the hybrid validator and prompt parameters used for the AAAI 2027 paper. Frozen on pat_test_01 (dev). Must not be modified once the 20 held-out cases begin.",
+
+  "schema": {
+    "fields": ["severity", "category", "description", "cited_document_id", "source_quote", "grounding_status"],
+    "severity_enum": ["HIGH", "MEDIUM", "LOW"],
+    "grounding_status_enum": [null, "grounded", "misattributed", "fabricated"]
+  },
+
+  "llm_call": {
+    "model": "claude-sonnet-4-6",
+    "temperature": 0.7,
+    "max_tokens": 1500,
+    "temperature_justification": "0.7 reflects realistic deployment defaults rather than a determinism-maximising 0.0 that would artificially suppress the reproducibility variance we are measuring."
+  },
+
+  "validator": {
+    "guard_1_phantom_citation": {
+      "rule": "cited_document_id MUST appear in the set of document_ids for the patient",
+      "active": true
+    },
+    "guard_2_trivial_quote": {
+      "predicate": "(chars>=30 AND words>=6) OR (words>=3 AND quote_shares_subject_with_flag)",
+      "min_quote_chars_strict": 30,
+      "min_quote_words_strict": 6,
+      "min_quote_words_soft": 3,
+      "active": true,
+      "justification": "A minimum of six words / thirty characters excludes single-term keyword matches while admitting any complete clinical phrase. The OR'd soft branch admits terse-but-grounded clinical instructions verified on the 13 dev-quote test."
+    },
+    "guard_3_verbatim": {
+      "rule": "source_quote must appear verbatim in cited document; whitespace-normalised substring match; rejections sub-bucketed into case-mismatch / paraphrase-or-boundary / fabrication based on word-overlap fraction",
+      "normalisation": "lowercase preserved (case-mismatch reported separately); whitespace collapsed via re.sub(r'\\s+', ' '); leading/trailing strip",
+      "active": true
+    },
+    "guard_4_irrelevant_padding": {
+      "rule": "quote must share at least one >=4-char alphabetic clinical subject word with the flag's category+description after stripping stopwords",
+      "stopword_set": "spacy.lang.en.stop_words.STOP_WORDS union with clinical-generic set",
+      "clinical_generic_set": ["patient", "documented", "noted", "listed", "verify", "confirm", "doctor"],
+      "spacy_version_pinned": "see requirements.txt",
+      "active": true,
+      "justification": "Closes the padding loophole - a long but irrelevant quote that satisfies guards 1-3 would still fail Guard 4 if it shares no clinical subject word with its own flag's description."
+    }
+  },
+
+  "prompt_versions": {
+    "flag_second_pass": "v1.2",
+    "flag_llm_naive": "v1.0",
+    "flag_llm_thoughtful": "v1.0"
+  },
+
+  "dataset_split": {
+    "dev_instrument": "pat_test_01",
+    "held_out_cases": "20 synthetic NHS cases (to be generated)",
+    "rule": "Validator and prompt parameters frozen against pat_test_01. After the 20-case run begins, no further parameter adjustment is permitted."
+  }
+}
