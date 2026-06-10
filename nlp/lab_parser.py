@@ -104,9 +104,15 @@ _VALUE_PATTERN = (
     r"(?:[:=]\s*|\s+)"                # separator: colon, equals, or whitespace
     r"(?P<value>[<>]?\s*\d+(?:\.\d+)?)"  # number, optionally prefixed with </>
     r"\s*"
-    r"(?P<unit>(?:%|mL/min(?:/1\.73m2)?|mmol/L|g/dL|g/L|mg/dL|mg/L|"
-    r"ng/mL|pg/mL|U/L|IU/L|mIU/L|mU/L|fL|10\^9/L|10\^12/L|"
-    r"x10\^9/L|x10\^12/L|/L|/mm3))?"
+    r"(?P<unit>(?:%|mL/min(?:/1\.73m2)?|"
+    r"mmol/L|micromol/L|umol/L|µmol/L|"
+    r"g/dL|g/L|mg/dL|mg/L|mcg/L|mcg/dL|µg/L|µg/dL|"
+    r"ng/mL|ng/L|pg/mL|pg/L|"
+    r"U/L|IU/L|mIU/L|mU/L|kU/L|"
+    r"fL|fmol/L|nmol/L|"
+    r"10\^9/L|10\^12/L|x10\^9/L|x10\^12/L|/L|/mm3|"
+    r"kPa|mmHg|bpm"
+    r"))?"
 )
 
 
