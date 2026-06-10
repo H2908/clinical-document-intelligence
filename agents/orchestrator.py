@@ -214,17 +214,18 @@ def _write_outputs(state: OrchestrationState) -> OrchestrationState:
             log.exception("write_contradictions failed")
             state["errors"].append(f"write_contradictions: {e}")
 
-    # Always refresh the summary — even if some agents failed, the doctor
-    # benefits from whatever data did land.
-    try:
-        refresh_summary(patient_id)
-    except Exception as e:
-        log.exception("refresh_summary failed")
-        state["errors"].append(f"refresh_summary: {e}")
+    # Persist briefing directly to MART (bypasses SP_REFRESH_SUMMARY which
+    # builds from CORE.condition / CORE.medication - tables not currently
+    # populated). The briefing agent's dict is the source of truth.
+    if state["briefing"]:
+        try:
+            from database.snowflake_writer import write_briefing
+            write_briefing(patient_id, state["briefing"])
+        except Exception as e:
+            log.exception("write_briefing failed")
+            state["errors"].append(f"write_briefing: {e}")
 
-    return state
-
-
+        return state
 # ---------------------------------------------------------------------------
 # Graph construction
 # ---------------------------------------------------------------------------

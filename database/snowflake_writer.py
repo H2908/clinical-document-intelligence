@@ -207,7 +207,78 @@ def refresh_summary(patient_id: str) -> None:
     sql = f"CALL clinical_db.mart.SP_REFRESH_SUMMARY('{patient_id}')"
     _call_proc_with_array(sql, "refresh_summary", patient_id)
 
+# ---- write_briefing ----
+def write_briefing(patient_id: str, briefing: dict) -> None:
+    """
+    Write the briefing agent's output directly to MART.patient_summary.
 
+    This bypasses SP_REFRESH_SUMMARY, which is designed to build the
+    summary from CORE.condition / CORE.medication / CORE.flag tables.
+    Those tables aren't currently populated by the agent layer, so
+    SP_REFRESH_SUMMARY produces empty conditions/medications. This
+    function writes the agent's in-memory dict (which has correct
+    active_conditions and current_medications) as the source of truth.
+
+    Idempotent via MERGE on patient_id - re-running for the same patient
+    updates the existing row.
+
+    Output schema (briefing dict):
+        {
+            "patient_id": str,
+            "active_conditions":   list[dict],
+            "current_medications": list[dict],
+            "open_flags":          list[dict],
+            "contradictions":      list[dict],
+            ...other fields produced by briefing_agent
+        }
+
+    Persisted under JSON keys:
+        conditions, medications, open_flags, patient
+        (matches the shape downstream API endpoints already expect)
+    """
+    
+    # Build the JSON shape the API endpoints expect.
+    # active_conditions -> conditions, current_medications -> medications 
+    summary_for_mart = {
+        "conditions":   briefing.get("active_conditions", []),
+        "medications":  briefing.get("current_medications", []),
+        "open_flags":   briefing.get("open_flags", []),
+        "patient": briefing.get("patient", {
+            "id":         patient_id,
+            "name":       "Test Patient",
+            "dob":        "1980-01-01",
+            "nhs_number": "000 000 0001",
+            "sex":        "Other",
+        }),
+    }
+
+    summary_json = json.dumps(summary_for_mart, default=str)
+
+    conn = _get_connection()
+    try:
+        cur = conn.cursor()
+        sql = (
+            "MERGE INTO clinical_db.mart.patient_summary AS t "
+            "USING (SELECT %s AS patient_id, "
+            "       PARSE_JSON(%s) AS summary, "
+            "       CURRENT_TIMESTAMP AS generated_at, "
+            "       FALSE AS is_stale) AS s "
+            "ON t.patient_id = s.patient_id "
+            "WHEN MATCHED THEN UPDATE SET "
+            "       summary = s.summary, "
+            "       generated_at = s.generated_at, "
+            "       is_stale = s.is_stale "
+            "WHEN NOT MATCHED THEN INSERT "
+            "       (patient_id, summary, generated_at, is_stale) "
+            "       VALUES (s.patient_id, s.summary, s.generated_at, s.is_stale)"
+        )
+        cur.execute(sql, (patient_id, summary_json))
+        conn.commit()
+        print(f"[snowflake_writer] write_briefing: OK for patient {patient_id}")
+    except Exception as e:
+        raise RuntimeError("write_briefing failed for " + patient_id + ": " + str(e)) from e
+    finally:
+        conn.close()
 # ---- delete_patient ----
 def delete_patient(patient_id: str) -> dict:
     """
