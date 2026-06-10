@@ -22,7 +22,12 @@ import logging
 from datetime import date, timedelta
 from collections import defaultdict
 from agents.prompts import build_flag_second_pass, get_prompt_version
-
+from agents.prompts import (
+    build_flag_second_pass,
+    build_flag_llm_thoughtful,
+    build_flag_llm_naive,
+    get_prompt_version,
+)
 from anthropic import Anthropic
 
 log = logging.getLogger(__name__)
@@ -113,37 +118,39 @@ def detect_flags(
                 existing_flags=rule_flags,
                 client=llm_client,
             )
-        except Exception as e:
+        except NotImplementedError:
+            raise
+        except Exception:
             log.exception("LLM second-pass failed in mode=hybrid")
             llm_flags = []
 
     elif mode == "llm_naive":
         try:
             llm_flags = _llm_only_naive_pass(documents, client=llm_client)
-        except Exception as e:
-            log.exception("LLM naive pass failed")
+        except NotImplementedError:
+            raise  # gated/unimplemented modes must fail loud
+        except Exception:
+            log.exception("LLM naive pass failed in mode=llm_naive")
             llm_flags = []
 
     elif mode == "llm_thoughtful":
         try:
             llm_flags = _llm_only_thoughtful_pass(documents, client=llm_client)
-        except Exception as e:
-            log.exception("LLM thoughtful pass failed")
+        except NotImplementedError:
+            raise  # gated/unimplemented modes must fail loud
+        except Exception:
+            log.exception("LLM thoughtful pass failed in mode=llm_thoughtful")
             llm_flags = []
 
     flags = rule_flags + llm_flags
     metadata = {
-        "mode": mode,
-        "n_rule_flags": len(rule_flags),
-        "n_llm_flags": len(llm_flags),
-        "n_active_entities": len(active),
-        "n_total_entities": len(entities),
-        "n_documents": len(documents),
         "prompt_version": (
-            get_prompt_version("flag_second_pass")
-            if mode in ("hybrid", "llm_naive", "llm_thoughtful")
+            get_prompt_version("flag_second_pass") if mode == "hybrid"
+            else get_prompt_version("flag_llm_naive") if mode == "llm_naive" and llm_flags
+            else get_prompt_version("flag_llm_thoughtful") if mode == "llm_thoughtful" and llm_flags
             else None
         ),
+        "temperature": 0.7,  # locked operating point for all LLM-using modes
     }
 
     log.info(
@@ -333,18 +340,50 @@ def _llm_second_pass(
         return []
 
     # Validate every flag the LLM produced
+    # Build a map of document_id -> extracted_text for quote validation
+    doc_text_by_id = {
+        d["document_id"]: (d.get("extracted_text") or "")
+        for d in documents
+    }
+
+    # Validate every flag the LLM produced
     validated = []
+    required_fields = (
+        "severity", "category", "description",
+        "cited_document_id", "source_quote",
+    )
     for f in parsed:
         if not isinstance(f, dict):
             continue
-        if not all(k in f for k in ("severity", "category", "description", "source_document_id")):
+        if not all(k in f for k in required_fields):
+            log.warning("LLM flag missing required field; rejecting: %s", f)
             continue
         if f["severity"] not in ("HIGH", "MEDIUM", "LOW"):
             continue
-        # Source document MUST be from the patient's actual docs
-        if f["source_document_id"] not in valid_doc_ids:
-            log.warning("LLM cited unknown doc %s; rejecting flag", f["source_document_id"])
+        # cited_document_id MUST be in the patient's actual docs
+        cited = f["cited_document_id"]
+        if cited not in valid_doc_ids:
+            log.warning("LLM cited unknown doc %s; rejecting flag", cited)
             continue
+        # source_quote MUST appear verbatim in the cited document's text
+        quote = (f.get("source_quote") or "").strip()
+        doc_text = doc_text_by_id.get(cited, "")
+        if not quote:
+            log.warning("LLM flag has empty source_quote; rejecting")
+            continue
+        if quote not in doc_text:
+            # Soft check: normalise whitespace before final reject
+            import re
+            quote_norm = re.sub(r"\s+", " ", quote)
+            doc_norm = re.sub(r"\s+", " ", doc_text)
+            if quote_norm not in doc_norm:
+                log.warning(
+                    "LLM source_quote not found in cited document %s; rejecting (quote=%r)",
+                    cited, quote[:80],
+                )
+                continue
+        # Reserve grounding_status field; metric module will populate later
+        f.setdefault("grounding_status", None)
         # Tag as AI-detected so the doctor knows
         if not f["category"].startswith("AI_"):
             f["category"] = f"AI_{f['category']}"
@@ -359,18 +398,17 @@ def _llm_only_naive_pass(
 ) -> list[dict]:
     """
     Naive LLM-only baseline. Receives raw cleaned document text only.
-    NO entity extraction. NO negation filtering. NO rule context.
+    NO entity extraction, NO negation filtering, NO rule context,
     NO provenance enforcement.
 
-    This is what unguarded prompting produces — the strawman baseline.
+    The strawman baseline: what unguarded prompting produces.
 
     REQUIRES: documents must include 'extracted_text' field.
-              Gated on the reader SELECT fix + worker text-population fix.
     """
     if client is None:
         client = Anthropic()
 
-    # Build raw corpus, tagged by document_id for citation tracking
+    # Build raw corpus, tagged by document_id - never touches entity list
     blocks = []
     for d in documents:
         text = d.get("extracted_text") or ""
@@ -388,13 +426,48 @@ def _llm_only_naive_pass(
 
     raw_corpus = "\n\n".join(blocks)
 
-    # TODO (after gate): build_llm_naive_prompt() in agents/prompts.py
-    # TODO (after gate): call Claude with naive prompt
-    # TODO (after gate): parse, return — NO validation
-    raise NotImplementedError(
-        "llm_naive prompt + call to be finalised after extracted_text "
-        "plumbing is verified. See spec review Gap 1."
+    prompt = build_flag_llm_naive(raw_corpus)
+    log.info(
+        "flag_agent: llm_naive using prompt version %s",
+        get_prompt_version("flag_llm_naive"),
     )
+
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=1500,
+        temperature=0.7,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    raw = response.content[0].text.strip()
+
+    # Strip markdown fences if present
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
+
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        log.warning("llm_naive: LLM returned non-JSON; ignoring")
+        return []
+
+    if not isinstance(parsed, list):
+        return []
+
+    # No validation at all - this is the strawman. Return what the LLM said.
+    # Minimal shape enforcement so downstream code doesn't crash.
+    required_fields = ("severity", "category", "description",
+                       "cited_document_id", "source_quote")
+    out = []
+    for f in parsed:
+        if isinstance(f, dict) and all(k in f for k in required_fields):
+            f.setdefault("grounding_status", None)
+            out.append(f)
+
+    log.info("llm_naive: returning %d flags (no validation)", len(out))
+    return out
 
 
 def _llm_only_thoughtful_pass(
@@ -403,10 +476,10 @@ def _llm_only_thoughtful_pass(
 ) -> list[dict]:
     """
     Thoughtful LLM-only baseline. Same input as naive (raw text, no entities),
-    but with a carefully written prompt: asks Claude to identify risks AND
-    quote the supporting sentence from the source document.
+    but with a carefully written prompt: verbatim quoting, document scoping,
+    conservative when uncertain. No hard post-validation.
 
-    This is the 'fair' LLM baseline. A reviewer asking 'did you compare
+    This is the "fair" LLM baseline. A reviewer asking 'did you compare
     against a well-prompted LLM?' is answered by this condition.
 
     REQUIRES: documents must include 'extracted_text' field.
@@ -414,6 +487,7 @@ def _llm_only_thoughtful_pass(
     if client is None:
         client = Anthropic()
 
+    # Build raw corpus, tagged by document_id - never touches the entity list
     blocks = []
     for d in documents:
         text = d.get("extracted_text") or ""
@@ -431,14 +505,49 @@ def _llm_only_thoughtful_pass(
 
     raw_corpus = "\n\n".join(blocks)
 
-    # TODO (after gate): build_llm_thoughtful_prompt() in agents/prompts.py
-    # TODO (after gate): call Claude with quote-anchored prompt
-    # TODO (after gate): parse, return — NO validation (validation belongs to hybrid)
-    raise NotImplementedError(
-        "llm_thoughtful prompt + call to be finalised after extracted_text "
-        "plumbing is verified. See spec review Gap 1."
+    prompt = build_flag_llm_thoughtful(raw_corpus)
+    log.info(
+        "flag_agent: llm_thoughtful using prompt version %s",
+        get_prompt_version("flag_llm_thoughtful"),
     )
 
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=1500,
+        temperature=0.7,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    raw = response.content[0].text.strip()
+
+    # Strip markdown fences if present
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
+
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        log.warning("llm_thoughtful: LLM returned non-JSON; ignoring")
+        return []
+
+    if not isinstance(parsed, list):
+        return []
+
+    # No hard validation - this is a baseline. Return what the LLM said.
+    # The metric module will compute grounding_status against doc text later.
+    # We do enforce shape minimally so downstream code doesn't crash.
+    required_fields = ("severity", "category", "description",
+                       "cited_document_id", "source_quote")
+    out = []
+    for f in parsed:
+        if isinstance(f, dict) and all(k in f for k in required_fields):
+            f.setdefault("grounding_status", None)
+            out.append(f)
+
+    log.info("llm_thoughtful: returning %d flags (no provenance validation)", len(out))
+    return out
 
 
 # ─── CLI test ────────────────────────────────────────────────────────
