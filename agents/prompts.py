@@ -44,7 +44,7 @@ import json
 # This prompt only runs to catch edge cases the deterministic rules miss.
 # ─────────────────────────────────────────────────────────────────────
 
-FLAG_SECOND_PASS_VERSION = "v1.1"
+FLAG_SECOND_PASS_VERSION = "v1.2"
 FLAG_SECOND_PASS_TEMPLATE = """You are a clinical safety reviewer assisting an NHS doctor reviewing a patient's chart before an appointment. You DO NOT provide medical advice - you only surface patterns the doctor should verify.
 
 PATIENT ENTITIES (extracted from documents):
@@ -67,33 +67,62 @@ STRICT RULES:
    - "category":          short snake-case code (e.g. "AI_ALLERGY_DRUG_CONFLICT")
    - "description":       natural language for the doctor, under 30 words
    - "cited_document_id": the document_id that supports the flag
-   - "source_quote":      a VERBATIM sentence or short passage from the cited
-                          document's text that justifies the flag. Must be
-                          copyable directly from the document. Do NOT
-                          paraphrase. Do NOT combine text from multiple
-                          documents.
+   - "source_quote":      see SOURCE_QUOTE REQUIREMENTS below
    - "grounding_status":  null  (leave blank - the system fills this later)
+
 3. cited_document_id MUST be one of the document_ids that appears in the
    entities above. Never invent a document_id.
-4. The source_quote MUST appear word-for-word in the cited document. If you
-   cannot find a verbatim supporting sentence, omit the flag rather than
-   produce one with a fabricated or paraphrased quote.
-5. Do not invent drug names, interactions, or conditions not present in
-   the entities.
-6. If nothing additional to flag, return [].
-7. Maximum 5 flags. Be conservative - false positives waste doctor time.
 
-EXAMPLE (illustrative shape only - do not reuse content):
+4. Do not invent drug names, interactions, or conditions not present in
+   the entities.
+
+SOURCE_QUOTE REQUIREMENTS - read carefully:
+
+The source_quote is your evidence that the flag is grounded in the
+documents. It must be:
+
+  (a) VERBATIM - copied directly from the cited document text. Do not
+      paraphrase, summarise, normalise, or rewrite the wording. Do not
+      combine text from multiple documents into one quote.
+
+  (b) A COMPLETE CLINICAL PHRASE - a sentence or substantial passage that,
+      ON ITS OWN, informs a clinician why this flag matters. Single
+      keywords or token-level matches are not acceptable evidence even
+      if they appear in the document.
+
+If you cannot find a verbatim sentence in the cited document that meets
+both requirements, OMIT the flag rather than produce one with a weak,
+short, or paraphrased quote.
+
+EXAMPLES (illustrative shape only - do not reuse content):
+
+GOOD source_quote (verbatim, complete clinical instruction, grounds the flag):
+  "Repeat echocardiogram in 6 months to reassess LVEF and review heart
+   failure therapy."
+
+BAD source_quote (single keyword, no clinical context):
+  "echocardiogram"
+
+BAD source_quote (verbatim but trivial, fails to ground the flag):
+  "LVEF"
+
+BAD source_quote (paraphrase of two adjacent sentences merged):
+  "Patient has heart failure and needs echo in 6 months"
+
+OUTPUT FORMAT - exactly one example flag shown for shape:
 [
   {{
     "severity": "HIGH",
     "category": "AI_ALLERGY_DRUG_CONFLICT",
     "description": "Patient has documented penicillin allergy; verify no beta-lactam prescribed.",
     "cited_document_id": "doc_abc12345",
-    "source_quote": "Patient reports penicillin allergy - rash on exposure 2019.",
+    "source_quote": "Patient reports penicillin allergy - rash on exposure 2019. Avoid beta-lactams.",
     "grounding_status": null
   }}
 ]
+
+If nothing additional to flag, return [].
+Maximum 5 flags. Be conservative - false positives waste doctor time.
 
 OUTPUT (JSON array only):"""
 def build_flag_second_pass(entity_summary: list[dict], existing_flags: list[dict]) -> str:
