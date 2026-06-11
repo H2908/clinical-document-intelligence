@@ -202,7 +202,16 @@ def _write_outputs(state: OrchestrationState) -> OrchestrationState:
 
     if state["flags"]:
         try:
-            write_flags(patient_id, state["flags"])
+            # SP_WRITE_FLAGS expects source_document_id; v1.3 AI flags
+            # emit cited_document_id. Map so both rule and AI flags persist.
+            # TODO partner: update SP_WRITE_FLAGS to handle both field names.
+            flags_to_write = []
+            for f in state["flags"]:
+                fcopy = dict(f)
+                if "source_document_id" not in fcopy and "cited_document_id" in fcopy:
+                    fcopy["source_document_id"] = fcopy["cited_document_id"]
+                flags_to_write.append(fcopy)
+            write_flags(patient_id, flags_to_write)
         except Exception as e:
             log.exception("write_flags failed")
             state["errors"].append(f"write_flags: {e}")
