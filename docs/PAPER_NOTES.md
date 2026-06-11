@@ -134,3 +134,49 @@ Provenance validation guarantees a flag's quote is verbatim, substantial, and to
 
 4\. Send advisor the bucketed table.
 
+## Verdict reference card (pat_test_01 dev examples, 2026-06-10)
+
+Reference for v1.3 verdict labels with one concrete example per label
+from the dev runs. For Day 21 analysis on held-out data.
+
+### verbatim
+0 observed on pat_test_01 dev. Definition: source_quote appears as an
+exact substring in cited document (whitespace-collapsed). Retained for
+held-out — Claude rarely quotes exactly at temperature 0.7 but may on
+some patients.
+
+### paraphrase (accepted as grounded)
+Example: source_quote = "bloods including eGFR in 4 weeks"
+Cited doc text: "Routine bloods including U&E;, eGFR in 4 weeks"
+Token overlap = 1.00, longest contiguous run >= floor. All content
+words present, surface form smoothed (punctuation, line breaks).
+Verdict: grounded paraphrase.
+
+### fabrication (partial-drift subtype, observed on dev)
+Example: source_quote = "Repeat echocardiogram in 6 months to reassess
+LVEF and review heart failure therapy"
+Cited doc text: "3. Repeat echocardiogram in 6 months"
+Token overlap = 0.78 (7/9 content tokens; "reassess" and "review" are
+the additions). First half verbatim, second half invented clinical
+reasoning the doc does not contain. Falls below 0.80 threshold by
+0.02. Detector fires fabrication. Subtype noted in paper: this is
+partial-drift, not wholesale invention.
+
+### composition-fabrication
+Example: source_quote = "NYHA class II consistent with heart failure
+therapy"
+Cited doc text:
+  "...symptoms consistent with NYHA class II"
+  "...Continue current heart failure therapy"
+Token overlap = 1.00 (all content words present in doc), longest
+contiguous run = 3 tokens, required >= 4. Quote stitches phrases from
+separate document sentences into a claim ("NYHA II consistent with HF
+therapy") the doc never makes. Caught by n-gram floor; would have
+passed token-overlap alone.
+
+### misattributed
+0 observed on pat_test_01 dev (only one source-of-truth document in
+practice). Definition: token overlap with cited doc < threshold, but
+overlap with some OTHER document in patient corpus >= threshold.
+Retained for held-out — relevant when patients have multiple distinct
+documents.

@@ -1,12 +1,12 @@
 {
-  "instrument_version": "v1.2",
-  "frozen_at_utc": "2026-06-10T07:00:00Z",
-  "pre_registration_note": "This config defines the hybrid validator and prompt parameters used for the AAAI 2027 paper. Frozen on pat_test_01 (dev). Must not be modified once the 20 held-out cases begin.",
+  "instrument_version": "v1.3",
+  "frozen_at_utc": "2026-06-10T22:30:00Z",
+  "pre_registration_note": "Construct-validity fix discovered on pat_test_01 dev data: v1.2 conflated paraphrase with fabrication via strict-substring matching. v1.3 separates fabrication (content not present) from paraphrase (content present, surface differs) via token-overlap + contiguous n-gram floor. Validated against a 6-case graded test set covering: obvious fabrication, composition fabrication, verbatim, faithful paraphrase, borderline paraphrase (demonstrating mechanical limit), and misattribution. All six cases land in expected verdict buckets. Frozen before held-out 20-case run.",
 
   "schema": {
     "fields": ["severity", "category", "description", "cited_document_id", "source_quote", "grounding_status"],
     "severity_enum": ["HIGH", "MEDIUM", "LOW"],
-    "grounding_status_enum": [null, "grounded", "misattributed", "fabricated"]
+    "grounding_status_enum": [null, "verbatim", "paraphrase", "fabrication", "composition-fabrication", "misattributed"]
   },
 
   "llm_call": {
@@ -29,9 +29,23 @@
       "active": true,
       "justification": "A minimum of six words / thirty characters excludes single-term keyword matches while admitting any complete clinical phrase. The OR'd soft branch admits terse-but-grounded clinical instructions verified on the 13 dev-quote test."
     },
-    "guard_3_verbatim": {
-      "rule": "source_quote must appear verbatim in cited document; whitespace-normalised substring match; rejections sub-bucketed into case-mismatch / paraphrase-or-boundary / fabrication based on word-overlap fraction",
-      "normalisation": "lowercase preserved (case-mismatch reported separately); whitespace collapsed via re.sub(r'\\s+', ' '); leading/trailing strip",
+    "guard_3_two_tier_verdict": {
+      "tier_1_fabrication": {
+        "rule": "Token-overlap of quote content words against CITED document's content words. If overlap < threshold, fabrication. Misattribution sub-rule: if cited overlap < threshold but some other document's overlap >= threshold, classify as misattributed instead of fabrication.",
+        "fabrication_threshold": 0.8,
+        "threshold_justification": "0.8 means at most one content word in five may be unaccounted for. Tolerates a single tokenisation/lemmatisation mismatch or one dropped modifier without admitting wholesale invention. Chosen from measurement logic, not from dev-set fit.",
+        "computed_against": "cited document only; other documents consulted only for misattribution detection"
+      },
+      "tier_1_composition_fabrication": {
+        "rule": "If token-overlap passes but longest contiguous n-gram match is below ngram_floor, classify as composition-fabrication. Catches quotes that stitch unrelated facts from scattered sentences into a claim the document never makes.",
+        "ngram_floor": 5,
+        "ngram_short_quote_rule": "For short quotes where 5 tokens is impossible, accept min(ngram_floor, max(2, len(quote_tokens) // 2 + 1))"
+      },
+      "tier_2_surface_fidelity": {
+        "rule": "Among grounded quotes, classify verbatim (exact substring after whitespace collapse) vs paraphrase (high overlap + long contiguous run but not exact). This is surface form, not grounding.",
+        "normalisation": "lowercase preserved; whitespace collapsed via re.sub(r'\\s+', ' '); leading/trailing strip"
+      },
+      "content_token_definition": "lowercase tokens of length >= 4, alpha-only, with spaCy STOP_WORDS and the 7-word clinical-generic set stripped",
       "active": true
     },
     "guard_4_irrelevant_padding": {
@@ -44,6 +58,20 @@
     }
   },
 
+  "graded_test_set": {
+    "file": "graded_test_cases.py",
+    "case_count": 6,
+    "all_pass_at_freeze": true,
+    "case_summary": [
+      {"case": "1_obvious_fabrication",       "expected": "fabrication",              "overlap": 0.12, "longest_run": 1, "verdict_observed": "fabrication"},
+      {"case": "2_composition_fabrication",   "expected": "composition-fabrication",  "overlap": 1.00, "longest_run": 2, "verdict_observed": "composition-fabrication"},
+      {"case": "3_verbatim_grounded",         "expected": "verbatim",                 "overlap": 1.00, "longest_run": 3, "verdict_observed": "verbatim"},
+      {"case": "4_faithful_paraphrase",       "expected": "paraphrase",               "overlap": 1.00, "longest_run": 8, "verdict_observed": "paraphrase"},
+      {"case": "5_borderline_paraphrase",     "expected": "fabrication-or-borderline","overlap": 0.43, "longest_run": 2, "verdict_observed": "fabrication", "interpretation": "Mechanical limit demonstrated. Coronary artery disease IS clinically equivalent to ischaemic heart disease, so the quote is clinically faithful. Mechanically, content words 'coronary'/'artery'/'percent' are absent. Validator correctly identifies as mechanical fabrication. This case is documented in the paper as the precise boundary of mechanical grounding."},
+      {"case": "6_misattribution",            "expected": "misattributed",            "overlap": 0.50, "longest_run": 1, "verdict_observed": "misattributed"}
+    ]
+  },
+
   "prompt_versions": {
     "flag_second_pass": "v1.2",
     "flag_llm_naive": "v1.0",
@@ -53,6 +81,10 @@
   "dataset_split": {
     "dev_instrument": "pat_test_01",
     "held_out_cases": "20 synthetic NHS cases (to be generated)",
-    "rule": "Validator and prompt parameters frozen against pat_test_01. After the 20-case run begins, no further parameter adjustment is permitted."
-  }
+    "rule": "Validator and prompt parameters frozen against pat_test_01. After the 20-case run begins, no further parameter adjustment is permitted.",
+    "held_out_document_requirement": "Each synthetic patient must have 2-3 genuinely distinct documents - different dates, different document types (e.g. one cardiology letter + one GP note + one lab report), different clinical content. NO near-duplicate documents within a single patient. Rationale: pat_test_01's dev runs all used four byte-identical copies of one cardiology letter, which means pat_test_01 alone cannot test reproducibility under varied input. The 20 held-out cases therefore carry the entire reproducibility claim, and each one must contain genuine intra-patient document variation for the measurement to be valid.",
+    "verification_before_holdout_run": "Before any patient enters the 20-case run, verify document distinctness: max pairwise extracted_text similarity within a patient < 0.5 (Jaccard on content tokens). If any patient fails, regenerate or replace that patient's documents before the run starts."
+  },
+
+  "stated_limit": "Mechanical provenance validation guarantees that a flag's quote is verbatim, substantial, topically relevant, and content-grounded against its cited document. It does NOT guarantee that the quote clinically justifies the flag, which remains a matter for clinician review. Case 5 of the graded test set (coronary artery disease vs ischaemic heart disease) demonstrates this boundary: clinically equivalent terminology that mechanically presents as fabrication."
 }
