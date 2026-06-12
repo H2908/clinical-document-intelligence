@@ -62,17 +62,13 @@ INSTRUMENT_VERSION = "v1.3"
 MODEL_STRING = "claude-sonnet-4-6"
 TEMPERATURE = 0.7
 
-CONDITIONS = [
-    "rules_only",
-    "llm_naive",
-    "llm_thoughtful",
-    "hybrid_validated",
-    "hybrid_unvalidated",
-]
-
-# Conditions where running multiple reps adds nothing
-DETERMINISTIC_CONDITIONS = {"rules_only"}
-
+from evaluation.conditions import (
+    ALL_CONDITIONS as CONDITIONS,
+    DETERMINISTIC_CONDITIONS,
+    apply_condition_env,
+    clear_condition_env,
+    is_deterministic,
+)
 
 # ---------------------------------------------------------------------------
 # Log capture
@@ -157,34 +153,9 @@ def extract_rejection_trace(records: list[logging.LogRecord]) -> list[dict]:
     return trace
 
 
-# ---------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 # Condition execution
 # ---------------------------------------------------------------------------
-def apply_condition_env(condition: str) -> dict:
-    """Set env vars for a condition and return a snapshot of what was set."""
-    if condition == "rules_only":
-        env = {"FLAG_AGENT_MODE": "rules_only", "FLAG_VALIDATE": "true"}
-    elif condition == "llm_naive":
-        env = {"FLAG_AGENT_MODE": "llm_naive", "FLAG_VALIDATE": "true"}
-    elif condition == "llm_thoughtful":
-        env = {"FLAG_AGENT_MODE": "llm_thoughtful", "FLAG_VALIDATE": "true"}
-    elif condition == "hybrid_validated":
-        env = {"FLAG_AGENT_MODE": "hybrid", "FLAG_VALIDATE": "true"}
-    elif condition == "hybrid_unvalidated":
-        env = {"FLAG_AGENT_MODE": "hybrid", "FLAG_VALIDATE": "false"}
-    else:
-        raise ValueError(f"Unknown condition: {condition}")
-
-    for k, v in env.items():
-        os.environ[k] = v
-
-    return env
-
-
-def clear_condition_env() -> None:
-    for k in ("FLAG_AGENT_MODE", "FLAG_VALIDATE"):
-        os.environ.pop(k, None)
-
 
 def run_single(
     patient_id: str,
@@ -319,7 +290,7 @@ def main() -> int:
             log.info("  %d entities, %d documents", len(entities), len(documents))
 
             for condition in conditions:
-                reps = 1 if condition in DETERMINISTIC_CONDITIONS else args.reps
+                reps = 1 if is_deterministic(condition) else args.reps
                 for sampling_run in range(reps):
                     log.info("  -> %s rep=%d/%d", condition, sampling_run + 1, reps)
                     row = run_single(
