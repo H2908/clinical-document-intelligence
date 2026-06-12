@@ -301,6 +301,12 @@ def _llm_second_pass(
     """
     import re
 
+    # Flag-validator ablation switch (paper Day 3).
+    # FLAG_VALIDATE=false disables Guard 3 (the v1.3 grounding validator).
+    # Guards 1, 2, 4 remain active. Default ON = production behaviour.
+    FLAG_VALIDATE_GROUNDING = os.environ.get("FLAG_VALIDATE", "true").lower() != "false"
+    log.info("FLAG_VALIDATE_GROUNDING=%s", FLAG_VALIDATE_GROUNDING)
+
     # Build a compact summary for the prompt
     entity_summary = [
         {
@@ -457,146 +463,153 @@ def _llm_second_pass(
             log.warning("=" * 70)
             continue
 
-        # GUARD 3 v1.3 - two-tier verdict with misattribution detection.
-        #
-        # Tier 0: misattribution check
-        #   Token-overlap against CITED doc AND every other doc. If overlap
-        #   against the cited doc is below threshold but overlap against
-        #   some OTHER doc clears it, the flag is misattributed.
-        #
-        # Tier 1: fabrication vs grounded (against cited doc only)
-        #   Requires BOTH:
-        #     (a) token_overlap_ratio >= FABRICATION_THRESHOLD (0.8)
-        #     (b) contiguous_ngram_len >= NGRAM_FLOOR (5 content tokens)
-        #            OR >= 50% of quote content tokens as a single run
-        #   Token overlap alone is insufficient - composition-fabrication
-        #   defeats it. The n-gram floor is what catches "real words,
-        #   wrong meaning" stitched from unrelated sentences.
-        #
-        # Tier 2: surface fidelity (among grounded)
-        #   Exact substring (after whitespace collapse) -> verbatim
-        #   Otherwise -> paraphrase
-        FABRICATION_THRESHOLD = 0.8   # at most 1 content word in 5 unaccounted for
-        NGRAM_FLOOR = 5               # minimum contiguous content-token match
-
-        def _content_tokens(text: str) -> list[str]:
-            """Tokenise to lowercase content tokens (>=4 chars, alpha, not stopwords)."""
-            tokens = re.findall(r"[a-z]{4,}", text.lower())
-            return [t for t in tokens if t not in STOPWORDS_AND_GENERIC]
-
-        def _longest_contiguous_match(a: list[str], b: list[str]) -> int:
-            """Length of longest contiguous sequence shared by lists a and b."""
-            if not a or not b:
-                return 0
-            n, m = len(a), len(b)
-            # Standard LCS-substring DP
-            dp = [[0] * (m + 1) for _ in range(n + 1)]
-            best = 0
-            for i in range(1, n + 1):
-                for j in range(1, m + 1):
-                    if a[i - 1] == b[j - 1]:
-                        dp[i][j] = dp[i - 1][j - 1] + 1
-                        if dp[i][j] > best:
-                            best = dp[i][j]
-            return best
-
-        quote_tokens = _content_tokens(quote)
-        cited_tokens = _content_tokens(doc_text)
-
-        if not quote_tokens:
-            log.warning("=" * 70)
-            log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
-            log.warning("LLM quote: %r", quote)
-            log.warning("VERDICT: empty-content-quote (no content tokens after stopword strip)")
-            log.warning("=" * 70)
-            continue
-
-        # Overlap ratio against cited document
-        overlap_cited = len(set(quote_tokens) & set(cited_tokens))
-        overlap_ratio_cited = overlap_cited / len(set(quote_tokens))
-
-        # Tier 0 - misattribution check: if cited overlap is low but some
-        # other doc would clear it, flag misattribution.
-        if overlap_ratio_cited < FABRICATION_THRESHOLD:
-            best_other_ratio = 0.0
-            best_other_doc = None
-            for other_id, other_text in doc_text_by_id.items():
-                if other_id == cited:
-                    continue
-                other_tokens = _content_tokens(other_text)
-                if not other_tokens:
-                    continue
-                other_overlap = len(set(quote_tokens) & set(other_tokens))
-                other_ratio = other_overlap / len(set(quote_tokens))
-                if other_ratio > best_other_ratio:
-                    best_other_ratio = other_ratio
-                    best_other_doc = other_id
-
-            if best_other_ratio >= FABRICATION_THRESHOLD:
-                log.warning("=" * 70)
-                log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
-                log.warning("LLM quote: %r", quote[:200])
-                log.warning("LLM description: %r", description[:120])
-                log.warning(
-                    "VERDICT: misattributed "
-                    "(overlap with cited=%.2f below %.2f, but overlap with %s=%.2f)",
-                    overlap_ratio_cited, FABRICATION_THRESHOLD,
-                    best_other_doc, best_other_ratio,
-                )
-                log.warning("=" * 70)
-                continue
-
-            # No other doc rescues it -> fabrication
-            log.warning("=" * 70)
-            log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
-            log.warning("LLM quote: %r", quote[:200])
-            log.warning("LLM description: %r", description[:120])
-            log.warning(
-                "VERDICT: fabrication "
-                "(token-overlap with cited doc=%.2f, below %.2f; no other doc rescues)",
-                overlap_ratio_cited, FABRICATION_THRESHOLD,
-            )
-            log.warning("=" * 70)
-            continue
-
-        # Tier 1b - contiguous n-gram floor
-        longest_run = _longest_contiguous_match(quote_tokens, cited_tokens)
-        ngram_required = max(NGRAM_FLOOR, len(quote_tokens) // 2)
-        if longest_run < min(NGRAM_FLOOR, ngram_required) or longest_run < min(NGRAM_FLOOR, max(1, len(quote_tokens) // 2)):
-            # Decision rule: longest contiguous run must be either >= NGRAM_FLOOR
-            # OR >= 50% of quote content tokens (whichever is achievable on a
-            # short quote). A 4-token quote can't have a 5-token run; allow it
-            # if half the quote runs contiguously.
-            min_run_needed = min(NGRAM_FLOOR, max(2, len(quote_tokens) // 2 + 1))
-            if longest_run < min_run_needed:
-                log.warning("=" * 70)
-                log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
-                log.warning("LLM quote: %r", quote[:200])
-                log.warning("LLM description: %r", description[:120])
-                log.warning(
-                    "VERDICT: composition-fabrication "
-                    "(token-overlap=%.2f passes, but longest contiguous run=%d "
-                    "below required %d - quote stitches scattered words)",
-                    overlap_ratio_cited, longest_run, min_run_needed,
-                )
-                log.warning("=" * 70)
-                continue
-
-        # Tier 2 - grounded; classify surface fidelity (verbatim vs paraphrase)
-        quote_norm = re.sub(r"\s+", " ", quote).strip()
-        doc_norm = re.sub(r"\s+", " ", doc_text).strip()
-        if quote_norm in doc_norm:
-            f["grounding_status"] = "verbatim"
-            log.info(
-                "HYBRID VALIDATOR ACCEPT (verbatim) on doc %s: overlap=%.2f, longest_run=%d",
-                cited, overlap_ratio_cited, longest_run,
-            )
+        # Ablation switch (paper Day 3): when FLAG_VALIDATE_GROUNDING=False,
+        # skip Guard 3 entirely. The flag passes through with grounding_status
+        # set to 'unvalidated' so the JSONL row can distinguish it. Guards 1,
+        # 2, 4 stay active. This isolates the v1.3 grounding-validator
+        # contribution from the rest of the validation pipeline.
+        if not FLAG_VALIDATE_GROUNDING:
+            f["grounding_status"] = "unvalidated"
+            log.info("HYBRID VALIDATOR ACCEPT (unvalidated) on doc %s", cited)
         else:
-            f["grounding_status"] = "paraphrase"
-            log.info(
-                "HYBRID VALIDATOR ACCEPT (paraphrase) on doc %s: overlap=%.2f, longest_run=%d",
-                cited, overlap_ratio_cited, longest_run,
-            )
+            # Tier 0: misattribution check
+            #   Token-overlap against CITED doc AND every other doc. If overlap
+            #   against the cited doc is below threshold but overlap against
+            #   some OTHER doc clears it, the flag is misattributed.
+            #
+            # Tier 1: fabrication vs grounded (against cited doc only)
+            #   Requires BOTH:
+            #     (a) token_overlap_ratio >= FABRICATION_THRESHOLD (0.8)
+            #     (b) contiguous_ngram_len >= NGRAM_FLOOR (5 content tokens)
+            #            OR >= 50% of quote content tokens as a single run
+            #   Token overlap alone is insufficient - composition-fabrication
+            #   defeats it. The n-gram floor is what catches "real words,
+            #   wrong meaning" stitched from unrelated sentences.
+            #
+            # Tier 2: surface fidelity (among grounded)
+            #   Exact substring (after whitespace collapse) -> verbatim
+            #   Otherwise -> paraphrase
+            FABRICATION_THRESHOLD = 0.8   # at most 1 content word in 5 unaccounted for
+            NGRAM_FLOOR = 5               # minimum contiguous content-token match
+
+            def _content_tokens(text: str) -> list[str]:
+                """Tokenise to lowercase content tokens (>=4 chars, alpha, not stopwords)."""
+                tokens = re.findall(r"[a-z]{4,}", text.lower())
+                return [t for t in tokens if t not in STOPWORDS_AND_GENERIC]
+
+            def _longest_contiguous_match(a: list[str], b: list[str]) -> int:
+                """Length of longest contiguous sequence shared by lists a and b."""
+                if not a or not b:
+                    return 0
+                n, m = len(a), len(b)
+                # Standard LCS-substring DP
+                dp = [[0] * (m + 1) for _ in range(n + 1)]
+                best = 0
+                for i in range(1, n + 1):
+                    for j in range(1, m + 1):
+                        if a[i - 1] == b[j - 1]:
+                            dp[i][j] = dp[i - 1][j - 1] + 1
+                            if dp[i][j] > best:
+                                best = dp[i][j]
+                return best
+
+            quote_tokens = _content_tokens(quote)
+            cited_tokens = _content_tokens(doc_text)
+
+            if not quote_tokens:
+                log.warning("=" * 70)
+                log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
+                log.warning("LLM quote: %r", quote)
+                log.warning("VERDICT: empty-content-quote (no content tokens after stopword strip)")
+                log.warning("=" * 70)
+                continue
+
+            # Overlap ratio against cited document
+            overlap_cited = len(set(quote_tokens) & set(cited_tokens))
+            overlap_ratio_cited = overlap_cited / len(set(quote_tokens))
+
+            # Tier 0 - misattribution check: if cited overlap is low but some
+            # other doc would clear it, flag misattribution.
+            if overlap_ratio_cited < FABRICATION_THRESHOLD:
+                best_other_ratio = 0.0
+                best_other_doc = None
+                for other_id, other_text in doc_text_by_id.items():
+                    if other_id == cited:
+                        continue
+                    other_tokens = _content_tokens(other_text)
+                    if not other_tokens:
+                        continue
+                    other_overlap = len(set(quote_tokens) & set(other_tokens))
+                    other_ratio = other_overlap / len(set(quote_tokens))
+                    if other_ratio > best_other_ratio:
+                        best_other_ratio = other_ratio
+                        best_other_doc = other_id
+
+                if best_other_ratio >= FABRICATION_THRESHOLD:
+                    log.warning("=" * 70)
+                    log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
+                    log.warning("LLM quote: %r", quote[:200])
+                    log.warning("LLM description: %r", description[:120])
+                    log.warning(
+                        "VERDICT: misattributed "
+                        "(overlap with cited=%.2f below %.2f, but overlap with %s=%.2f)",
+                        overlap_ratio_cited, FABRICATION_THRESHOLD,
+                        best_other_doc, best_other_ratio,
+                    )
+                    log.warning("=" * 70)
+                    continue
+
+                # No other doc rescues it -> fabrication
+                log.warning("=" * 70)
+                log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
+                log.warning("LLM quote: %r", quote[:200])
+                log.warning("LLM description: %r", description[:120])
+                log.warning(
+                    "VERDICT: fabrication "
+                    "(token-overlap with cited doc=%.2f, below %.2f; no other doc rescues)",
+                    overlap_ratio_cited, FABRICATION_THRESHOLD,
+                )
+                log.warning("=" * 70)
+                continue
+
+            # Tier 1b - contiguous n-gram floor
+            longest_run = _longest_contiguous_match(quote_tokens, cited_tokens)
+            ngram_required = max(NGRAM_FLOOR, len(quote_tokens) // 2)
+            if longest_run < min(NGRAM_FLOOR, ngram_required) or longest_run < min(NGRAM_FLOOR, max(1, len(quote_tokens) // 2)):
+                # Decision rule: longest contiguous run must be either >= NGRAM_FLOOR
+                # OR >= 50% of quote content tokens (whichever is achievable on a
+                # short quote). A 4-token quote can't have a 5-token run; allow it
+                # if half the quote runs contiguously.
+                min_run_needed = min(NGRAM_FLOOR, max(2, len(quote_tokens) // 2 + 1))
+                if longest_run < min_run_needed:
+                    log.warning("=" * 70)
+                    log.warning("HYBRID VALIDATOR REJECTION on doc %s", cited)
+                    log.warning("LLM quote: %r", quote[:200])
+                    log.warning("LLM description: %r", description[:120])
+                    log.warning(
+                        "VERDICT: composition-fabrication "
+                        "(token-overlap=%.2f passes, but longest contiguous run=%d "
+                        "below required %d - quote stitches scattered words)",
+                        overlap_ratio_cited, longest_run, min_run_needed,
+                    )
+                    log.warning("=" * 70)
+                    continue
+
+            # Tier 2 - grounded; classify surface fidelity (verbatim vs paraphrase)
+            quote_norm = re.sub(r"\s+", " ", quote).strip()
+            doc_norm = re.sub(r"\s+", " ", doc_text).strip()
+            if quote_norm in doc_norm:
+                f["grounding_status"] = "verbatim"
+                log.info(
+                    "HYBRID VALIDATOR ACCEPT (verbatim) on doc %s: overlap=%.2f, longest_run=%d",
+                    cited, overlap_ratio_cited, longest_run,
+                )
+            else:
+                f["grounding_status"] = "paraphrase"
+                log.info(
+                    "HYBRID VALIDATOR ACCEPT (paraphrase) on doc %s: overlap=%.2f, longest_run=%d",
+                    cited, overlap_ratio_cited, longest_run,
+                )
 
         # GUARD 4 - quote must mention the clinical subject of its own flag.
         # Closes the padding loophole. Uses subject_words and
