@@ -85,7 +85,104 @@ def list_patient_documents(patient_id: str) -> dict:
         })
 
     return {"documents": documents}
+# ─── GET /documents/{document_id}/file (stream from S3) ────────────
+@router.get("/documents/{document_id}/file")
+def stream_document_file(document_id: str):
+    """Stream the original uploaded file from S3 to the browser.
 
+    Reads s3_key from CORE.document, downloads the object from S3,
+    returns a StreamingResponse with the right Content-Type and an
+    inline Content-Disposition so the browser renders it (PDF in
+    iframe, image in <img>).
+    """
+    import os
+    import io
+    import mimetypes
+    import boto3
+    import snowflake.connector
+    from dotenv import load_dotenv
+    from fastapi.responses import StreamingResponse
+
+    load_dotenv()
+
+    # 1. Look up s3_key in Snowflake
+    try:
+        conn = snowflake.connector.connect(
+            account=os.environ["SNOWFLAKE_ACCOUNT"],
+            user=os.environ["SNOWFLAKE_USER"],
+            password=os.environ["SNOWFLAKE_PASSWORD"],
+            database="clinical_db",
+            warehouse="clinical_wh",
+            role=os.environ["SNOWFLAKE_ROLE"],
+        )
+    except Exception:
+        log.exception("Snowflake connect failed for file stream")
+        raise HTTPException(
+            status_code=503,
+            detail={"error": {"code": "database_unavailable",
+                              "message": "Could not connect to data warehouse"}},
+        )
+
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT s3_key, file_name, doc_type FROM clinical_db.core.document WHERE document_id = %s",
+            (document_id,),
+        )
+        row = cur.fetchone()
+    finally:
+        conn.close()
+
+    if row is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"error": {"code": "not_found",
+                              "message": f"Document {document_id} not found"}},
+        )
+
+    s3_key, file_name, doc_type = row
+
+    # Notes have a synthetic s3_key like "notes://..." with no file in S3
+    if not s3_key or s3_key.startswith("notes://"):
+        raise HTTPException(
+            status_code=404,
+            detail={"error": {"code": "no_file",
+                              "message": f"Document {document_id} is a typed note and has no underlying file"}},
+        )
+
+    # 2. Download from S3 to memory
+    try:
+        s3 = boto3.client(
+            "s3",
+            region_name=os.environ["AWS_REGION"],
+            aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+            aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+        )
+        buf = io.BytesIO()
+        s3.download_fileobj(os.environ["AWS_S3_BUCKET"], s3_key, buf)
+        buf.seek(0)
+    except Exception as e:
+        log.exception("S3 download failed for %s (s3_key=%s)", document_id, s3_key)
+        raise HTTPException(
+            status_code=500,
+            detail={"error": {"code": "internal_error",
+                              "message": f"Could not fetch file from S3: {e}"}},
+        )
+
+    # 3. Pick a Content-Type from the filename, falling back to PDF
+    content_type, _ = mimetypes.guess_type(file_name or s3_key)
+    if not content_type:
+        content_type = "application/pdf"
+
+    safe_name = file_name or f"{document_id}.bin"
+    return StreamingResponse(
+        buf,
+        media_type=content_type,
+        headers={
+            "Content-Disposition": f'inline; filename="{safe_name}"',
+            "Cache-Control": "private, max-age=300",
+        },
+    )
 # ─── GET /documents/{document_id} (Phase 1 mock) ────────────────────
 @router.get("/documents/{document_id}")
 def get_document(document_id: str) -> dict:
