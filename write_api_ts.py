@@ -1,4 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+"""Write frontend/lib/api.ts with proper UTF-8 encoding (no BOM)."""
+content = r'''const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
@@ -256,3 +257,10 @@ export const api = {
     }>;
   },
 };
+'''
+
+with open("frontend/lib/api.ts", "w", encoding="utf-8") as f:
+    f.write(content)
+
+print("Wrote frontend/lib/api.ts in UTF-8")
+print(f"Line count: {len(content.splitlines())}")
