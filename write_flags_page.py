@@ -1,4 +1,6 @@
-"use client";
+from pathlib import Path
+
+content = r'''"use client";
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -135,3 +137,11 @@ function FilterBtn({
     </button>
   );
 }
+'''
+
+target = Path("frontend/app/patients/[id]/flags/page.tsx")
+target.parent.mkdir(parents=True, exist_ok=True)
+target.write_text(content, encoding="utf-8", newline="\n")
+print(f"Wrote {target}")
+print(f"Lines: {len(content.splitlines())}")
+print(f"First 3 bytes: {open(target, 'rb').read(3).hex()}")
