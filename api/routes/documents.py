@@ -300,3 +300,172 @@ async def upload_document(
         "agent_counts": agent_counts,
         "message": message,
     }
+# ─── DELETE /documents/{document_id} ────────────────────────────────
+@router.delete("/documents/{document_id}")
+def delete_document(document_id: str) -> dict:
+    """Delete a document and its derived agent data, then regenerate.
+
+    Steps:
+      1. Look up s3_key + patient_id from CORE.document (404 if missing)
+      2. Delete S3 object (skip if notes:// synthetic key)
+      3. DELETE rows from CORE.flag, CORE.contradiction, CORE.timeline_event,
+         CORE.observation, CORE.entity, CORE.document, RAW.raw_documents
+         that reference this document.
+      4. Re-run agent orchestrator on remaining docs (best-effort; if it
+         fails the delete still succeeded).
+      5. Return summary.
+
+    No transaction. Failure mid-way leaves a partial-delete state recoverable
+    by re-running the DELETE.
+    """
+    import os
+    import boto3
+    import snowflake.connector
+    from dotenv import load_dotenv
+    from agents.orchestrator import run_agents
+
+    load_dotenv()
+
+    # 1. Look up
+    try:
+        conn = snowflake.connector.connect(
+            account=os.environ["SNOWFLAKE_ACCOUNT"],
+            user=os.environ["SNOWFLAKE_USER"],
+            password=os.environ["SNOWFLAKE_PASSWORD"],
+            database="clinical_db",
+            warehouse="clinical_wh",
+            role=os.environ["SNOWFLAKE_ROLE"],
+        )
+    except Exception:
+        log.exception("Snowflake connect failed for delete_document")
+        raise HTTPException(
+            status_code=503,
+            detail={"error": {"code": "database_unavailable",
+                              "message": "Could not connect to data warehouse"}},
+        )
+
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT patient_id, s3_key FROM clinical_db.core.document WHERE document_id = %s",
+            (document_id,),
+        )
+        row = cur.fetchone()
+        if row is None:
+            raise HTTPException(
+                status_code=404,
+                detail={"error": {"code": "not_found",
+                                  "message": f"Document {document_id} not found"}},
+            )
+        patient_id, s3_key = row
+
+        # 2. S3 delete (skip for typed notes)
+        s3_deleted = False
+        if s3_key and not s3_key.startswith("notes://"):
+            try:
+                s3 = boto3.client(
+                    "s3",
+                    region_name=os.environ["AWS_REGION"],
+                    aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+                    aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+                )
+                s3.delete_object(Bucket=os.environ["AWS_S3_BUCKET"], Key=s3_key)
+                s3_deleted = True
+            except Exception as e:
+                log.exception("S3 delete failed for %s (key=%s)", document_id, s3_key)
+                # Continue with DB cleanup even if S3 delete fails - the
+                # orphaned object can be cleaned up later via lifecycle policy.
+
+        # 3. Cascade deletes
+        # Order matters only for FK respect; CORE.document referenced by
+        # entity/observation/flag/contradiction/timeline. Delete leaves first.
+        deletes = []
+
+        cur.execute(
+            "DELETE FROM clinical_db.core.flag WHERE source_document_id = %s",
+            (document_id,),
+        )
+        deletes.append(("flag",          cur.rowcount))
+
+        cur.execute(
+            "DELETE FROM clinical_db.core.contradiction WHERE doc_a_id = %s OR doc_b_id = %s",
+            (document_id, document_id),
+        )
+        deletes.append(("contradiction", cur.rowcount))
+
+        cur.execute(
+            "DELETE FROM clinical_db.core.timeline_event WHERE source_document_id = %s",
+            (document_id,),
+        )
+        deletes.append(("timeline_event", cur.rowcount))
+
+        cur.execute(
+            "DELETE FROM clinical_db.core.observation WHERE source_document_id = %s",
+            (document_id,),
+        )
+        deletes.append(("observation",   cur.rowcount))
+
+        cur.execute(
+            "DELETE FROM clinical_db.core.entity WHERE document_id = %s",
+            (document_id,),
+        )
+        deletes.append(("entity",        cur.rowcount))
+
+        cur.execute(
+            "DELETE FROM clinical_db.core.document WHERE document_id = %s",
+            (document_id,),
+        )
+        deletes.append(("document",      cur.rowcount))
+
+        # RAW.raw_documents DELETE requires a permission we don't currently
+        # hold (partner-side TODO: GRANT DELETE on RAW.raw_documents).
+        # Best-effort: try the delete; on permission failure, leave the row
+        # as orphan. RAW is the ingest landing zone; nothing reads from it
+        # after CORE promotion, so an orphan row is harmless.
+        try:
+            cur.execute(
+                "DELETE FROM clinical_db.raw.raw_documents WHERE document_id = %s",
+                (document_id,),
+            )
+            deletes.append(("raw_documents", cur.rowcount))
+        except Exception as e:
+            log.warning("RAW.raw_documents delete skipped (likely permission): %s", e)
+            deletes.append(("raw_documents", 0))
+
+        conn.commit()
+    except HTTPException:
+        raise
+    except Exception as e:
+        log.exception("DELETE cascade failed for %s", document_id)
+        raise HTTPException(
+            status_code=500,
+            detail={"error": {"code": "internal_error",
+                              "message": f"Delete failed: {e}"}},
+        )
+    finally:
+        conn.close()
+
+    # 4. Re-run agents on remaining docs (best-effort)
+    regen: dict = {}
+    try:
+        state = run_agents(patient_id=patient_id, document_id=f"<deleted-{document_id}>")
+        regen = {
+            "timeline_events": len(state.get("timeline_events", [])),
+            "flags":           len(state.get("flags", [])),
+            "contradictions":  len(state.get("contradictions", [])),
+            "briefing":        state.get("briefing") is not None,
+            "errors":          len(state.get("errors", [])),
+        }
+    except Exception as e:
+        log.exception("Agent regen failed after delete of %s", document_id)
+        regen = {"error": f"{type(e).__name__}: {e}"}
+
+    # 5. Summary
+    return {
+        "deleted":           True,
+        "document_id":       document_id,
+        "patient_id":        patient_id,
+        "s3_deleted":        s3_deleted,
+        "rows_deleted":      {table: count for table, count in deletes},
+        "regenerated":       regen,
+    }
