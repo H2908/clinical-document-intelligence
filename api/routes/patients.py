@@ -90,18 +90,78 @@ def list_patients(search: Optional[str] = None) -> dict:
     return {"patients": items}
 
 
-# ---------------- CREATE ----------------
+# ---------------- CREATE (real Snowflake) ----------------
 @router.post("/patients", status_code=status.HTTP_201_CREATED)
 def create_patient(body: NewPatient) -> dict:
+    """Insert a new patient into CORE.patient.
+
+    Returns 409 Conflict if the NHS number already exists.
+    Returns 503 if Snowflake is unreachable.
+    """
+    import uuid as _uuid
+    import logging as _logging
+    _log = _logging.getLogger(__name__)
+
+    patient_id = f"pat_{_uuid.uuid4().hex[:8]}"
+    now = datetime.utcnow().replace(microsecond=0)
+
+    try:
+        conn = _sf_conn()
+    except Exception as e:
+        _log.exception("Snowflake connect failed for create_patient")
+        raise HTTPException(
+            status_code=503,
+            detail={"error": {"code": "database_unavailable",
+                              "message": "Could not connect to data warehouse"}},
+        )
+
+    try:
+        cur = conn.cursor()
+
+        # Uniqueness check on NHS number (the human-facing key)
+        cur.execute(
+            "SELECT patient_id FROM clinical_db.core.patient WHERE nhs_number = %s",
+            (body.nhs_number,),
+        )
+        existing = cur.fetchone()
+        if existing:
+            raise HTTPException(
+                status_code=409,
+                detail={"error": {"code": "patient_exists",
+                                  "message": f"A patient with NHS number {body.nhs_number} already exists",
+                                  "existing_patient_id": existing[0]}},
+            )
+
+        cur.execute(
+            """
+            INSERT INTO clinical_db.core.patient
+                (patient_id, name, dob, nhs_number, sex, created_at, last_updated)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (patient_id, body.name, body.dob, body.nhs_number, body.sex, now, now),
+        )
+        conn.commit()
+    except HTTPException:
+        raise
+    except Exception as e:
+        _log.exception("INSERT into CORE.patient failed for %s", body.nhs_number)
+        raise HTTPException(
+            status_code=500,
+            detail={"error": {"code": "internal_error",
+                              "message": f"Patient creation failed: {e}"}},
+        )
+    finally:
+        conn.close()
+
     return {
-        "id": "pat_new1",
+        "id": patient_id,
         "name": body.name,
         "dob": body.dob.isoformat(),
         "nhs_number": body.nhs_number,
         "sex": body.sex,
         "document_count": 0,
         "open_flag_count": 0,
-        "last_updated": datetime.utcnow().isoformat() + "Z",
+        "last_updated": now.isoformat() + "Z",
     }
 
 
