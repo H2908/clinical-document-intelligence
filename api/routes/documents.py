@@ -20,23 +20,71 @@ log = logging.getLogger(__name__)
 router = APIRouter()
 
 
-# ─── GET /patients/{patient_id}/documents (Phase 1 mock) ────────────
+# ─── GET /patients/{patient_id}/documents (real Snowflake) ──────────
 @router.get("/patients/{patient_id}/documents")
 def list_patient_documents(patient_id: str) -> dict:
-    return {
-        "documents": [
-            {"id": "doc_11", "name": "GP_Referral_14Jan2024.pdf",
-             "type": "referral", "source": "EMIS Web",
-             "date": "2024-01-14", "status": "processed"},
-            {"id": "doc_77ab", "name": "Cardiology_28Feb2024.pdf",
-             "type": "clinic_letter", "source": "Trust EPR",
-             "date": "2024-02-28", "status": "processed"},
-            {"id": "doc_91", "name": "DM_Review_10Apr2024.pdf",
-             "type": "clinic_letter", "source": "EMIS Web",
-             "date": "2024-04-10", "status": "processed"},
-        ]
-    }
+    """List a patient's documents from CORE.document, newest first."""
+    import os
+    import snowflake.connector
+    from dotenv import load_dotenv
 
+    load_dotenv()
+
+    try:
+        conn = snowflake.connector.connect(
+            account=os.environ["SNOWFLAKE_ACCOUNT"],
+            user=os.environ["SNOWFLAKE_USER"],
+            password=os.environ["SNOWFLAKE_PASSWORD"],
+            database="clinical_db",
+            warehouse="clinical_wh",
+            role=os.environ["SNOWFLAKE_ROLE"],
+        )
+    except Exception:
+        log.exception("Snowflake connect failed for documents list")
+        raise HTTPException(
+            status_code=503,
+            detail={"error": {"code": "database_unavailable",
+                              "message": "Could not connect to data warehouse"}},
+        )
+
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT
+                document_id,
+                file_name,
+                doc_type,
+                source,
+                document_date,
+                status
+            FROM clinical_db.core.document
+            WHERE patient_id = %s
+            ORDER BY document_date DESC NULLS LAST, created_at DESC
+        """, (patient_id,))
+        rows = cur.fetchall()
+    except Exception as e:
+        log.exception("CORE.document read failed for %s", patient_id)
+        raise HTTPException(
+            status_code=500,
+            detail={"error": {"code": "internal_error",
+                              "message": f"Query failed: {e}"}},
+        )
+    finally:
+        conn.close()
+
+    documents = []
+    for row in rows:
+        doc_id, file_name, doc_type, source, doc_date, doc_status = row
+        documents.append({
+            "id":     doc_id,
+            "name":   file_name or doc_id,
+            "type":   doc_type or "unknown",
+            "source": source or "",
+            "date":   doc_date.isoformat() if doc_date else "",
+            "status": doc_status or "processed",
+        })
+
+    return {"documents": documents}
 
 # ─── GET /documents/{document_id} (Phase 1 mock) ────────────────────
 @router.get("/documents/{document_id}")
