@@ -23,9 +23,14 @@ Conventions:
 #   "description":       str,    # natural-language for the clinician
 #   "cited_document_id": str,    # must appear in the patient's documents
 #   "source_quote":      str,    # verbatim sentence from the cited document
-#   "grounding_status":  None    # agent leaves blank; metric module fills
+#   "grounding_status":  None,   # agent leaves blank; metric module fills
 #                                # one of: "grounded" | "misattributed"
 #                                # | "fabricated"
+#   "clinical_subject":  str     # canonical lower-case noun phrase the flag
+#                                # is about (e.g. "atorvastatin",
+#                                # "penicillin allergy", "heart failure",
+#                                # "hba1c monitoring"). Used by the matcher
+#                                # to deduplicate paraphrased restatements.
 # }
 #
 # All three LLM passes run at temperature = 0.7 (logged in metadata).
@@ -44,7 +49,7 @@ import json
 # This prompt only runs to catch edge cases the deterministic rules miss.
 # ─────────────────────────────────────────────────────────────────────
 
-FLAG_SECOND_PASS_VERSION = "v1.2"
+FLAG_SECOND_PASS_VERSION = "v1.3"
 FLAG_SECOND_PASS_TEMPLATE = """You are a clinical safety reviewer assisting an NHS doctor reviewing a patient's chart before an appointment. You DO NOT provide medical advice - you only surface patterns the doctor should verify.
 
 PATIENT ENTITIES (extracted from documents):
@@ -62,10 +67,15 @@ Identify any additional clinically relevant patterns the doctor should verify. E
 
 STRICT RULES:
 1. Output ONLY a JSON array of flag objects. No prose, no markdown fences.
-2. Each flag MUST have exactly these six fields:
+2. Each flag MUST have exactly these seven fields:
    - "severity":          "HIGH" | "MEDIUM" | "LOW"
    - "category":          short snake-case code (e.g. "AI_ALLERGY_DRUG_CONFLICT")
    - "description":       natural language for the doctor, under 30 words
+   - "clinical_subject":  canonical lower-case noun phrase the flag is about
+                          (e.g. "atorvastatin", "penicillin allergy",
+                          "heart failure", "hba1c monitoring"). Not a sentence.
+                          One subject per flag. Used by downstream matching
+                          to merge paraphrased restatements of the same risk.
    - "cited_document_id": the document_id that supports the flag
    - "source_quote":      see SOURCE_QUOTE REQUIREMENTS below
    - "grounding_status":  null  (leave blank - the system fills this later)
@@ -115,6 +125,7 @@ OUTPUT FORMAT - exactly one example flag shown for shape:
     "severity": "HIGH",
     "category": "AI_ALLERGY_DRUG_CONFLICT",
     "description": "Patient has documented penicillin allergy; verify no beta-lactam prescribed.",
+    "clinical_subject": "penicillin allergy",
     "cited_document_id": "doc_abc12345",
     "source_quote": "Patient reports penicillin allergy - rash on exposure 2019. Avoid beta-lactams.",
     "grounding_status": null
@@ -143,7 +154,7 @@ def build_flag_second_pass(entity_summary: list[dict], existing_flags: list[dict
 # Difference from hybrid: no hard post-validation. The prompt does the work.
 # ----------------------------------------------------------------------------
 
-FLAG_LLM_THOUGHTFUL_VERSION = "v1.0"
+FLAG_LLM_THOUGHTFUL_VERSION = "v1.1"
 FLAG_LLM_THOUGHTFUL_TEMPLATE = """You are a clinical safety reviewer assisting an NHS doctor reviewing a patient's chart before an appointment. You DO NOT provide medical advice - you only surface patterns the doctor should verify.
 
 PATIENT DOCUMENTS (raw text, with document_id tags):
@@ -167,10 +178,14 @@ PROVENANCE DISCIPLINE - read carefully:
 
 OUTPUT RULES:
 1. Output ONLY a JSON array. No prose, no markdown fences.
-2. Each flag MUST have exactly these six fields:
+2. Each flag MUST have exactly these seven fields:
    - "severity":          "HIGH" | "MEDIUM" | "LOW"
    - "category":          short snake-case code (e.g. "ALLERGY_CONFLICT")
    - "description":       natural language for the doctor, under 30 words
+   - "clinical_subject":  canonical lower-case noun phrase the flag is about
+                          (e.g. "atorvastatin", "penicillin allergy",
+                          "heart failure", "hba1c monitoring"). Not a sentence.
+                          One subject per flag.
    - "cited_document_id": the document_id that supports the flag
    - "source_quote":      verbatim sentence from the cited document
    - "grounding_status":  null
@@ -183,6 +198,7 @@ EXAMPLE (illustrative shape only - do not reuse content):
     "severity": "HIGH",
     "category": "ALLERGY_CONFLICT",
     "description": "Patient has documented penicillin allergy; verify no beta-lactam prescribed.",
+    "clinical_subject": "penicillin allergy",
     "cited_document_id": "doc_abc12345",
     "source_quote": "Patient reports penicillin allergy - rash on exposure 2019.",
     "grounding_status": null
@@ -206,7 +222,7 @@ def build_flag_llm_thoughtful(document_corpus: str) -> str:
 # in structure so the comparison isolates exactly the missing guards.
 # ----------------------------------------------------------------------------
 
-FLAG_LLM_NAIVE_VERSION = "v1.0"
+FLAG_LLM_NAIVE_VERSION = "v1.1"
 FLAG_LLM_NAIVE_TEMPLATE = """You are a clinical assistant helping a doctor review a patient's chart before an appointment.
 
 PATIENT DOCUMENTS:
@@ -226,6 +242,10 @@ Return a JSON array of risk flags. Each flag should include:
   - "severity":          "HIGH" | "MEDIUM" | "LOW"
   - "category":          short snake-case code
   - "description":       short clinical description for the doctor
+  - "clinical_subject":  canonical lower-case noun phrase the flag is about
+                         (e.g. "atorvastatin", "penicillin allergy",
+                         "heart failure", "hba1c monitoring"). Not a sentence.
+                         One subject per flag.
   - "cited_document_id": which document supports this flag
   - "source_quote":      a sentence from the document showing why
   - "grounding_status":  null
@@ -328,8 +348,8 @@ EXAMPLE OF BAD OUTPUT (do not write this):
 
 OUTPUT:"""
 
-FLAG_LLM_NAIVE_VERSION       = "v1.0"
-FLAG_LLM_THOUGHTFUL_VERSION  = "v1.0"
+FLAG_LLM_NAIVE_VERSION       = "v1.1"
+FLAG_LLM_THOUGHTFUL_VERSION  = "v1.1"
 
 
 def build_briefing_summary(facts: dict) -> str:

@@ -199,6 +199,7 @@ def _check_allergy_drug_conflicts(entities: list[dict]) -> list[dict]:
                             f"{drug['text'].strip()}. Verify before prescribing."
                         ),
                         "source_document_id": drug["document_id"],
+                        "clinical_subject": f"{allergy_term} allergy",
                     })
     return flags
 
@@ -231,6 +232,7 @@ def _check_duplicate_medications(entities: list[dict]) -> list[dict]:
                     f"{len(doc_ids)} documents. Confirm current dose."
                 ),
                 "source_document_id": sorted(doc_ids)[-1],
+                "clinical_subject": drug_name,
             })
     return flags
 
@@ -275,6 +277,7 @@ def _check_overdue_followups(
                     f"({latest_date.isoformat()}). Consider review."
                 ),
                 "source_document_id": doc_id,
+                "clinical_subject": condition,
             })
     return flags
 
