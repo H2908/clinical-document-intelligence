@@ -42,13 +42,27 @@ from evaluation.grounding import grade_flag, is_grounded
 def _flag_key(flag: dict) -> tuple[str, str]:
     """Canonical identity for a flag for set comparisons.
 
-    Two flags are considered the same if they share (category, description).
-    Severity / source_document_id deliberately excluded — the same clinical
-    issue cited from a different doc is still the same flag.
+    Identity = (category, canonical(clinical_subject)).
+    canonical(s) = s.strip().lower().
+
+    Two flags are the same iff they have the same category AND the same
+    canonical clinical_subject. Severity, source_document_id,
+    cited_document_id, and description are all deliberately excluded from
+    identity:
+      - severity is a label not an identity
+      - {source,cited}_document_id can differ for the same clinical issue
+        cited in different docs
+      - description is paraphrasable; the whole point of clinical_subject
+        as a first-class field is to make identity robust to paraphrase.
+
+    Flags missing clinical_subject get an empty-string key. They will
+    collapse together into a single "no-subject" bucket, which is the
+    correct behaviour for the matcher (and an obvious diagnostic signal
+    that the upstream is dropping the field).
     """
     return (
-        flag.get("category", ""),
-        flag.get("description", "").strip(),
+        (flag.get("category") or "").strip(),
+        (flag.get("clinical_subject") or "").strip().lower(),
     )
 
 
