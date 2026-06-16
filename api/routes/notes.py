@@ -14,7 +14,7 @@ import logging
 import uuid
 from datetime import date
 
-from fastapi import APIRouter, Form, HTTPException, status
+from fastapi import APIRouter, Form, HTTPException, status, BackgroundTasks
 from pydantic import BaseModel, Field
 
 from database.snowflake_writer import (
@@ -26,6 +26,7 @@ from parsers.text_cleaner import clean_text
 from nlp.medical_ner import extract_entities
 from nlp.negation_detector import detect_negation
 from nlp.date_normaliser import normalise_dates
+from api.jobs import create_job, mark_running, mark_completed, mark_failed
 
 log = logging.getLogger(__name__)
 router = APIRouter()
@@ -49,6 +50,7 @@ class ClinicianNote(BaseModel):
 async def add_clinician_note(
     patient_id: str,
     note: ClinicianNote,
+    background_tasks: BackgroundTasks = None,
 ) -> dict:
     """
     Notes pipeline (different from documents - no PDF, no S3):
@@ -132,14 +134,44 @@ async def add_clinician_note(
             log.exception("write_entities failed for note %s", document_id)
             # Non-fatal: the note is saved; entities can be re-extracted later
 
-    # 6. Run agent orchestrator
-    agent_counts = {}
-    try:
-        from agents.orchestrator import run_agents
-        agent_state = run_agents(
+    # 6. Run agents in background; respond now with what we know already
+    job_id = create_job(
+        kind="note_agents",
+        context={"document_id": document_id, "patient_id": patient_id},
+    )
+    if background_tasks is not None:
+        background_tasks.add_task(
+            _run_note_agents_in_background,
+            job_id=job_id,
             patient_id=patient_id,
             document_id=document_id,
         )
+    else:
+        # Fallback for callers that didn't pass BackgroundTasks - run inline
+        _run_note_agents_in_background(job_id, patient_id, document_id)
+
+    return {
+        "document_id": document_id,
+        "job_id": job_id,
+        "status": "saved",
+        "doc_type": "clinician_note",
+        "entity_count": len(entities),
+        "message": (
+            f"Note saved - {len(entities)} entities extracted. "
+            "Agents running in background. Poll /api/jobs/{job_id}."
+        ),
+    }
+
+
+def _run_note_agents_in_background(
+    job_id: str,
+    patient_id: str,
+    document_id: str,
+) -> None:
+    mark_running(job_id)
+    try:
+        from agents.orchestrator import run_agents
+        agent_state = run_agents(patient_id=patient_id, document_id=document_id)
         agent_counts = {
             "timeline_events": len(agent_state.get("timeline_events", [])),
             "flags": len(agent_state.get("flags", [])),
@@ -147,21 +179,17 @@ async def add_clinician_note(
             "briefing": agent_state.get("briefing") is not None,
             "errors": len(agent_state.get("errors", [])),
         }
+        mark_completed(job_id, {
+            "document_id": document_id,
+            "agent_counts": agent_counts,
+            "message": (
+                f"Note agents complete - {agent_counts['flags']} flags, "
+                f"{agent_counts['contradictions']} contradictions."
+            ),
+        })
     except Exception as e:
         log.exception("Agent orchestrator crashed for note %s", document_id)
-        agent_counts = {"error": str(e)}
-
-    return {
-        "document_id": document_id,
-        "status": "processed",
-        "doc_type": "clinician_note",
-        "entity_count": len(entities),
-        "agent_counts": agent_counts,
-        "message": (
-            f"Note recorded - {len(entities)} entities extracted, "
-            f"{agent_counts.get('flags', 0)} flags."
-        ),
-    }
+        mark_failed(job_id, f"Agent orchestrator failed: {e}")
 
 
 # ---- GET /patients/{patient_id}/notes ----

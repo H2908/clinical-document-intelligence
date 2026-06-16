@@ -121,6 +121,19 @@ export type BriefingResponse = {
   message?: string;
 };
 
+
+export type Job = {
+  job_id: string;
+  kind: string;
+  status: "queued" | "running" | "completed" | "failed";
+  created_at: number;
+  started_at: number | null;
+  finished_at: number | null;
+  context: Record<string, any>;
+  result: Record<string, any> | null;
+  error: string | null;
+};
+
 export type PatientOverview = PatientCard & {
   age: number;
   stats: {
@@ -194,7 +207,7 @@ export const api = {
     ),
 
   postNote: (id: string, body: { text: string; document_date: string; source?: string | null }) =>
-    request<{ document_id: string; status: string; entity_count: number; message: string }>(
+    request<{ document_id: string; job_id: string; status: string; entity_count: number; message: string }>(
       `/patients/${id}/notes`,
       { method: "POST", body: JSON.stringify(body) }
     ),
@@ -222,9 +235,8 @@ export const api = {
     }
     return res.json() as Promise<{
       document_id: string;
-      status: string;
-      entity_count: number;
-      agent_counts: Record<string, number>;
+      job_id: string;
+      status: "queued";
       message: string;
     }>;
   },
@@ -248,11 +260,27 @@ export const api = {
     }
     return res.json() as Promise<{
       document_id: string;
-      status: string;
-      observation_count: number;
-      entity_count: number;
-      agent_counts: Record<string, number>;
+      job_id: string;
+      status: "queued";
+      doc_type: string;
       message: string;
     }>;
+  },
+
+  getJob: (jobId: string) => request<Job>(`/jobs/${jobId}`),
+
+  pollJob: async (jobId: string, opts?: { intervalMs?: number; timeoutMs?: number; onProgress?: (job: Job) => void }): Promise<Job> => {
+    const intervalMs = opts?.intervalMs ?? 2000;
+    const timeoutMs = opts?.timeoutMs ?? 5 * 60 * 1000; // 5 minutes
+    const start = Date.now();
+    while (true) {
+      const job = await request<Job>(`/jobs/${jobId}`);
+      opts?.onProgress?.(job);
+      if (job.status === "completed" || job.status === "failed") return job;
+      if (Date.now() - start > timeoutMs) {
+        throw new Error(`Job ${jobId} did not finish within ${timeoutMs / 1000}s (last status: ${job.status})`);
+      }
+      await new Promise((r) => setTimeout(r, intervalMs));
+    }
   },
 };

@@ -22,6 +22,7 @@ from api.routes import (
     contradictions,
     briefing,
     timeline,
+    jobs,
 )
 
 # ----------------------------------------------------------------------
@@ -131,6 +132,7 @@ app.include_router(flags.router,           prefix="/api", tags=["flags"])
 app.include_router(contradictions.router,  prefix="/api", tags=["contradictions"])
 app.include_router(briefing.router,        prefix="/api", tags=["briefing"])
 app.include_router(timeline.router, prefix="/api", tags=["timeline"])
+app.include_router(jobs.router,     prefix="/api", tags=["jobs"])
 
 # ----------------------------------------------------------------------
 # Health

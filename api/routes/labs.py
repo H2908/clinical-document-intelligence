@@ -14,10 +14,11 @@ import uuid
 from pathlib import Path
 from datetime import date
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status, BackgroundTasks
 
 from database.snowflake_writer import insert_raw_document
 from ingestion.s3_uploader import upload
+from api.jobs import create_job, mark_running, mark_completed, mark_failed
 
 log = logging.getLogger(__name__)
 router = APIRouter()
@@ -30,6 +31,7 @@ router = APIRouter()
 )
 async def upload_lab_report(
     patient_id: str,
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     document_date: date = Form(...),
     source: str | None = Form(None),
@@ -78,9 +80,44 @@ async def upload_lab_report(
                               "message": f"S3 ok but DB insert failed: {e}"}},
         )
 
-    # 3 + 4. Worker + orchestrator
-    from worker.document_processor import process_from_s3
+    # 3. Create job and schedule background processing
+    job_id = create_job(
+        kind="lab_upload",
+        context={
+            "document_id": document_id,
+            "patient_id": patient_id,
+            "doc_type": "lab_report",
+            "s3_key": s3_key,
+        },
+    )
+    background_tasks.add_task(
+        _process_lab_in_background,
+        job_id=job_id,
+        document_id=document_id,
+        patient_id=patient_id,
+        s3_key=s3_key,
+        document_date=document_date,
+    )
+
+    return {
+        "document_id": document_id,
+        "job_id": job_id,
+        "status": "queued",
+        "doc_type": "lab_report",
+        "message": "Lab report uploaded; processing in background. Poll /api/jobs/{job_id}.",
+    }
+
+
+def _process_lab_in_background(
+    job_id: str,
+    document_id: str,
+    patient_id: str,
+    s3_key: str,
+    document_date,
+) -> None:
+    mark_running(job_id)
     try:
+        from worker.document_processor import process_from_s3
         result = process_from_s3(
             document_id=document_id,
             patient_id=patient_id,
@@ -88,36 +125,28 @@ async def upload_lab_report(
             document_date=document_date,
             doc_type="lab_report",
         )
-        final_status = result["status"]
+        final_status = result.get("status", "unknown")
         entity_count = len(result.get("entities", []))
         observation_count = len(result.get("observations", []))
         agent_counts = result.get("agent_counts", {})
-    except Exception as e:
-        log.exception("Worker pipeline failed for lab %s", document_id)
-        final_status = "failed"
-        entity_count = 0
-        observation_count = 0
-        agent_counts = {}
-
-    # 5. Response
-    if final_status == "processed":
         message = (
             f"Lab report processed - {observation_count} observations, "
-            f"{entity_count} entities, "
-            f"{agent_counts.get('flags', 0)} flags."
+            f"{entity_count} entities, {agent_counts.get('flags', 0)} flags."
+            if final_status == "processed"
+            else "Lab report received but processing did not complete cleanly."
         )
-    else:
-        message = "Lab report received but processing failed - check logs."
-
-    return {
-        "document_id": document_id,
-        "status": final_status,
-        "doc_type": "lab_report",
-        "observation_count": observation_count,
-        "entity_count": entity_count,
-        "agent_counts": agent_counts,
-        "message": message,
-    }
+        mark_completed(job_id, {
+            "document_id": document_id,
+            "status": final_status,
+            "doc_type": "lab_report",
+            "observation_count": observation_count,
+            "entity_count": entity_count,
+            "agent_counts": agent_counts,
+            "message": message,
+        })
+    except Exception as e:
+        log.exception("Background lab processing failed for %s", document_id)
+        mark_failed(job_id, f"Worker pipeline failed: {e}")
 
 
 # ---- GET /patients/{patient_id}/labs ----
