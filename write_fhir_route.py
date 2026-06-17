@@ -1,4 +1,24 @@
-"""FHIR R4 endpoints.
+"""Write the FHIR endpoint to api/routes/fhir.py.
+
+Two endpoints:
+  GET  /api/patients/{patient_id}/fhir         - return cached bundle
+  POST /api/patients/{patient_id}/fhir/rebuild - build + write fresh bundle
+
+REST semantics (design A locked):
+  - GET is pure read. 200 with bundle if cached, 404 if not yet built
+    or patient unknown.
+  - POST triggers the side-effecting build/write. 200 with metadata.
+
+The endpoint reads from mart.fhir_patient_bundle (built and written by
+fhir.fhir_builder.write_fhir_bundle). Storage architecture per partner's
+database/schemas/05_fhir.sql.
+
+Atomic: this script overwrites api/routes/fhir.py - we verified above
+that the existing file is a 2-line stub.
+"""
+from pathlib import Path
+
+new_content = '''"""FHIR R4 endpoints.
 
 Exposes the patient-level FHIR Bundle stored in mart.fhir_patient_bundle.
 The bundle is built by fhir.fhir_builder.write_fhir_bundle (call POST
@@ -164,3 +184,24 @@ def rebuild_fhir_bundle(patient_id: str):
             f"GET /api/patients/{patient_id}/fhir to retrieve."
         ),
     }
+'''
+
+p = Path("api/routes/fhir.py")
+existing = p.read_text(encoding="utf-8") if p.exists() else ""
+
+# Sanity: only overwrite if existing is a stub or absent
+if existing.strip() and "get_fhir_bundle" not in existing and "router = APIRouter()" in existing:
+    # Stub case - safe to overwrite
+    p.write_text(new_content, encoding="utf-8", newline="\n")
+    print(f"OK overwrote stub api/routes/fhir.py ({len(existing.splitlines())} -> "
+          f"{len(new_content.splitlines())} lines)")
+elif not existing.strip():
+    p.write_text(new_content, encoding="utf-8", newline="\n")
+    print(f"OK wrote new api/routes/fhir.py ({len(new_content.splitlines())} lines)")
+elif "get_fhir_bundle" in existing:
+    print("[SKIP] api/routes/fhir.py already has FHIR endpoints - not overwriting")
+    raise SystemExit(0)
+else:
+    print("[FAIL] api/routes/fhir.py has unexpected content - manual review needed")
+    print(f"First 200 chars: {existing[:200]!r}")
+    raise SystemExit(1)
