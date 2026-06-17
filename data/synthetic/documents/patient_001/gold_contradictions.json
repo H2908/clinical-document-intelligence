@@ -1,17 +1,23 @@
 {
   "patient_id": "patient_001",
   "construction_date": "2026-06-17",
+  "schema_version": "v2_claim_based_matching",
+  "match_rule": "A gold contradiction is satisfied if the agent emits a contradiction where one side cites any document in claim_a_sources and the other side cites any document in claim_b_sources. The clinical fact is what matters, not which specific document-pair is cited.",
   "gold_contradictions": [
     {
       "category": "ALLERGY",
       "severity": "HIGH",
-      "doc_a_id": "01_GP_Referral_Thompson_12Jan2024.pdf",
-      "doc_a_statement": "Allergies: NKDA \u2014 no known drug allergies recorded.",
-      "doc_b_id": "02_Cardiology_Thompson_28Feb2024.pdf",
-      "doc_b_statement": "Patient reports penicillin allergy (rash, 2018). Avoid beta-lactams.",
-      "explanation": "Doc 01 (GP referral, Jan 2024) records NKDA; doc 02 (cardiology, Feb 2024) records a specific penicillin allergy with documented reaction date. These are directly opposing factual claims about the same patient. The cardiology letter is the more recent and more specific record.",
-      "rationale_for_planting": "This contradiction is realistic of real EHRs where allergy status diverges across primary care and specialist records. It tests whether the contradiction agent detects allergy-status disagreement, which is the highest-stakes contradiction type in clinical practice."
+      "claim_a": "no known drug allergies",
+      "claim_b": "penicillin allergy",
+      "claim_a_sources": [
+        "01_GP_Referral_Thompson_12Jan2024.pdf",
+        "03_AE_Discharge_Thompson_04Apr2024.pdf"
+      ],
+      "claim_b_sources": [
+        "02_Cardiology_Thompson_28Feb2024.pdf"
+      ],
+      "explanation": "Documents 01 and 03 record NKDA. Document 02 records a specific penicillin allergy with documented reaction date (rash 2018). These are directly opposing factual claims about the same patient. The cardiology letter is the more recent and more specific record. The A&E discharge reproduces the GP referral's NKDA error - realistic of real EHRs where bad allergy records propagate across systems.",
+      "rationale_for_planting": "Tests whether the contradiction agent detects allergy-status disagreement, which is the highest-stakes contradiction type in clinical practice. The 2-vs-1 propagation structure tests that the matching rule is robust to multi-document fact propagation - any cross-pairing (01-vs-02, 03-vs-02) should count as the same correct detection."
     }
-  ],
-  "notes": "Doc 03 (A&E discharge) ALSO records NKDA, reproducing the error from doc 01. The contradiction agent may emit the contradiction as 01-vs-02 or as 03-vs-02 (or both); either is correct. The matcher should treat these as the same underlying contradiction because they're about the same penicillin allergy."
+  ]
 }
