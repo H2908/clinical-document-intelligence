@@ -1,0 +1,36 @@
+{
+  "patient_id": "patient_001",
+  "patient_name": "Margaret Thompson",
+  "patient_dob": "1954-08-15",
+  "patient_nhs": "999 100 0001",
+  "construction_date": "2026-06-17",
+  "design_principle": "Cardiology + CKD case with intentionally planted allergy contradiction. Documents are chronologically distinct (Jan, Feb, Apr 2024) and deliberately diverse in content (GP referral / cardiology specialist letter / A&E discharge), targeting pairwise content-token Jaccard < 0.5.",
+  "gold_flags": [
+    {
+      "category": "ALLERGY_CONFLICT",
+      "clinical_subject": "penicillin allergy",
+      "severity": "HIGH",
+      "rationale": "Two documents disagree on allergy status (doc 01 + doc 03 say NKDA; doc 02 documents penicillin allergy). The flag should fire on the doc-02 allergy record because that is the explicit clinical statement.",
+      "expected_source_document": "02_Cardiology_Thompson_28Feb2024.pdf"
+    },
+    {
+      "category": "OVERDUE_FOLLOWUP",
+      "clinical_subject": "chronic kidney disease",
+      "severity": "MEDIUM",
+      "rationale": "Last CKD-relevant clinical entry is doc 03 (04 Apr 2024). If evaluation is run >90 days after this date, the OVERDUE_FOLLOWUP rule should fire on chronic kidney disease.",
+      "expected_source_document": "03_AE_Discharge_Thompson_04Apr2024.pdf"
+    },
+    {
+      "category": "OVERDUE_FOLLOWUP",
+      "clinical_subject": "heart failure",
+      "severity": "MEDIUM",
+      "rationale": "Heart failure is documented across all three docs. Last entry is 04 Apr 2024; if evaluation runs >90 days later, OVERDUE_FOLLOWUP should fire on heart failure.",
+      "expected_source_document": "03_AE_Discharge_Thompson_04Apr2024.pdf"
+    }
+  ],
+  "additional_AI_flags_acceptable": [
+    "AI_UNDOCUMENTED_TREATMENT for heart failure (ACE inhibitor is documented but the LLM may flag absence of SGLT2 inhibitor or sacubitril/valsartan \u2014 that is acceptable, though not in the gold set since it requires guideline knowledge beyond what's in the docs).",
+    "AI flags surfacing the worsening eGFR (32 mL/min) as needing review \u2014 acceptable, not in gold set since it's evidence-grounded but not a deterministic rule trigger."
+  ],
+  "notes": "patient_001 is the CONTRADICTION case. The eval should pick up both the gold flags AND the gold contradiction below. Watch the contradiction agent specifically."
+}

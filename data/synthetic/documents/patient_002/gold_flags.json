@@ -1,0 +1,23 @@
+{
+  "patient_id": "patient_002",
+  "patient_name": "Daniel Ofori",
+  "patient_dob": "1968-03-22",
+  "patient_nhs": "999 200 0002",
+  "construction_date": "2026-06-17",
+  "design_principle": "T2DM case with worsening glycaemic control. Three documents chronologically spread May 2023 - Feb 2024. Documents are deliberately diverse: GP annual review / diabetes clinic specialist letter / lab report. The lab report tests the lab_parser code path. Pairwise content-token Jaccard should be < 0.5. NO planted contradictions - this is the false-positive control.",
+  "gold_flags": [
+    {
+      "category": "OVERDUE_FOLLOWUP",
+      "clinical_subject": "type 2 diabetes",
+      "severity": "MEDIUM",
+      "rationale": "Last clinical entry is doc 03 lab report (14 Feb 2024). If evaluation runs >90 days later (which it will, given today is mid-2026), the OVERDUE_FOLLOWUP rule should fire on type 2 diabetes.",
+      "expected_source_document": "03_Lab_Report_Ofori_14Feb2024.pdf"
+    }
+  ],
+  "additional_AI_flags_acceptable": [
+    "AI_UNDOCUMENTED_TREATMENT for SGLT2 inhibitor (clinically defensible at HbA1c >8% with eGFR adequate, but requires guideline knowledge not explicitly in the docs - acceptable if emitted but not in gold set).",
+    "AI flag for worsening trend (HbA1c 8.4 -> 8.7 -> 9.1) - acceptable as evidence-grounded but not a deterministic rule trigger.",
+    "AI_INVESTIGATION_NO_RESULT for the 'review in clinic at 6 months' plan from doc 02 having no documented follow-up - acceptable."
+  ],
+  "notes": "patient_002 is the FALSE-POSITIVE CONTROL. The contradiction agent should return [] for this patient. Any contradiction emitted is a false positive and should be investigated."
+}

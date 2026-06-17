@@ -1,0 +1,452 @@
+[
+  {
+    "entity_type": "Diagnosis",
+    "text": "Whitfield Surgery\n",
+    "start_offset": 0,
+    "end_offset": 18,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Date",
+    "text": "12 Jan 2024",
+    "start_offset": 24,
+    "end_offset": 35,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "Margaret Thompson\nDOB",
+    "start_offset": 61,
+    "end_offset": 82,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Date",
+    "text": "1954-08-15",
+    "start_offset": 84,
+    "end_offset": 94,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "Beech Avenue",
+    "start_offset": 141,
+    "end_offset": 153,
+    "negated": false,
+    "icd10_code": "M14",
+    "normalised_value": "explicit"
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "Manchester",
+    "start_offset": 155,
+    "end_offset": 165,
+    "negated": false,
+    "icd10_code": "M14",
+    "normalised_value": "explicit"
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "Active Medical Conditions",
+    "start_offset": 175,
+    "end_offset": 200,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "Chronic heart failure",
+    "start_offset": 204,
+    "end_offset": 225,
+    "negated": false,
+    "icd10_code": "I50.22",
+    "normalised_value": "explicit"
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "ICD-10",
+    "start_offset": 258,
+    "end_offset": 264,
+    "negated": false,
+    "icd10_code": "I50.22",
+    "normalised_value": "explicit"
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "diagnosed",
+    "start_offset": 276,
+    "end_offset": 285,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Date",
+    "text": "2022-03-14",
+    "start_offset": 286,
+    "end_offset": 296,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "Chronic kidney disease stage 3b",
+    "start_offset": 299,
+    "end_offset": 330,
+    "negated": false,
+    "icd10_code": "N18.32",
+    "normalised_value": "explicit"
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "ICD-10",
+    "start_offset": 332,
+    "end_offset": 338,
+    "negated": false,
+    "icd10_code": "N18.32",
+    "normalised_value": "explicit"
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "diagnosed",
+    "start_offset": 350,
+    "end_offset": 359,
+    "negated": false,
+    "icd10_code": "I10",
+    "normalised_value": "explicit"
+  },
+  {
+    "entity_type": "Date",
+    "text": "2021-11-09",
+    "start_offset": 360,
+    "end_offset": 370,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "Hypertension",
+    "start_offset": 373,
+    "end_offset": 385,
+    "negated": false,
+    "icd10_code": "I10",
+    "normalised_value": "explicit"
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "ICD-10",
+    "start_offset": 387,
+    "end_offset": 393,
+    "negated": false,
+    "icd10_code": "I10",
+    "normalised_value": "explicit"
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "diagnosed",
+    "start_offset": 402,
+    "end_offset": 411,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Date",
+    "text": "2015-04-22",
+    "start_offset": 412,
+    "end_offset": 422,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "Type 2 diabetes mellitus",
+    "start_offset": 425,
+    "end_offset": 449,
+    "negated": false,
+    "icd10_code": "E11.9",
+    "normalised_value": "explicit"
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "ICD-10",
+    "start_offset": 451,
+    "end_offset": 457,
+    "negated": false,
+    "icd10_code": "E11.9",
+    "normalised_value": "explicit"
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "diagnosed",
+    "start_offset": 468,
+    "end_offset": 477,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Date",
+    "text": "2017-08-30",
+    "start_offset": 478,
+    "end_offset": 488,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Drug",
+    "text": "Ramipril",
+    "start_offset": 512,
+    "end_offset": 520,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": "ramipril"
+  },
+  {
+    "entity_type": "Date",
+    "text": "2022-04-01",
+    "start_offset": 545,
+    "end_offset": 555,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Drug",
+    "text": "Bisoprolol",
+    "start_offset": 559,
+    "end_offset": 569,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": "bisoprolol"
+  },
+  {
+    "entity_type": "Date",
+    "text": "2022-04-01",
+    "start_offset": 594,
+    "end_offset": 604,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Drug",
+    "text": "Furosemide",
+    "start_offset": 608,
+    "end_offset": 618,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": "furosemide"
+  },
+  {
+    "entity_type": "Date",
+    "text": "2023-05-12",
+    "start_offset": 645,
+    "end_offset": 655,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Drug",
+    "text": "Metformin",
+    "start_offset": 659,
+    "end_offset": 668,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": "metformin"
+  },
+  {
+    "entity_type": "Date",
+    "text": "2017-09-15",
+    "start_offset": 694,
+    "end_offset": 704,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Drug",
+    "text": "Atorvastatin",
+    "start_offset": 708,
+    "end_offset": 720,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": "atorvastatin"
+  },
+  {
+    "entity_type": "Date",
+    "text": "2019-02-03",
+    "start_offset": 747,
+    "end_offset": 757,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Conflict",
+    "text": "Allergies",
+    "start_offset": 759,
+    "end_offset": 768,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Conflict",
+    "text": "NKDA",
+    "start_offset": 770,
+    "end_offset": 774,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Conflict",
+    "text": "drug allergies",
+    "start_offset": 786,
+    "end_offset": 800,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "cardiology",
+    "start_offset": 845,
+    "end_offset": 855,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "worsening",
+    "start_offset": 870,
+    "end_offset": 879,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "exertional dyspnoea",
+    "start_offset": 880,
+    "end_offset": 899,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Date",
+    "text": "6 weeks",
+    "start_offset": 914,
+    "end_offset": 921,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "eGFR",
+    "start_offset": 930,
+    "end_offset": 934,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "Patient reports",
+    "start_offset": 953,
+    "end_offset": 968,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "orthopnoea",
+    "start_offset": 969,
+    "end_offset": 979,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "ankle swelling",
+    "start_offset": 984,
+    "end_offset": 998,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "Echocardiogram",
+    "start_offset": 1000,
+    "end_offset": 1014,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "please\nreview",
+    "start_offset": 1026,
+    "end_offset": 1039,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "advise",
+    "start_offset": 1044,
+    "end_offset": 1050,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "heart failure",
+    "start_offset": 1054,
+    "end_offset": 1067,
+    "negated": false,
+    "icd10_code": "I50.9",
+    "normalised_value": "mapper-high"
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "therapy",
+    "start_offset": 1068,
+    "end_offset": 1075,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  },
+  {
+    "entity_type": "Diagnosis",
+    "text": "optimisation",
+    "start_offset": 1076,
+    "end_offset": 1088,
+    "negated": false,
+    "icd10_code": null,
+    "normalised_value": null
+  }
+]

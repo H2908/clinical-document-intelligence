@@ -1,0 +1,17 @@
+{
+  "patient_id": "patient_001",
+  "construction_date": "2026-06-17",
+  "gold_contradictions": [
+    {
+      "category": "ALLERGY",
+      "severity": "HIGH",
+      "doc_a_id": "01_GP_Referral_Thompson_12Jan2024.pdf",
+      "doc_a_statement": "Allergies: NKDA \u2014 no known drug allergies recorded.",
+      "doc_b_id": "02_Cardiology_Thompson_28Feb2024.pdf",
+      "doc_b_statement": "Patient reports penicillin allergy (rash, 2018). Avoid beta-lactams.",
+      "explanation": "Doc 01 (GP referral, Jan 2024) records NKDA; doc 02 (cardiology, Feb 2024) records a specific penicillin allergy with documented reaction date. These are directly opposing factual claims about the same patient. The cardiology letter is the more recent and more specific record.",
+      "rationale_for_planting": "This contradiction is realistic of real EHRs where allergy status diverges across primary care and specialist records. It tests whether the contradiction agent detects allergy-status disagreement, which is the highest-stakes contradiction type in clinical practice."
+    }
+  ],
+  "notes": "Doc 03 (A&E discharge) ALSO records NKDA, reproducing the error from doc 01. The contradiction agent may emit the contradiction as 01-vs-02 or as 03-vs-02 (or both); either is correct. The matcher should treat these as the same underlying contradiction because they're about the same penicillin allergy."
+}

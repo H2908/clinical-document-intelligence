@@ -11,10 +11,11 @@ import uuid
 from pathlib import Path
 from datetime import date
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status, BackgroundTasks
 
 from database.snowflake_writer import insert_raw_document
 from ingestion.s3_uploader import upload
+from api.jobs import create_job, mark_running, mark_completed, mark_failed
 
 log = logging.getLogger(__name__)
 router = APIRouter()
@@ -216,18 +217,20 @@ def get_document(document_id: str) -> dict:
 )
 async def upload_document(
     patient_id: str,
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     document_date: date = Form(...),
     type: str = Form(...),
     source: str | None = Form(None),
 ) -> dict:
     """
-    Upload flow:
-      1. Push file to S3
-      2. Insert row into RAW.raw_documents (status='pending')
-      3. Run NLP worker synchronously — parses, extracts entities, writes to CORE
-      4. Worker invokes agent orchestrator — timeline, flags, contradictions, briefing
-      5. Return summary counts to caller
+    Upload flow (Phase 4 L2 async):
+      1. Push file to S3 (synchronous - small, fast)
+      2. Insert row into RAW.raw_documents (synchronous)
+      3. Create a job and schedule background processing
+      4. Return immediately with {document_id, job_id, status: "queued"}
+      5. Background task runs worker + agents, updates job status
+    Frontend polls GET /api/jobs/{job_id} for completion.
     """
     document_id = f"doc_{uuid.uuid4().hex[:8]}"
     original_ext = Path(file.filename or "").suffix or ".pdf"
@@ -264,45 +267,85 @@ async def upload_document(
                               "message": f"S3 ok but DB insert failed: {e}"}},
         )
 
-    # 3 + 4. Worker + orchestrator (synchronous for Phase 3; async in Phase 5)
-    from worker.document_processor import process_from_s3
+    # 3. Create a job and schedule background processing
+    job_id = create_job(
+        kind="document_upload",
+        context={
+            "document_id": document_id,
+            "patient_id": patient_id,
+            "doc_type": type,
+            "s3_key": s3_key,
+        },
+    )
+    background_tasks.add_task(
+        _process_document_in_background,
+        job_id=job_id,
+        document_id=document_id,
+        patient_id=patient_id,
+        s3_key=s3_key,
+        document_date=document_date,
+        doc_type=type,
+    )
+
+    # 4. Return immediately with the job id
+    return {
+        "document_id": document_id,
+        "job_id": job_id,
+        "status": "queued",
+        "message": "Document uploaded; processing in background. Poll /api/jobs/{job_id}.",
+    }
+
+
+def _process_document_in_background(
+    job_id: str,
+    document_id: str,
+    patient_id: str,
+    s3_key: str,
+    document_date,
+    doc_type: str,
+) -> None:
+    """Run worker + orchestrator. Updates job status throughout.
+
+    Runs after the HTTP response has been sent. Any exception is caught
+    and recorded in the job so the frontend can show a failure state
+    instead of hanging.
+    """
+    mark_running(job_id)
     try:
+        from worker.document_processor import process_from_s3
         result = process_from_s3(
             document_id=document_id,
             patient_id=patient_id,
             s3_key=s3_key,
             document_date=document_date,
-            doc_type=type,
+            doc_type=doc_type,
         )
-        final_status = result["status"]
+        final_status = result.get("status", "unknown")
         entity_count = len(result.get("entities", []))
         agent_counts = result.get("agent_counts", {})
+
+        if final_status == "processed":
+            message = (
+                f"Document processed - {entity_count} entities extracted, "
+                f"{agent_counts.get('flags', 0)} flags, "
+                f"{agent_counts.get('contradictions', 0)} contradictions."
+            )
+        else:
+            message = "Document received but processing did not complete cleanly."
+
+        mark_completed(job_id, {
+            "document_id": document_id,
+            "status": final_status,
+            "entity_count": entity_count,
+            "agent_counts": agent_counts,
+            "message": message,
+        })
     except Exception as e:
-        log.exception("Worker pipeline failed for %s", document_id)
-        final_status = "failed"
-        entity_count = 0
-        agent_counts = {}
-
-    # 5. Build response
-    if final_status == "processed":
-        message = (
-            f"Document processed — {entity_count} entities extracted, "
-            f"{agent_counts.get('flags', 0)} flags, "
-            f"{agent_counts.get('contradictions', 0)} contradictions."
-        )
-    else:
-        message = "Document received but processing failed — check logs."
-
-    return {
-        "document_id": document_id,
-        "status": final_status,
-        "entity_count": entity_count,
-        "agent_counts": agent_counts,
-        "message": message,
-    }
+        log.exception("Background processing failed for %s", document_id)
+        mark_failed(job_id, f"Worker pipeline failed: {e}")
 # ─── DELETE /documents/{document_id} ────────────────────────────────
 @router.delete("/documents/{document_id}")
-def delete_document(document_id: str) -> dict:
+def delete_document(document_id: str, background_tasks: BackgroundTasks) -> dict:
     """Delete a document and its derived agent data, then regenerate.
 
     Steps:
@@ -445,20 +488,18 @@ def delete_document(document_id: str) -> dict:
     finally:
         conn.close()
 
-    # 4. Re-run agents on remaining docs (best-effort)
-    regen: dict = {}
-    try:
-        state = run_agents(patient_id=patient_id, document_id=f"<deleted-{document_id}>")
-        regen = {
-            "timeline_events": len(state.get("timeline_events", [])),
-            "flags":           len(state.get("flags", [])),
-            "contradictions":  len(state.get("contradictions", [])),
-            "briefing":        state.get("briefing") is not None,
-            "errors":          len(state.get("errors", [])),
-        }
-    except Exception as e:
-        log.exception("Agent regen failed after delete of %s", document_id)
-        regen = {"error": f"{type(e).__name__}: {e}"}
+    # 4. Re-run agents in background. The DB cascade above is already
+    # committed; the response returns immediately so the UI can update.
+    # The frontend polls /api/jobs/{job_id} for regeneration completion.
+    job_id = create_job(
+        kind="post_delete_regen",
+        context={"patient_id": patient_id, "deleted_document_id": document_id},
+    )
+    background_tasks.add_task(
+        _rerun_agents_in_background,
+        job_id=job_id,
+        patient_id=patient_id,
+    )
 
     # 5. Summary
     return {
@@ -467,5 +508,31 @@ def delete_document(document_id: str) -> dict:
         "patient_id":        patient_id,
         "s3_deleted":        s3_deleted,
         "rows_deleted":      {table: count for table, count in deletes},
-        "regenerated":       regen,
+        "regen_job_id":      job_id,
+        "regen_status":      "queued",
+        "message":           "Document deleted. Agents regenerating in background; poll /api/jobs/{job_id}.",
     }
+
+
+def _rerun_agents_in_background(job_id: str, patient_id: str) -> None:
+    """After a delete, re-run the orchestrator on the patient's remaining
+    documents. Slow because it touches every doc; runs in background."""
+    mark_running(job_id)
+    try:
+        from agents.orchestrator import run_agents
+        agent_state = run_agents(patient_id=patient_id, document_id=None)
+        agent_counts = {
+            "timeline_events": len(agent_state.get("timeline_events", [])),
+            "flags": len(agent_state.get("flags", [])),
+            "contradictions": len(agent_state.get("contradictions", [])),
+            "briefing": agent_state.get("briefing") is not None,
+            "errors": len(agent_state.get("errors", [])),
+        }
+        mark_completed(job_id, {
+            "patient_id": patient_id,
+            "agent_counts": agent_counts,
+            "message": "Post-delete agent regeneration complete.",
+        })
+    except Exception as e:
+        log.exception("Post-delete agent regeneration failed for %s", patient_id)
+        mark_failed(job_id, f"Agent regeneration failed: {e}")

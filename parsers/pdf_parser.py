@@ -58,10 +58,15 @@ def parse_pdf(file_path: str | Path) -> str:
 
     text = "\n".join(pages)
     if not text.strip():
-        raise ValueError(
-            f"No extractable text in {path}. "
-            "If this is a scanned PDF, OCR is needed (Phase 4, L2)."
+        # Phase 4 L2: fall back to OCR for scanned PDFs.
+        # Import lazily so users without Tesseract installed only hit the
+        # import error when they actually need OCR.
+        from parsers.ocr_engine import ocr_pdf as _ocr_fallback
+        import logging
+        logging.getLogger(__name__).info(
+            f"No extractable text in {path} - falling back to OCR (Tesseract)"
         )
+        return _ocr_fallback(path)
     return text
 
 

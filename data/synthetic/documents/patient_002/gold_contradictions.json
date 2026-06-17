@@ -1,0 +1,6 @@
+{
+  "patient_id": "patient_002",
+  "construction_date": "2026-06-17",
+  "gold_contradictions": [],
+  "notes": "This patient is the false-positive control for the contradiction agent. The three documents are deliberately internally consistent - same demographics, same conditions, same medication progression (metformin -> + gliclazide), same allergy status (NKDA), same renal function trend. Any contradiction the agent emits on this patient is a false positive."
+}
