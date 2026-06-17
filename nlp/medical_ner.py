@@ -29,6 +29,7 @@ from typing import TypedDict, Literal
 import spacy
 from spacy.language import Language
 from ontology.icd10_mapper import lookup as _icd10_mapper_lookup
+from ontology.bnf_mapper import lookup as _bnf_mapper_lookup
 
 
 EntityType = Literal["Diagnosis", "Drug", "Date", "Conflict"]
@@ -41,6 +42,7 @@ class Entity(TypedDict):
     end_offset: int
     negated: bool
     icd10_code: str | None
+    bnf_code: str | None
     normalised_value: str | None
 
 
@@ -304,6 +306,19 @@ def _icd10_for_span(text: str, full_text: str, start: int, end: int) -> str | No
     return result["code"] if result is not None else None
 
 
+def _bnf_for_drug(text: str) -> str | None:
+    """Resolve BNF code for a drug span via the curated mapper.
+
+    Mapper handles dose-stripping internally. Returns None for unknown
+    drugs. Pure additive: doesn't change drug classification, only
+    annotates the entity with a code when one is available.
+    """
+    if not text:
+        return None
+    result = _bnf_mapper_lookup(text)
+    return result["bnf_code"] if result is not None else None
+
+
 def _icd10_confidence_for_span(text: str, full_text: str, start: int, end: int) -> str | None:
     """Confidence label for the ICD-10 assignment from _icd10_for_span.
 
@@ -338,6 +353,7 @@ def _find_drugs_by_dictionary(text: str) -> list[Entity]:
                 end_offset=end,
                 negated=False,
                 icd10_code=None,
+                bnf_code=_bnf_for_drug(text[start:end]),
                 normalised_value=drug,
             ))
     return found
@@ -367,6 +383,7 @@ def _find_conflicts_by_dictionary(text: str) -> list[Entity]:
                 end_offset=end,
                 negated=False,
                 icd10_code=None,
+                bnf_code=None,
                 normalised_value=None,
             ))
     return found
@@ -383,6 +400,7 @@ def _find_dates(text: str) -> list[Entity]:
                 end_offset=match.end(),
                 negated=False,
                 icd10_code=None,
+                bnf_code=None,
                 normalised_value=None,
             ))
     return found
@@ -476,6 +494,7 @@ def extract_entities(text: str) -> list[Entity]:
                 _icd10_for_span(ent.text, text, ent.start_char, ent.end_char)
                 if etype == "Diagnosis" else None
             ),
+            bnf_code=(_bnf_for_drug(ent.text) if etype == "Drug" else None),
             normalised_value=(
                 ent.text.lower().split()[0] if etype == "Drug"
                 else _icd10_confidence_for_span(ent.text, text, ent.start_char, ent.end_char)
