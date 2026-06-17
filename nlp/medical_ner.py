@@ -28,6 +28,7 @@ from typing import TypedDict, Literal
 
 import spacy
 from spacy.language import Language
+from ontology.icd10_mapper import lookup as _icd10_mapper_lookup
 
 
 EntityType = Literal["Diagnosis", "Drug", "Date", "Conflict"]
@@ -81,11 +82,37 @@ DATE_PATTERNS = [
 ]
 
 NON_MEDICAL_STOPWORDS = {
+    # Document structure / metadata
     "patient", "patients", "reports", "report", "history", "examination",
     "review", "follow", "follow-up", "plan", "letter", "department",
     "consultant", "doctor", "dr", "nhs", "dob", "date", "address",
     "name", "phone", "tel", "email", "weeks", "months", "years",
     "symptoms", "consistent",
+    # Generic clinical verbs / nouns NOT diagnoses themselves
+    "diagnosed", "diagnosis", "worsening", "advise", "advised", "advice",
+    "therapy", "optimisation", "optimization", "management", "treatment",
+    "medication", "medications", "prescribing", "prescribed", "investigation",
+    "investigations", "ongoing", "stable", "active", "current", "new",
+    "additional", "specialist", "primary", "secondary",
+    # Specialty/department names (not diagnoses)
+    "cardiology", "cardiac", "neurology", "neurological", "respiratory",
+    "renal", "endocrine", "haematology", "haematological", "oncology",
+    "psychiatry", "psychiatric", "psychology", "dermatology", "ophthalmology",
+    "urology", "urological", "gastroenterology", "rheumatology",
+    "musculoskeletal", "infectious",
+    # Investigation names (clinically real but not diagnoses)
+    "echocardiogram", "echocardiography", "ecg", "egfr", "fbc", "lft",
+    "u&e", "ues", "hba1c", "tft", "trop", "troponin", "crp", "esr",
+    "ct", "mri", "xray", "x-ray", "ultrasound", "endoscopy", "colonoscopy",
+    "biopsy", "spirometry",
+    # Address / geography (cities, common road words)
+    "manchester", "london", "birmingham", "liverpool", "leeds", "sheffield",
+    "newcastle", "bristol", "glasgow", "edinburgh", "cardiff", "belfast",
+    "oxford", "cambridge", "croydon", "avenue", "street", "road", "lane",
+    "drive", "close", "way", "boulevard", "place",
+    # Common nouns appearing in clinical letters but not diagnoses
+    "yours", "sincerely", "regards", "thank", "thanks", "today",
+    "presentation", "arrival", "discharge", "admission",
 }
 
 
@@ -102,34 +129,196 @@ def _load_model() -> Language:
 # Helpers
 # ---------------------------------------------------------------------------
 
+# Condition-shape signal: a span is a Diagnosis if it contains one of
+# these condition roots or matches a known clinical condition family.
+# Positive-signal gate (component B of the A+B fix): without this, we
+# silently classify any noun span >=4 chars as Diagnosis.
+CONDITION_ROOTS = {
+    "failure", "disease", "syndrome", "deficiency", "neoplasm", "tumour",
+    "tumor", "infarction", "embolism", "thrombosis", "haemorrhage",
+    "hemorrhage", "infection", "inflammation", "itis",  # arthritis, pancreatitis, ...
+    "osis",   # cirrhosis, psychosis, fibrosis, ...
+    "aemia",  # anaemia, leukaemia, ...
+    "emia",   # anemia, leukemia (US)
+    "pathy",  # neuropathy, myopathy, ...
+    "stenosis", "ischaemia", "ischemia", "dyspnoea", "dyspnea",
+}
+
+CONDITION_TERMS = {
+    "diabetes", "hypertension", "asthma", "copd", "depression", "anxiety",
+    "schizophrenia", "epilepsy", "parkinson", "alzheimer", "stroke",
+    "cva", "tia", "psoriasis", "eczema", "obesity", "hyperlipidaemia",
+    "hyperlipidemia", "hypercholesterolaemia", "hypothyroidism",
+    "hyperthyroidism", "thyrotoxicosis", "osteoporosis", "osteoarthritis",
+    "fibromyalgia", "gout", "hiv", "hepatitis", "tuberculosis", "pneumonia",
+    "sepsis", "cancer", "carcinoma", "lymphoma", "leukaemia", "leukemia",
+    "myeloma", "melanoma", "psoriasis", "dermatitis", "reflux", "gord",
+    "gerd", "ckd", "aki", "uti", "bph", "afib", "fibrillation", "arrhythmia",
+    "cardiomyopathy", "angina", "ischaemic heart", "ischemic heart",
+    "heart failure", "kidney disease", "renal failure", "back pain",
+    "low back pain", "depressive disorder", "anxiety disorder",
+    "bipolar", "dementia", "delirium", "asthma exacerbation",
+    "myocardial infarction", "deep vein thrombosis", "dvt", "pe",
+    "pulmonary embolism",
+}
+
+
+SYMPTOM_TERMS = {
+    # Cardiovascular / respiratory symptoms
+    "orthopnoea", "orthopnea", "dyspnoea", "dyspnea", "breathlessness",
+    "palpitations", "syncope", "presyncope", "chest pain", "chest tightness",
+    "wheeze", "wheezing", "cough", "haemoptysis", "hemoptysis",
+    # Peripheral / fluid signs
+    "ankle swelling", "leg swelling", "peripheral oedema", "peripheral edema",
+    "oedema", "edema", "pitting oedema", "ascites",
+    # General / neurological
+    "fatigue", "weakness", "dizziness", "vertigo", "headache", "nausea",
+    "vomiting", "diarrhoea", "diarrhea", "constipation",
+    # Mental / sleep
+    "insomnia", "anhedonia", "low mood", "suicidal ideation",
+    # Genitourinary
+    "polyuria", "nocturia", "haematuria", "hematuria", "dysuria",
+    # MSK
+    "joint pain", "myalgia", "arthralgia",
+    # Other common
+    "fever", "rash", "pruritus", "weight loss", "weight gain",
+    "night sweats",
+}
+
+
+def _looks_like_condition(lower: str) -> bool:
+    """Positive-signal gate: does this span look like a clinical condition?
+
+    Accepts if ANY of:
+      - Direct match on a known condition term (CONDITION_TERMS)
+      - Contains a known condition term as a substring
+      - Contains a known condition root suffix (CONDITION_ROOTS)
+      - Direct match on a known symptom term (SYMPTOM_TERMS)
+      - Contains a known symptom term as a substring
+
+    Symptoms are absorbed as "Diagnosis" because the 4-type entity schema
+    does not model them separately. Signal preserved at the cost of
+    schematic looseness.
+    """
+    # Direct match on a known condition term
+    if lower in CONDITION_TERMS:
+        return True
+    # Contains a known condition term as a substring
+    for term in CONDITION_TERMS:
+        if term in lower:
+            return True
+    # Direct match on a symptom term
+    if lower in SYMPTOM_TERMS:
+        return True
+    # Contains a symptom term as a substring
+    for term in SYMPTOM_TERMS:
+        if term in lower:
+            return True
+    # Contains a known condition root suffix
+    for root in CONDITION_ROOTS:
+        if root in lower:
+            return True
+    return False
+
+
 def _classify_span(span_text: str) -> EntityType | None:
     lower = span_text.lower().strip()
 
+    # Length + has-alpha minimum
     if len(lower) < 3 or not any(c.isalpha() for c in lower):
         return None
 
+    # Drugs win first (dictionary)
     if lower in DRUG_NAMES:
         return "Drug"
     first_token = lower.split()[0] if lower.split() else ""
     if first_token in DRUG_NAMES:
         return "Drug"
 
+    # Conflict markers
     if any(m in lower for m in CONFLICT_MARKERS):
         return "Conflict"
 
+    # ==== A+B exclusion gate ====
+    # A: structural / address / stopword rejects BEFORE accepting as Diagnosis
+    if "\n" in span_text or "\r" in span_text:
+        # Document structure noise spanning a line break
+        return None
+    if "icd" in lower:
+        # The label "ICD-10" leaking as an entity
+        return None
     if lower in NON_MEDICAL_STOPWORDS:
         return None
+    # Reject if ANY token of the span is in stopwords AND the span is short
+    # (catches "Margaret Thompson" type entities where every token is a name)
+    tokens = lower.split()
+    if tokens and all(t.strip(".,") in NON_MEDICAL_STOPWORDS for t in tokens):
+        return None
 
-    if len(lower) >= 4:
-        return "Diagnosis"
+    # B: positive-signal gate - must look like a condition
+    if not _looks_like_condition(lower):
+        return None
 
-    return None
+    return "Diagnosis"
 
 
 def _icd10_for_span(text: str, full_text: str, start: int, end: int) -> str | None:
+    """Resolve ICD-10 code for a diagnosis span.
+
+    Three-tier:
+      1. Explicit code with the literal label 'ICD-10' or 'ICD10' in the
+         trailing 50-char window. Required to defeat the UK-postcode
+         collision (M14 5RT contains M14, a real ICD-10 code; without
+         the label requirement the regex would falsely match it).
+      2. Bare-regex match in trailing window IF NOT followed by " <digit>"
+         (postcode-shape). Fallback when the label is absent but the code
+         pattern is unambiguous.
+      3. ontology.icd10_mapper.lookup on the span text itself.
+    """
     window = full_text[end : end + 50]
+
+    # Tier 1: explicit "ICD-10:" label nearby
+    if "ICD-10" in window or "ICD10" in window:
+        m = ICD10_RE.search(window)
+        if m:
+            return m.group(1)
+
+    # Tier 2: bare regex match - but reject UK postcode shape "<code> <digit><letter>"
     m = ICD10_RE.search(window)
-    return m.group(1) if m else None
+    if m:
+        code = m.group(1)
+        # Look at what follows the matched code in the window
+        after_match = window[m.end():m.end() + 4]
+        # UK postcode pattern: " 5RT", " 8QR" - space then digit then letter
+        is_postcode = (
+            len(after_match) >= 3
+            and after_match[0] == " "
+            and after_match[1].isdigit()
+            and after_match[2].isalpha()
+        )
+        if not is_postcode:
+            return code
+
+    # Tier 3: curated CSV mapper
+    result = _icd10_mapper_lookup(text)
+    return result["code"] if result is not None else None
+
+
+def _icd10_confidence_for_span(text: str, full_text: str, start: int, end: int) -> str | None:
+    """Confidence label for the ICD-10 assignment from _icd10_for_span.
+
+    Returns 'explicit' if the document gave us the code, 'mapper-high' or
+    'mapper-medium' if the curated mapper fell back, None if no code found.
+    Stored in normalised_value for Diagnosis entities (which otherwise
+    don't use that field).
+    """
+    window = full_text[end : end + 50]
+    if ICD10_RE.search(window):
+        return "explicit"
+    result = _icd10_mapper_lookup(text)
+    if result is None:
+        return None
+    return f"mapper-{result['confidence']}"
 
 
 def _find_drugs_by_dictionary(text: str) -> list[Entity]:
@@ -288,7 +477,10 @@ def extract_entities(text: str) -> list[Entity]:
                 if etype == "Diagnosis" else None
             ),
             normalised_value=(
-                ent.text.lower().split()[0] if etype == "Drug" else None
+                ent.text.lower().split()[0] if etype == "Drug"
+                else _icd10_confidence_for_span(ent.text, text, ent.start_char, ent.end_char)
+                if etype == "Diagnosis"
+                else None
             ),
         ))
 
