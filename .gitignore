@@ -20,3 +20,16 @@ data/mimic/
 # OS / editor
 .DS_Store
 .vscode/
+# Anaconda / IDE workspace artefacts
+anaconda_projects/
+
+# Jupyter auto-save
+*.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# OCR test artefacts (>10MB, regeneratable via make_scanned_test_pdf.py)
+data/synthetic/documents/scanned_test.pdf
+
+# Day 5 base64 paste-bypass artefacts (superseded by atomic write scripts)
+prompts_current.b64
+write_prompts_clinical_subject.py
