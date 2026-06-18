@@ -131,6 +131,43 @@ def read_documents_for_patient(patient_id: str) -> list[dict[str, Any]]:
         conn.close()
 
 
+def read_observations_for_patient(patient_id: str) -> list[dict[str, Any]]:
+    """
+    Return every observation for this patient, ordered newest first.
+
+    Each dict: {observation_id, test, value, unit, observation_date,
+                source_document_id, created_at}.
+
+    Used by the FHIR builder to assemble Observation resources for
+    inclusion in the patient Bundle.
+    """
+    log.info("Reading observations for patient %s", patient_id)
+    conn = _get_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT
+                observation_id,
+                test,
+                value,
+                unit,
+                observation_date,
+                source_document_id,
+                created_at
+            FROM clinical_db.core.observation
+            WHERE patient_id = %s
+            ORDER BY observation_date DESC NULLS LAST, created_at DESC
+        """, (patient_id,))
+        rows = _rows_to_dicts(cur)
+        log.info("Found %d observations for %s", len(rows), patient_id)
+        return rows
+    except Exception as e:
+        log.exception("read_observations_for_patient failed for %s", patient_id)
+        raise RuntimeError(f"read_observations_for_patient failed: {e}") from e
+    finally:
+        conn.close()
+
+
 # ---------------------------------------------------------------------------
 # Quick test
 # ---------------------------------------------------------------------------
