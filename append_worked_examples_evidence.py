@@ -1,94 +1,16 @@
-\# Worked examples — backbone of the evaluation narrative
+"""Append live-evidence section to paper/findings/worked_examples.md.
 
+Yesterday's entity cleanup ran the hybrid validator across pat_test_01's
+9 documents and produced live rejections of all three documented failure
+modes. That's real evidence for the paper, captured during a routine
+re-process rather than constructed. Adds an 'Evidence captured during
+2026-06-17 cleanup' section.
+"""
+from pathlib import Path
 
+p = Path("paper/findings/worked_examples.md")
 
-Per supervisor 2026-06-14: three named failure modes of unguarded LLM
-
-flagging, each with a concrete case from real outputs.
-
-
-
-\## 1. Composition-fabrication — NYHA case
-
-\[Day 3, fill in from JSONL]
-
-LLM emits a flag whose source\_quote is verbatim but assembled from
-
-sentences that don't actually appear together. v1.3 validator Guard 4
-
-catches this.
-
-
-
-\## 2. Paraphrase-reproducibility — penicillin case (Day 5)
-
-Across 5 reps, hybrid\_validated emits the same penicillin-allergy flag
-
-with 5 different prose descriptions but identical subject. Old matcher
-
-counted these as 5 distinct flags; new matcher (category + canonical
-
-clinical\_subject) correctly collapses them to 1. LLM-only baselines
-
-paraphrase the subject too, so even the new matcher leaves them as
-
-5 distinct flags - 0/5 intersection across reps.
-
-
-
-\## 3. Category-instability — eGFR case (Day 5, spot-check)
-
-The same clinical issue (cardiology requested eGFR bloods in 4 weeks,
-
-no result documented) surfaces under different LLM-invented categories
-
-across reps of hybrid\_validated:
-
-&#x20; rep0: AI\_UNREVIEWED\_FOLLOWUP
-
-&#x20; rep3: AI\_INVESTIGATION\_NO\_RESULT
-
-The matcher correctly keeps these distinct (different category).
-
-Structural finding: unguarded LLM flagging is non-reproducible on
-
-TWO independent axes — paraphrase of the subject, AND inconsistent
-
-category naming for the same issue. Rule layer cannot do this
-
-because it emits a fixed controlled vocabulary. Evidence for guards
-
-that wasn't obvious before.
-
-
-
-\## Held-out watch-items (updated)
-
-1\. Ablation reversal (hybrid\_validated > hybrid\_unvalidated) holds on diverse docs?
-
-2\. Grounding-rate gap holds on diverse docs?
-
-3\. AI-repro magnitude climbs past 0.625 on clean inputs?
-
-4\. llm\_naive grounding rate falls from 0.975 on diverse docs?
-
-5\. NEW (Day 5): Does category-instability in LLM-only/unvalidated conditions
-
-&#x20;  persist on diverse documents? Does it widen the hybrid-vs-baseline
-
-&#x20;  reproducibility gap?
-
-
-
-\## Open decision for Bahja meeting
-
-Open vocabulary vs constrained category enum for LLM-emitted flags.
-
-Supervisor lean: (b) measure it, don't fix it - the instability is the
-
-evidence. Defer until after Bahja.
-
-
+new_section = '''
 
 ## Evidence captured during 2026-06-17 cleanup (live on real data)
 
@@ -116,7 +38,7 @@ Token-overlap with the cited document was 0.78, below the 0.80 threshold for sof
 
 Multiple flags during the cleanup tried to use this quote:
 
-> "Margaret Thompson\nDOB 1954-08-15"
+> "Margaret Thompson\\nDOB 1954-08-15"
 
 …as evidence for flags about *different dates of birth across documents*. The quote shares zero clinical subject words with the flag's own description (the flag's subject words were "appear, birth, correct, dates, different, documents, identity, mismatch, multiple"). Verdict: irrelevant-padding. The quote is from the source document but doesn't ground the specific claim.
 
@@ -129,3 +51,18 @@ Repeatedly across the cleanup: `Amlodipine`, `penicillin allergy`, `Echocardiogr
 These rejections were not surfaced by the held-out evaluation — they're from a routine maintenance operation (entity cleanup after the NER classifier fix). The grounding instrument is not just running on test data; it's gating real production output. **The v1.3 instrument with the cleaned NER is the v1.4 production state.**
 
 One spot-check observation: a single LLM second-pass on `doc_7f61d513` returned non-JSON during the cleanup. Pipeline tolerated it (logged "ignoring second-pass output"), downstream writes succeeded with the rules-only flag set. Real LLM stochasticity, gracefully handled. Worth one sentence in the limitations section.
+'''
+
+if p.exists():
+    existing = p.read_text(encoding="utf-8")
+    if "Evidence captured during 2026-06-17 cleanup" in existing:
+        print("[SKIP] live-evidence section already present")
+        raise SystemExit(0)
+    p.write_text(existing + new_section, encoding="utf-8", newline="\n")
+    print(f"OK appended live-evidence section to {p}")
+else:
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(new_section.lstrip(), encoding="utf-8", newline="\n")
+    print(f"OK created {p} with live-evidence section")
+
+print(f"File now {len(p.read_text(encoding='utf-8').splitlines())} lines")
