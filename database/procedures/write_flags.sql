@@ -5,15 +5,20 @@
 -- Signature (locked in DB_SCHEMA.md):
 --   SP_WRITE_FLAGS(patient_id VARCHAR, flags VARIANT) -> STRING
 --
--- Called by: snowflake_writer.write_flags()
+-- Called by: snowflake_writer.write_flags() / flag_agent
 -- Writes to: CORE.flag
 --
--- Each object in the flags array matches NLP_OUTPUT.md:
+-- UPDATED: now also writes provenance_hash — an audit fingerprint of
+-- the flag's source, computed by flag_agent. Nullable and backwards
+-- compatible: flags without a hash still write fine.
+--
+-- Each object in the flags array:
 --   {
 --     "severity":           "HIGH|MEDIUM|LOW",
 --     "category":           "ALLERGY CONFLICT",
 --     "description":        "doctor-readable text",
---     "source_document_id": "doc_77ab"
+--     "source_document_id": "doc_77ab",      ← required (provenance)
+--     "provenance_hash":    "a1b2c3..."      ← NEW, nullable (audit hash)
 --   }
 -- ─────────────────────────────────────────────────────────────────
 
@@ -52,9 +57,10 @@ $$
             sqlText: `
                 INSERT INTO clinical_db.core.flag (
                     flag_id, patient_id, severity, category,
-                    description, source_document_id, status, created_at
+                    description, source_document_id, provenance_hash,
+                    status, created_at
                 ) VALUES (
-                    :1, :2, :3, :4, :5, :6, 'open', CURRENT_TIMESTAMP()
+                    :1, :2, :3, :4, :5, :6, :7, 'open', CURRENT_TIMESTAMP()
                 )
             `,
             binds: [
@@ -63,7 +69,8 @@ $$
                 f.severity           || null,
                 f.category           || null,
                 f.description        || null,
-                f.source_document_id
+                f.source_document_id,
+                f.provenance_hash    || null     // NEW — nullable audit hash
             ]
         });
 
@@ -77,8 +84,11 @@ $$;
 GRANT USAGE ON PROCEDURE SP_WRITE_FLAGS(STRING, VARIANT) TO ROLE clinical_role;
 
 -- ── Test ─────────────────────────────────────────────────────────
+-- DELETE FROM clinical_db.core.flag WHERE patient_id = 'pat_test001';
 -- CALL SP_WRITE_FLAGS('pat_test001', PARSE_JSON('[
 --   {"severity":"HIGH","category":"ALLERGY CONFLICT",
---    "description":"Allergy status conflicts between letters.",
---    "source_document_id":"doc_test001"}
+--    "description":"Test flag with hash","source_document_id":"doc_test001",
+--    "provenance_hash":"a1b2c3d4e5f6"}
 -- ]'));
+-- SELECT flag_id, description, provenance_hash FROM clinical_db.core.flag
+-- WHERE patient_id = 'pat_test001';

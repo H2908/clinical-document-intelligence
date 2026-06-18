@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS entity (
                                                 -- a condition/flag
     icd10_code      STRING,                     -- for Diagnosis entities. Nullable.
     normalised_value STRING,                    -- ISO date for Date; drug name for Drug.
+    bnf_code            STRING,                 ---- BNF drug code. Nullable — drugs only.
     created_at      TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
     PRIMARY KEY (entity_id),
     FOREIGN KEY (document_id) REFERENCES document (document_id),
@@ -148,8 +149,9 @@ CREATE TABLE IF NOT EXISTS flag (
     category            STRING          NOT NULL,   -- e.g. "ALLERGY CONFLICT"
     description         STRING          NOT NULL,
     source_document_id  STRING          NOT NULL,   -- FK → document. Provenance — required.
+    provenance_hash     STRING,                     -- Audit fingerprint. Nullable. Set by flag_agent.
     status              STRING          NOT NULL DEFAULT 'open',
-                                                    -- open | resolved
+                                                    -- open | resolve
     created_at          TIMESTAMP_NTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP(),
     resolved_at         TIMESTAMP_NTZ,              -- nullable
     PRIMARY KEY (flag_id),
