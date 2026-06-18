@@ -13,7 +13,7 @@ import json
 import snowflake.connector
 from dotenv import load_dotenv
 
-from fhir.fhir_builder import build_patient_bundle, write_fhir_bundle
+from clinical_fhir.fhir_builder import build_patient_bundle, write_fhir_bundle
 
 load_dotenv()
 

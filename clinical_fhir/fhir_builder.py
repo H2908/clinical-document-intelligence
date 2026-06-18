@@ -46,7 +46,8 @@ import logging
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-from fhir.builders import (
+from clinical_fhir.builders import (
+    _fhir_ref,
     build_patient,
     build_condition,
     build_medication_statement,
@@ -85,7 +86,7 @@ def _merge_evidence(existing: dict, new_entity: dict) -> None:
     doc_id = new_entity.get("document_id")
     if not doc_id:
         return
-    new_ref = {"reference": f"DocumentReference/{doc_id}"}
+    new_ref = {"reference": _fhir_ref(doc_id, "DocumentReference")}
     evidence = existing.setdefault("evidence", [{"detail": []}])
     if not evidence:
         evidence.append({"detail": []})
@@ -104,7 +105,7 @@ def _merge_information_source(existing: dict, new_entity: dict) -> None:
     doc_id = new_entity.get("document_id")
     if not doc_id:
         return
-    new_ref = {"reference": f"DocumentReference/{doc_id}"}
+    new_ref = {"reference": _fhir_ref(doc_id, "DocumentReference")}
     derived = existing.setdefault("derivedFrom", [])
     if not any(d.get("reference") == new_ref["reference"] for d in derived):
         derived.append(new_ref)

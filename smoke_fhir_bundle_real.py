@@ -12,7 +12,7 @@ Looking for:
     multiple docs mention it)
 """
 from collections import Counter
-from fhir.fhir_builder import build_patient_bundle
+from clinical_fhir.fhir_builder import build_patient_bundle
 
 bundle = build_patient_bundle("pat_test_01")
 

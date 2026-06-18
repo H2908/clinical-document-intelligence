@@ -20,7 +20,7 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 
-from fhir.fhir_builder import (
+from clinical_fhir.fhir_builder import (
     build_patient_bundle,
     write_fhir_bundle,
     PatientNotFound,

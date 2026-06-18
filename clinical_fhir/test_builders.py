@@ -10,12 +10,21 @@ parser validation on top of these tests.
 Run: python -m fhir.test_builders
 Expected: 8/8 pass.
 """
-from fhir.builders import (
+from clinical_fhir.builders import (
     build_patient,
     build_condition,
     build_medication_statement,
     build_observation,
 )
+from clinical_fhir.validator import validate_resource
+
+
+def _validate(resource: dict) -> tuple[bool, str]:
+    """R4B validator gate. Returns (True, '') if valid, else (False, errors)."""
+    err = validate_resource(resource)
+    if err is None:
+        return True, ""
+    return False, f"R4B validator rejected: {err.get('errors', [])}"
 
 
 # ---- Test fixtures ----
@@ -91,7 +100,7 @@ def case_1_patient_happy_path():
     return (
         r is not None
         and r["resourceType"] == "Patient"
-        and r["id"] == "pat_test_01"
+        and r["id"] == "pat-test-01"
         and any(i.get("value") == "9991000001" for i in r.get("identifier", []))
         and any(i.get("value") == "pat_test_01" for i in r.get("identifier", []))
         and r["gender"] == "female"
@@ -118,7 +127,7 @@ def case_3_condition_with_icd10():
     return (
         r is not None
         and r["resourceType"] == "Condition"
-        and r["subject"]["reference"] == "Patient/pat_test_01"
+        and r["subject"]["reference"] == "Patient/pat-test-01"
         and r["code"]["text"] == "Chronic heart failure"
         and any(
             c.get("code") == "I50.22"
@@ -147,7 +156,7 @@ def case_5_medication_with_bnf():
     return (
         r is not None
         and r["resourceType"] == "MedicationStatement"
-        and r["subject"]["reference"] == "Patient/pat_test_01"
+        and r["subject"]["reference"] == "Patient/pat-test-01"
         and r["status"] == "active"
         and r["medicationCodeableConcept"]["text"] in ("Ramipril 5 mg", "ramipril")
         and any(
@@ -179,7 +188,7 @@ def case_7_observation_with_unit():
         r is not None
         and r["resourceType"] == "Observation"
         and r["status"] == "final"
-        and r["subject"]["reference"] == "Patient/pat_test_01"
+        and r["subject"]["reference"] == "Patient/pat-test-01"
         and r["code"]["text"] == "HbA1c"
         and r["effectiveDateTime"] == "2023-05-22"
         and r["valueQuantity"]["value"] == 8.4
@@ -212,7 +221,7 @@ CASES = [
 
 
 def main() -> int:
-    print("Running 8-case FHIR builder test set\n")
+    print("Running 8-case FHIR builder test set + R4B validator gate\n")
     passes = 0
     fails = []
     for case_id, fn in CASES:
@@ -222,13 +231,24 @@ def main() -> int:
             print(f"  [ERROR] {case_id}: {type(e).__name__}: {e}")
             fails.append(case_id)
             continue
-        if ok:
-            print(f"  [OK]   {case_id}")
-            passes += 1
-        else:
+        if not ok:
             print(f"  [FAIL] {case_id}")
             print(f"         got: {detail}")
             fails.append(case_id)
+            continue
+        # Validator gate: detail carries the built resource for every case
+        if isinstance(detail, dict) and "resourceType" in detail:
+            v_ok, v_msg = _validate(detail)
+            if not v_ok:
+                print(f"  [FAIL] {case_id} - R4B validation")
+                print(f"         {v_msg}")
+                fails.append(case_id)
+                continue
+        # Case 02 returns a tuple of genders, not a resource - skip validator
+        # for it (the underlying Patient resources built inside the case
+        # already validate elsewhere).
+        print(f"  [OK]   {case_id}")
+        passes += 1
     print(f"\n{passes}/{len(CASES)} passed")
     if fails:
         print(f"FAILED: {fails}")

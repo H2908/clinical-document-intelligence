@@ -17,7 +17,21 @@ Five cases:
 Run: python -m fhir.test_fhir_builder
 Expected: 5/5 pass.
 """
-from fhir.fhir_builder import build_patient_bundle
+from clinical_fhir.fhir_builder import build_patient_bundle
+from clinical_fhir.validator import validate_bundle
+
+
+def _validate_bundle(bundle: dict) -> tuple[bool, str]:
+    """R4B validator gate for bundles."""
+    report = validate_bundle(bundle)
+    if report["bundle_valid"] and report["summary"]["invalid_count"] == 0:
+        return True, ""
+    bad = [e for e in report["entry_results"] if not e["valid"]]
+    return False, (
+        f"bundle_valid={report['bundle_valid']}, "
+        f"invalid_entries={report['summary']['invalid_count']}, "
+        f"first_failures={bad[:3]}"
+    )
 
 
 PATIENT = {
@@ -140,7 +154,7 @@ def case_3_condition_dedup_merges_evidence():
     cond = conditions[0]
     evidence_details = cond.get("evidence", [{}])[0].get("detail", [])
     refs = {d.get("reference") for d in evidence_details}
-    return refs == {"DocumentReference/doc_01", "DocumentReference/doc_02"}, refs
+    return refs == {"DocumentReference/doc-01", "DocumentReference/doc-02"}, refs
 
 
 def case_4_medication_dedup_merges_derivedFrom():
@@ -159,8 +173,8 @@ def case_4_medication_dedup_merges_derivedFrom():
     info = med.get("informationSource", {}).get("reference")
     derived_refs = {d.get("reference") for d in med.get("derivedFrom", [])}
     return (
-        info == "DocumentReference/doc_01"
-        and derived_refs == {"DocumentReference/doc_02"}
+        info == "DocumentReference/doc-01"
+        and derived_refs == {"DocumentReference/doc-02"}
     ), (info, derived_refs)
 
 
@@ -195,7 +209,7 @@ CASES = [
 
 
 def main() -> int:
-    print("Running 5-case FHIR bundle assembly test set\n")
+    print("Running 5-case FHIR bundle assembly test set + R4B validator gate\n")
     passes = 0
     fails = []
     for case_id, fn in CASES:
@@ -212,7 +226,26 @@ def main() -> int:
             print(f"  [FAIL] {case_id}")
             print(f"         got: {detail}")
             fails.append(case_id)
-    print(f"\n{passes}/{len(CASES)} passed")
+
+    # End-of-suite Bundle validation gate
+    print()
+    print("=== End-of-suite R4B Bundle validation gate ===")
+    bundle = build_patient_bundle(
+        "pat_test_01",
+        patient_row=PATIENT,
+        entities=[DX_HEART_FAILURE_DOC1, DX_DIABETES, DRUG_RAMIPRIL_DOC1, DRUG_METFORMIN],
+        observations=[OBS_HBA1C],
+    )
+    v_ok, v_msg = _validate_bundle(bundle)
+    if v_ok:
+        print(f"  [OK]   Bundle assembled from injected fixtures validates R4B")
+    else:
+        print(f"  [FAIL] R4B Bundle validation")
+        print(f"         {v_msg}")
+        fails.append("end_of_suite_r4b_bundle_validation")
+
+    print(f"\n{passes}/{len(CASES)} cases passed; "
+          f"R4B gate: {'OK' if 'end_of_suite_r4b_bundle_validation' not in fails else 'FAILED'}")
     return 0 if not fails else 1
 
 

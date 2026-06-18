@@ -30,6 +30,27 @@ ID_SYSTEM_NHS_NUMBER = "https://fhir.nhs.uk/Id/nhs-number"
 ID_SYSTEM_LOCAL_PATIENT = "urn:cdi:patient-id"
 
 
+# ---- ID sanitiser for FHIR R4B compliance ----
+
+# FHIR R4B Resource.id and reference values must match this regex.
+# Internal IDs use underscores (pat_test_01, doc_XXXXXXXX, obs_...);
+# we transform at the FHIR boundary so internal Snowflake IDs stay
+# untouched. _ -> -, leave digits/letters/period intact.
+def _to_fhir_id(internal_id: str) -> str:
+    if internal_id is None:
+        return ""
+    return str(internal_id).replace("_", "-")
+
+
+def _fhir_ref(internal_id: str, resource_type: str) -> str:
+    """Build a FHIR-compliant reference string.
+
+    Example:
+        _fhir_ref("pat_test_01", "Patient") -> "Patient/pat-test-01"
+    """
+    return f"{resource_type}/{_to_fhir_id(internal_id)}"
+
+
 # ---- Sex/gender mapping ----
 
 # Internal sex codes -> FHIR R4 gender values
@@ -79,7 +100,7 @@ def build_patient(patient_row: dict) -> dict:
 
     resource: dict[str, Any] = {
         "resourceType": "Patient",
-        "id": patient_id,
+        "id": _to_fhir_id(patient_id),
         "identifier": identifiers,
         "name": [{"text": name_text}],
         "gender": gender,
@@ -119,7 +140,7 @@ def build_condition(entity: dict, patient_id: str) -> dict:
 
     resource: dict[str, Any] = {
         "resourceType": "Condition",
-        "subject": {"reference": f"Patient/{patient_id}"},
+        "subject": {"reference": _fhir_ref(patient_id, "Patient")},
         "code": code,
     }
 
@@ -127,7 +148,7 @@ def build_condition(entity: dict, patient_id: str) -> dict:
     document_id = entity.get("document_id")
     if document_id:
         resource["evidence"] = [{
-            "detail": [{"reference": f"DocumentReference/{document_id}"}],
+            "detail": [{"reference": _fhir_ref(document_id, "DocumentReference")}],
         }]
 
     # Onset / recorded date
@@ -169,7 +190,7 @@ def build_medication_statement(entity: dict, patient_id: str) -> dict:
     resource: dict[str, Any] = {
         "resourceType": "MedicationStatement",
         "status": "active",  # default - we don't track stopped meds yet
-        "subject": {"reference": f"Patient/{patient_id}"},
+        "subject": {"reference": _fhir_ref(patient_id, "Patient")},
         "medicationCodeableConcept": medication_concept,
     }
 
@@ -177,7 +198,7 @@ def build_medication_statement(entity: dict, patient_id: str) -> dict:
     document_id = entity.get("document_id")
     if document_id:
         resource["informationSource"] = {
-            "reference": f"DocumentReference/{document_id}",
+            "reference": _fhir_ref(document_id, "DocumentReference"),
         }
 
     # effectiveDateTime: when the medication was recorded
@@ -221,13 +242,13 @@ def build_observation(obs_row: dict, patient_id: str) -> dict:
     resource: dict[str, Any] = {
         "resourceType": "Observation",
         "status": "final",
-        "subject": {"reference": f"Patient/{patient_id}"},
+        "subject": {"reference": _fhir_ref(patient_id, "Patient")},
         "code": {"text": obs_row.get("test", "")},
     }
 
     obs_id = obs_row.get("observation_id")
     if obs_id:
-        resource["id"] = obs_id
+        resource["id"] = _to_fhir_id(obs_id)
 
     obs_date = obs_row.get("observation_date")
     if obs_date is not None:
@@ -252,7 +273,7 @@ def build_observation(obs_row: dict, patient_id: str) -> dict:
     src = obs_row.get("source_document_id")
     if src:
         resource["derivedFrom"] = [{
-            "reference": f"DocumentReference/{src}",
+            "reference": _fhir_ref(src, "DocumentReference"),
         }]
 
     return resource
