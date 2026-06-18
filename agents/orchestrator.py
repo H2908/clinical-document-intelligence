@@ -220,14 +220,14 @@ def _write_outputs(state: OrchestrationState) -> OrchestrationState:
                 "prompt_version": "v1.3",
                 "temperature": 0.7,
             }
-            write_flags(patient_id, flags_to_write, context=audit_context)
+            write_flags(patient_id, flags_to_write, context=audit_context, replace_existing=True)
         except Exception as e:
             log.exception("write_flags failed")
             state["errors"].append(f"write_flags: {e}")
 
     if state["contradictions"]:
         try:
-            write_contradictions(patient_id, state["contradictions"])
+            write_contradictions(patient_id, state["contradictions"], replace_existing=True)
         except Exception as e:
             log.exception("write_contradictions failed")
             state["errors"].append(f"write_contradictions: {e}")
