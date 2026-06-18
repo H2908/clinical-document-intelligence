@@ -211,7 +211,16 @@ def _write_outputs(state: OrchestrationState) -> OrchestrationState:
                 if "source_document_id" not in fcopy and "cited_document_id" in fcopy:
                     fcopy["source_document_id"] = fcopy["cited_document_id"]
                 flags_to_write.append(fcopy)
-            write_flags(patient_id, flags_to_write)
+                        # Hash flags for tamper-evidence. Context tracks the locked
+            # production state of the v1.3 grounding instrument; if model,
+            # prompt_version, or temperature change in prompts.py, update
+            # this dict too so the hash reflects the real generation context.
+            audit_context = {
+                "model": "claude-sonnet-4-6",
+                "prompt_version": "v1.3",
+                "temperature": 0.7,
+            }
+            write_flags(patient_id, flags_to_write, context=audit_context)
         except Exception as e:
             log.exception("write_flags failed")
             state["errors"].append(f"write_flags: {e}")

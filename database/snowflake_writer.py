@@ -22,6 +22,7 @@ import os
 import json
 import snowflake.connector
 from dotenv import load_dotenv
+from agents.audit_agent import attach_hash
 
 load_dotenv()
 
@@ -172,8 +173,20 @@ def write_observations(document_id: str, patient_id: str, observations: list) ->
 
 
 # ---- write_flags ----
-def write_flags(patient_id: str, flags: list) -> None:
-    """Write risk flags to CORE.flag via SP_WRITE_FLAGS."""
+def write_flags(patient_id: str, flags: list, context: dict | None = None) -> None:
+    """Write risk flags to CORE.flag via SP_WRITE_FLAGS.
+
+    If context (with model + prompt_version + temperature) is provided,
+    every flag is hashed via audit_agent.attach_hash before serialisation.
+    The hash lands in CORE.flag.provenance_hash via SP_WRITE_FLAGS
+    (partner-side SP binds the field; verified via verify_sps_updated.py).
+
+    If context is None, behaviour is unchanged - no hash attached. Old
+    rows in CORE.flag have NULL provenance_hash; audit agent reports
+    those as no_stored_hash (not mismatch).
+    """
+    if context is not None:
+        flags = [attach_hash(flag, context) for flag in flags]
     flags_json = json.dumps(flags, default=str)
     sql = (f"CALL clinical_db.core.SP_WRITE_FLAGS("
            f"'{patient_id}', PARSE_JSON($${flags_json}$$))")
