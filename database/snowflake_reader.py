@@ -73,6 +73,7 @@ def read_entities_for_patient(patient_id: str) -> list[dict[str, Any]]:
                 e.end_offset,
                 e.negated,
                 e.icd10_code,
+                e.bnf_code,
                 e.normalised_value,
                 e.document_id,
                 d.document_date,

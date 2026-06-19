@@ -77,6 +77,27 @@ def delete_entities_for_document(document_id: str) -> int:
         conn.close()
 
 
+def delete_observations_for_document(document_id: str) -> int:
+    """DELETE observation rows for one document. Returns rows deleted.
+
+    Needed because process_from_s3 re-extracts observations via lab_parser
+    and appends without dedup; without explicit delete, duplicates compound
+    on every cleanup run.
+    """
+    conn = _conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "DELETE FROM clinical_db.core.observation WHERE source_document_id = %s",
+            (document_id,),
+        )
+        deleted = cur.rowcount
+        conn.commit()
+        return deleted
+    finally:
+        conn.close()
+
+
 def main():
     PATIENT_ID = "pat_test_01"
     docs = read_documents_for_patient(PATIENT_ID)
@@ -97,9 +118,10 @@ def main():
         print(f"[{i}/{len(docs)}] {doc_id} ({doc_type}, {document_date})")
         print(f"  Before: {before} entities in CORE.entity")
 
-        # 1. DELETE existing rows
-        deleted = delete_entities_for_document(doc_id)
-        print(f"  Deleted: {deleted} rows")
+        # 1. DELETE existing entity + observation rows for this doc
+        deleted_e = delete_entities_for_document(doc_id)
+        deleted_o = delete_observations_for_document(doc_id)
+        print(f"  Deleted: {deleted_e} entity rows, {deleted_o} observation rows")
 
         # 2. Re-process via worker (re-parses PDF, re-runs NER, writes back)
         t0 = time.time()

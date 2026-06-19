@@ -83,11 +83,75 @@ def _iso(value) -> Optional[str]:
 # ---------------- LIST ----------------
 @router.get("/patients")
 def list_patients(search: Optional[str] = None) -> dict:
-    items = MOCK_PATIENTS
-    if search:
-        s = search.lower()
-        items = [p for p in items if s in p["name"].lower() or s in p["nhs_number"]]
-    return {"patients": items}
+    """List patients from CORE.patient with document + open flag counts.
+
+    Falls back to MOCK_PATIENTS only if Snowflake is unreachable, so the
+    demo still works in offline development. Production path is the real
+    query; MOCK_PATIENTS are now demo seed only.
+    """
+    import logging as _logging
+    _log = _logging.getLogger(__name__)
+
+    try:
+        conn = snowflake.connector.connect(
+            account=os.environ["SNOWFLAKE_ACCOUNT"],
+            user=os.environ["SNOWFLAKE_USER"],
+            password=os.environ["SNOWFLAKE_PASSWORD"],
+            database="clinical_db",
+            warehouse="clinical_wh",
+            role=os.environ["SNOWFLAKE_ROLE"],
+        )
+    except Exception as exc:
+        _log.exception("list_patients: Snowflake connect failed, falling back to MOCK")
+        items = MOCK_PATIENTS
+        if search:
+            s = search.lower()
+            items = [p for p in items if s in p["name"].lower() or s in p["nhs_number"]]
+        return {"patients": items}
+
+    try:
+        cur = conn.cursor()
+        sql = """
+            SELECT
+                p.patient_id,
+                p.name,
+                p.dob,
+                p.nhs_number,
+                p.sex,
+                p.last_updated,
+                (SELECT COUNT(*) FROM clinical_db.core.document d
+                 WHERE d.patient_id = p.patient_id) AS document_count,
+                (SELECT COUNT(*) FROM clinical_db.core.flag f
+                 WHERE f.patient_id = p.patient_id AND f.status = 'open')
+                    AS open_flag_count
+            FROM clinical_db.core.patient p
+        """
+        params: tuple = ()
+        if search:
+            sql += " WHERE LOWER(p.name) LIKE %s OR p.nhs_number LIKE %s"
+            pat = f"%{search.lower()}%"
+            params = (pat, pat)
+        sql += " ORDER BY p.last_updated DESC NULLS LAST, p.patient_id"
+
+        cur.execute(sql, params)
+        rows = cur.fetchall()
+
+        items = []
+        for row in rows:
+            pid, name, dob, nhs, sex, last_updated, doc_count, flag_count = row
+            items.append({
+                "id": pid,
+                "name": name,
+                "dob": str(dob) if dob else None,
+                "nhs_number": nhs,
+                "sex": sex,
+                "document_count": doc_count or 0,
+                "open_flag_count": flag_count or 0,
+                "last_updated": str(last_updated) if last_updated else None,
+            })
+        return {"patients": items}
+    finally:
+        conn.close()
 
 
 # ---------------- CREATE (real Snowflake) ----------------

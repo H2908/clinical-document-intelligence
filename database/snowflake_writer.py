@@ -22,6 +22,7 @@ import os
 import json
 import snowflake.connector
 from dotenv import load_dotenv
+from agents.audit_agent import attach_hash
 
 load_dotenv()
 
@@ -172,8 +173,32 @@ def write_observations(document_id: str, patient_id: str, observations: list) ->
 
 
 # ---- write_flags ----
-def write_flags(patient_id: str, flags: list) -> None:
-    """Write risk flags to CORE.flag via SP_WRITE_FLAGS."""
+def write_flags(
+    patient_id: str,
+    flags: list,
+    context: dict | None = None,
+    replace_existing: bool = False,
+) -> None:
+    """Write risk flags to CORE.flag via SP_WRITE_FLAGS.
+
+    If context (with model + prompt_version + temperature) is provided,
+    every flag is hashed via audit_agent.attach_hash before serialisation.
+    The hash lands in CORE.flag.provenance_hash via SP_WRITE_FLAGS
+    (partner-side SP binds the field; verified via verify_sps_updated.py).
+    If context is None, behaviour is unchanged - no hash attached.
+
+    If replace_existing=True, all existing CORE.flag rows for this
+    patient are DELETED before insert. Use this when writing a complete
+    patient-level flag set (e.g. after a full orchestrator run on a
+    re-processed document). Default False preserves backward compat for
+    incremental-write callers.
+    """
+    if replace_existing:
+        deleted = delete_flags_for_patient(patient_id)
+        print(f"[snowflake_writer] write_flags: replace_existing deleted "
+              f"{deleted} prior flag rows for {patient_id}")
+    if context is not None:
+        flags = [attach_hash(flag, context) for flag in flags]
     flags_json = json.dumps(flags, default=str)
     sql = (f"CALL clinical_db.core.SP_WRITE_FLAGS("
            f"'{patient_id}', PARSE_JSON($${flags_json}$$))")
@@ -181,8 +206,16 @@ def write_flags(patient_id: str, flags: list) -> None:
 
 
 # ---- write_contradictions ----
-def write_contradictions(patient_id: str, contradictions: list) -> None:
+def write_contradictions(
+    patient_id: str,
+    contradictions: list,
+    replace_existing: bool = False,
+) -> None:
     """Write contradictions to CORE.contradiction via SP_WRITE_CONTRADICTIONS."""
+    if replace_existing:
+        deleted = delete_contradictions_for_patient(patient_id)
+        print(f"[snowflake_writer] write_contradictions: replace_existing deleted "
+              f"{deleted} prior contradiction rows for {patient_id}")
     contras_json = json.dumps(contradictions, default=str)
     sql = (f"CALL clinical_db.core.SP_WRITE_CONTRADICTIONS("
            f"'{patient_id}', PARSE_JSON($${contras_json}$$))")
@@ -279,6 +312,49 @@ def write_briefing(patient_id: str, briefing: dict) -> None:
         raise RuntimeError("write_briefing failed for " + patient_id + ": " + str(e)) from e
     finally:
         conn.close()
+# ---- delete helpers for patient-scoped outputs ----
+def delete_flags_for_patient(patient_id: str) -> int:
+    """DELETE all CORE.flag rows for one patient. Returns rows deleted.
+
+    Used by callers that produce a complete patient-level flag set and
+    want to replace any prior set atomically (orchestrator after a
+    full agent pipeline run). For incremental writes, call write_flags
+    without replace_existing=True instead.
+    """
+    conn = _get_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "DELETE FROM clinical_db.core.flag WHERE patient_id = %s",
+            (patient_id,),
+        )
+        deleted = cur.rowcount
+        conn.commit()
+        return deleted
+    finally:
+        conn.close()
+
+
+def delete_contradictions_for_patient(patient_id: str) -> int:
+    """DELETE all CORE.contradiction rows for one patient. Returns rows deleted.
+
+    Same rationale as delete_flags_for_patient: patient-scoped outputs
+    that should be replaced wholesale on full re-runs.
+    """
+    conn = _get_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "DELETE FROM clinical_db.core.contradiction WHERE patient_id = %s",
+            (patient_id,),
+        )
+        deleted = cur.rowcount
+        conn.commit()
+        return deleted
+    finally:
+        conn.close()
+
+
 # ---- delete_patient ----
 def delete_patient(patient_id: str) -> dict:
     """

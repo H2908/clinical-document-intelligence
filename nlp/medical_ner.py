@@ -319,6 +319,38 @@ def _bnf_for_drug(text: str) -> str | None:
     return result["bnf_code"] if result is not None else None
 
 
+# Dose suffix regex - tight to avoid false positives. Matches:
+#   "5 mg", "2.5 mg", "100 mcg", "1 g", "0.5 ml"
+#   "5mg" (no space) also OK
+#   Optional frequency: "5 mg OD", "2.5 mg BD", "10 mg nocte"
+_DOSE_RE = re.compile(
+    r"\s*"                                              # optional ws after drug
+    r"(\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml|units?|iu))"   # number + unit
+    r"(\s+(?:OD|BD|TDS|QDS|PRN|nocte|mane|"             # optional frequency
+    r"once\s+daily|twice\s+daily|three\s+times\s+daily))?",
+    flags=re.IGNORECASE,
+)
+
+
+def _extend_drug_span_with_dose(text: str, start: int, end: int) -> int:
+    """If a dose pattern starts within 5 chars after `end`, return the
+    extended end_offset that includes it. Otherwise return `end` unchanged.
+
+    The look-ahead is intentionally short - dose should be adjacent to the
+    drug name in clinical text. We don't want to glue distant dose strings
+    onto the wrong drug.
+    """
+    if end >= len(text):
+        return end
+    # Look at the next ~30 chars
+    tail = text[end:end + 30]
+    m = _DOSE_RE.match(tail)
+    if m is None:
+        return end
+    # Found a dose. Extend the entity's end to include it.
+    return end + m.end()
+
+
 def _icd10_confidence_for_span(text: str, full_text: str, start: int, end: int) -> str | None:
     """Confidence label for the ICD-10 assignment from _icd10_for_span.
 
@@ -346,14 +378,16 @@ def _find_drugs_by_dictionary(text: str) -> list[Entity]:
         pattern = re.compile(rf"\b{re.escape(drug)}\b", re.IGNORECASE)
         for match in pattern.finditer(text):
             start, end = match.start(), match.end()
+            extended_end = _extend_drug_span_with_dose(text, start, end)
+            span_text = text[start:extended_end]
             found.append(Entity(
                 entity_type="Drug",
-                text=text[start:end],
+                text=span_text,
                 start_offset=start,
-                end_offset=end,
+                end_offset=extended_end,
                 negated=False,
                 icd10_code=None,
-                bnf_code=_bnf_for_drug(text[start:end]),
+                bnf_code=_bnf_for_drug(span_text),
                 normalised_value=drug,
             ))
     return found
@@ -484,20 +518,29 @@ def extract_entities(text: str) -> list[Entity]:
         etype = _classify_span(ent.text)
         if etype is None:
             continue
+        # For Drug entities, extend the span forward to capture any dose
+        # suffix (e.g. "Ramipril 5 mg" instead of just "Ramipril").
+        if etype == "Drug":
+            extended_end = _extend_drug_span_with_dose(text, ent.start_char, ent.end_char)
+            span_text = text[ent.start_char:extended_end]
+            span_end = extended_end
+        else:
+            span_text = ent.text
+            span_end = ent.end_char
         entities.append(Entity(
             entity_type=etype,
-            text=ent.text,
+            text=span_text,
             start_offset=ent.start_char,
-            end_offset=ent.end_char,
+            end_offset=span_end,
             negated=False,
             icd10_code=(
-                _icd10_for_span(ent.text, text, ent.start_char, ent.end_char)
+                _icd10_for_span(span_text, text, ent.start_char, span_end)
                 if etype == "Diagnosis" else None
             ),
-            bnf_code=(_bnf_for_drug(ent.text) if etype == "Drug" else None),
+            bnf_code=(_bnf_for_drug(span_text) if etype == "Drug" else None),
             normalised_value=(
-                ent.text.lower().split()[0] if etype == "Drug"
-                else _icd10_confidence_for_span(ent.text, text, ent.start_char, ent.end_char)
+                span_text.lower().split()[0] if etype == "Drug"
+                else _icd10_confidence_for_span(span_text, text, ent.start_char, span_end)
                 if etype == "Diagnosis"
                 else None
             ),

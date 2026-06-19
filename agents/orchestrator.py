@@ -180,7 +180,16 @@ def _briefing_node(state: OrchestrationState) -> OrchestrationState:
 # ---------------------------------------------------------------------------
 
 def _write_outputs(state: OrchestrationState) -> OrchestrationState:
-    """Write timeline, flags, contradictions, briefing to Snowflake."""
+    """Write timeline, flags, contradictions, briefing to Snowflake.
+
+    Patient-level outputs (flags, contradictions) are written UNCONDITIONALLY
+    with replace_existing=True - even when the new list is empty. That
+    ensures stale rows from prior runs get deleted, which is essential
+    after a document delete reduces the patient's content footprint.
+
+    Timeline and briefing are append-or-merge oriented so they stay
+    conditional on having content to write.
+    """
     patient_id = state["patient_id"]
     log.info("Writing outputs for %s", patient_id)
 
@@ -191,6 +200,7 @@ def _write_outputs(state: OrchestrationState) -> OrchestrationState:
         write_flags,
         write_contradictions,
         refresh_summary,
+        write_briefing,
     )
 
     if state["timeline_events"]:
@@ -200,41 +210,52 @@ def _write_outputs(state: OrchestrationState) -> OrchestrationState:
             log.exception("write_timeline failed")
             state["errors"].append(f"write_timeline: {e}")
 
-    if state["flags"]:
-        try:
-            # SP_WRITE_FLAGS expects source_document_id; v1.3 AI flags
-            # emit cited_document_id. Map so both rule and AI flags persist.
-            # TODO partner: update SP_WRITE_FLAGS to handle both field names.
-            flags_to_write = []
-            for f in state["flags"]:
-                fcopy = dict(f)
-                if "source_document_id" not in fcopy and "cited_document_id" in fcopy:
-                    fcopy["source_document_id"] = fcopy["cited_document_id"]
-                flags_to_write.append(fcopy)
-            write_flags(patient_id, flags_to_write)
-        except Exception as e:
-            log.exception("write_flags failed")
-            state["errors"].append(f"write_flags: {e}")
+    # write_flags is called UNCONDITIONALLY with replace_existing=True so
+    # that stale rows are cleared even when state["flags"] is empty (e.g.
+    # after a delete reduces the doc set to zero meaningful flags).
+    try:
+        # SP_WRITE_FLAGS expects source_document_id; v1.3 AI flags emit
+        # cited_document_id. Map so both rule and AI flags persist.
+        flags_to_write = []
+        for f in state["flags"]:
+            fcopy = dict(f)
+            if "source_document_id" not in fcopy and "cited_document_id" in fcopy:
+                fcopy["source_document_id"] = fcopy["cited_document_id"]
+            flags_to_write.append(fcopy)
+        # Hash flags for tamper-evidence. Context tracks the locked
+        # production state of the v1.3 grounding instrument; if model,
+        # prompt_version, or temperature change in prompts.py, update
+        # this dict too so the hash reflects the real generation context.
+        audit_context = {
+            "model": "claude-sonnet-4-6",
+            "prompt_version": "v1.3",
+            "temperature": 0.7,
+        }
+        write_flags(patient_id, flags_to_write, context=audit_context, replace_existing=True)
+        log.info("write_flags: %d flags written (replace_existing=True)", len(flags_to_write))
+    except Exception as e:
+        log.exception("write_flags failed")
+        state["errors"].append(f"write_flags: {e}")
 
-    if state["contradictions"]:
-        try:
-            write_contradictions(patient_id, state["contradictions"])
-        except Exception as e:
-            log.exception("write_contradictions failed")
-            state["errors"].append(f"write_contradictions: {e}")
+    # write_contradictions UNCONDITIONALLY for same reason as flags.
+    try:
+        write_contradictions(patient_id, state["contradictions"], replace_existing=True)
+        log.info("write_contradictions: %d written (replace_existing=True)",
+                 len(state["contradictions"]))
+    except Exception as e:
+        log.exception("write_contradictions failed")
+        state["errors"].append(f"write_contradictions: {e}")
 
-    # Persist briefing directly to MART (bypasses SP_REFRESH_SUMMARY which
-    # builds from CORE.condition / CORE.medication - tables not currently
-    # populated). The briefing agent's dict is the source of truth.
+    # Briefing is a MERGE-on-patient_id - idempotent upsert. Still
+    # conditional because nothing to merge if briefing is None.
     if state["briefing"]:
         try:
-            from database.snowflake_writer import write_briefing
             write_briefing(patient_id, state["briefing"])
         except Exception as e:
             log.exception("write_briefing failed")
             state["errors"].append(f"write_briefing: {e}")
 
-        return state
+    return state
 # ---------------------------------------------------------------------------
 # Graph construction
 # ---------------------------------------------------------------------------

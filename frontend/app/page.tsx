@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { api, PatientCard, NewPatient } from "@/lib/api";
 
 function timeAgo(dateStr: string): string {
@@ -38,6 +39,7 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const router = useRouter();
 
   const load = async (q?: string) => {
     setLoading(true);
@@ -141,7 +143,7 @@ export default function LandingPage() {
 
           {/* Add patient form */}
           {showForm && (
-            <NewPatientForm onCreated={() => { setShowForm(false); load(); }} />
+            <NewPatientForm onCreated={(card) => { setShowForm(false); router.push(`/patients/${card.id}`); }} />
           )}
 
           {/* Patient list */}
@@ -247,8 +249,8 @@ function NewPatientForm({ onCreated }: { onCreated: () => void }) {
     setBusy(true);
     setError(null);
     try {
-      await api.createPatient(form);
-      onCreated();
+      const card = await api.createPatient(form);
+      onCreated(card);
     } catch (e) {
       setError((e as Error).message);
     } finally {
