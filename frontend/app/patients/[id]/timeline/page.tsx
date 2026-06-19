@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react"; // useMemo used for sort
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { api, TimelineEvent } from "@/lib/api";
+import ImageViewer from "@/components/ImageViewer";
 
 const FILTERS = [
   { label: "All",         value: "all" },
@@ -41,11 +42,13 @@ const FunnelIcon = () => (
   </svg>
 );
 
-const ChevronIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+const DocIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" />
   </svg>
 );
+
+type ViewingDoc = { id: string; name: string };
 
 export default function TimelinePage() {
   const params = useParams<{ id: string }>();
@@ -55,7 +58,7 @@ export default function TimelinePage() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedSources, setExpandedSources] = useState<Set<string>>(new Set());
+  const [viewingDoc, setViewingDoc] = useState<ViewingDoc | null>(null);
 
   useEffect(() => {
     if (!patientId) return;
@@ -72,15 +75,6 @@ export default function TimelinePage() {
   const sorted = useMemo(() => {
     return [...events].sort((a, b) => (b.event_date ?? "").localeCompare(a.event_date ?? ""));
   }, [events]);
-
-  const toggleSource = (id: string) => {
-    setExpandedSources((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
 
   return (
     <main className="p-8">
@@ -147,10 +141,10 @@ export default function TimelinePage() {
 
                 {e.source_document_id && (
                   <button
-                    onClick={() => toggleSource(e.event_id)}
-                    className="flex items-center gap-1 mt-2 text-xs text-blue-600 hover:text-blue-800"
+                    onClick={() => setViewingDoc({ id: e.source_document_id, name: e.source_document_id })}
+                    className="flex items-center gap-1.5 mt-2 text-xs text-blue-600 hover:text-blue-800 hover:underline"
                   >
-                    <ChevronIcon />
+                    <DocIcon />
                     {e.source_document_id}
                   </button>
                 )}
@@ -159,6 +153,12 @@ export default function TimelinePage() {
           ))}
         </div>
       </div>
+
+      <ImageViewer
+        documentId={viewingDoc?.id ?? null}
+        documentName={viewingDoc?.name ?? null}
+        onClose={() => setViewingDoc(null)}
+      />
     </main>
   );
 }

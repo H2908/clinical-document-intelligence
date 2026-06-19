@@ -35,7 +35,8 @@ export default function ImageViewer({ documentId, documentName, documentType, on
       aria-modal="true"
     >
       <div
-        className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden"
+        className="bg-white rounded-xl shadow-xl w-full h-full flex flex-col overflow-hidden"
+        style={{ maxWidth: "calc(100vw - 48px)", maxHeight: "calc(100vh - 48px)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <header className="px-5 py-3 border-b border-slate-200 flex items-center justify-between gap-4">
@@ -66,7 +67,7 @@ export default function ImageViewer({ documentId, documentName, documentType, on
           </div>
         </header>
 
-        <div className="flex-1 min-h-0 bg-slate-100">
+        <div className="flex-1 min-h-0 bg-slate-100 overflow-hidden">
           {isImage ? (
             <img
               src={fileUrl}

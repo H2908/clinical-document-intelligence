@@ -314,8 +314,8 @@ def get_patient(patient_id: str) -> dict:
         # columns render even when MART rows only carry drug + normalised.
         for m in medications:
             m.setdefault("dose", None)
-            m.setdefault("started", None)
-            m.setdefault("flag", None)
+            m.setdefault("last_prescribed", m.get("last_prescribed_date"))
+            m.setdefault("source_document_id", m.get("source_document_id"))
 
         # 4. Top 3 open flags ordered by severity (HIGH > MEDIUM > LOW) then created_at.
         cur.execute(
@@ -402,4 +402,74 @@ def _build_mock_overview(p: dict) -> dict:
 
 @router.delete("/patients/{patient_id}")
 def delete_patient(patient_id: str) -> dict:
+    import logging as _logging
+    _log = _logging.getLogger(__name__)
+
+    for p in MOCK_PATIENTS:
+        if p["id"] == patient_id:
+            raise HTTPException(
+                status_code=403,
+                detail={"error": {"code": "forbidden", "message": "Demo patients cannot be deleted"}},
+            )
+
+    try:
+        conn = _sf_conn()
+    except Exception:
+        raise HTTPException(
+            status_code=503,
+            detail={"error": {"code": "database_unavailable", "message": "Could not connect to data warehouse"}},
+        )
+
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT patient_id FROM clinical_db.core.patient WHERE patient_id = %s",
+            (patient_id,),
+        )
+        if cur.fetchone() is None:
+            raise HTTPException(
+                status_code=404,
+                detail={"error": {"code": "not_found", "message": f"Patient {patient_id} does not exist"}},
+            )
+
+        cur.execute("DELETE FROM clinical_db.core.flag WHERE patient_id = %s", (patient_id,))
+        cur.execute("DELETE FROM clinical_db.core.contradiction WHERE patient_id = %s", (patient_id,))
+
+        cur.execute(
+            "SELECT document_id FROM clinical_db.core.document WHERE patient_id = %s",
+            (patient_id,),
+        )
+        doc_ids = [r[0] for r in cur.fetchall()]
+
+        for doc_id in doc_ids:
+            cur.execute("DELETE FROM clinical_db.core.entity WHERE document_id = %s", (doc_id,))
+            try:
+                cur.execute("DELETE FROM clinical_db.core.observation WHERE document_id = %s", (doc_id,))
+            except Exception:
+                pass
+
+        cur.execute("DELETE FROM clinical_db.core.document WHERE patient_id = %s", (patient_id,))
+
+        try:
+            cur.execute("DELETE FROM clinical_db.mart.patient_summary WHERE patient_id = %s", (patient_id,))
+        except Exception:
+            pass
+
+        cur.execute("DELETE FROM clinical_db.core.patient WHERE patient_id = %s", (patient_id,))
+        conn.commit()
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        _log.exception("DELETE patient %s failed", patient_id)
+        raise HTTPException(
+            status_code=500,
+            detail={"error": {"code": "internal_error", "message": f"Delete failed: {e}"}},
+        )
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+
     return {"deleted": True, "patient_id": patient_id}

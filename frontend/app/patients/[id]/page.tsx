@@ -141,8 +141,7 @@ export default function PatientOverviewPage() {
                   <tr className="text-xs text-slate-400 border-b border-slate-100">
                     <th className="px-5 py-2 text-left font-medium">Drug</th>
                     <th className="px-5 py-2 text-left font-medium">Dose</th>
-                    <th className="px-5 py-2 text-left font-medium">Started</th>
-                    <th className="px-5 py-2 text-left font-medium">Flag</th>
+                    <th className="px-5 py-2 text-left font-medium">Last prescribed</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -150,17 +149,7 @@ export default function PatientOverviewPage() {
                     <tr key={i} className="hover:bg-slate-50">
                       <td className="px-5 py-3 text-slate-900 font-medium">{m.drug}</td>
                       <td className="px-5 py-3 text-slate-600">{m.dose || "—"}</td>
-                      <td className="px-5 py-3 text-slate-500 text-xs font-mono">{m.started || "—"}</td>
-                      <td className="px-5 py-3">
-                        {m.flag ? (
-                          <span className="inline-flex items-center gap-1 text-xs text-amber-700">
-                            <WarnIcon />
-                            {m.flag}
-                          </span>
-                        ) : (
-                          <span className="text-slate-300">—</span>
-                        )}
-                      </td>
+                      <td className="px-5 py-3 text-slate-500 text-xs font-mono">{m.last_prescribed || "—"}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -173,6 +173,8 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
+  deletePatient: (id: string) =>
+    request<{ deleted: boolean; patient_id: string }>(`/patients/${id}`, { method: "DELETE" }),
 
   getBriefing: (id: string) =>
     request<BriefingResponse>(`/patients/${id}/briefing`),

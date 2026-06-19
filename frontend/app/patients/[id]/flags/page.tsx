@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { api, Flag } from "@/lib/api";
 import SeverityBadge from "@/components/SeverityBadge";
+import ImageViewer from "@/components/ImageViewer";
 
 const ChevronIcon = ({ className }: { className?: string }) => (
   <svg
@@ -22,6 +23,12 @@ const ChevronIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const DocIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" />
+  </svg>
+);
+
 const borderColor = (sev: string) =>
   sev === "HIGH"
     ? "border-l-red-500"
@@ -30,6 +37,8 @@ const borderColor = (sev: string) =>
     : "border-l-yellow-400";
 
 const sevOrder = (s: string) => (s === "HIGH" ? 0 : s === "MEDIUM" ? 1 : 2);
+
+type ViewingDoc = { id: string; name: string };
 
 export default function FlagsPage() {
   const params = useParams<{ id: string }>();
@@ -41,7 +50,7 @@ export default function FlagsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showResolved, setShowResolved] = useState(false);
-  const [expandedDocs, setExpandedDocs] = useState<Set<string>>(new Set());
+  const [viewingDoc, setViewingDoc] = useState<ViewingDoc | null>(null);
 
   const load = () => {
     if (!patientId) return;
@@ -59,15 +68,6 @@ export default function FlagsPage() {
   };
 
   useEffect(() => { load(); }, [patientId]);
-
-  const toggleDoc = (flagId: string) => {
-    setExpandedDocs((prev) => {
-      const next = new Set(prev);
-      if (next.has(flagId)) next.delete(flagId);
-      else next.add(flagId);
-      return next;
-    });
-  };
 
   const handleResolve = (flagId: string) => {
     setAllFlags((prev) =>
@@ -111,10 +111,8 @@ export default function FlagsPage() {
             key={f.flag_id}
             flag={f}
             leftBorder={borderColor(f.severity)}
-            docExpanded={expandedDocs.has(f.flag_id)}
-            onToggleDoc={() => toggleDoc(f.flag_id)}
+            onViewDoc={(docId) => setViewingDoc({ id: docId, name: docId })}
             onResolve={() => handleResolve(f.flag_id)}
-            patientId={patientId}
           />
         ))}
 
@@ -134,10 +132,8 @@ export default function FlagsPage() {
                     key={f.flag_id}
                     flag={f}
                     leftBorder="border-l-slate-300"
-                    docExpanded={expandedDocs.has(f.flag_id)}
-                    onToggleDoc={() => toggleDoc(f.flag_id)}
+                    onViewDoc={(docId) => setViewingDoc({ id: docId, name: docId })}
                     onResolve={() => {}}
-                    patientId={patientId}
                     isResolved
                   />
                 ))}
@@ -146,6 +142,12 @@ export default function FlagsPage() {
           </div>
         )}
       </div>
+
+      <ImageViewer
+        documentId={viewingDoc?.id ?? null}
+        documentName={viewingDoc?.name ?? null}
+        onClose={() => setViewingDoc(null)}
+      />
     </main>
   );
 }
@@ -153,18 +155,14 @@ export default function FlagsPage() {
 function FlagCard({
   flag,
   leftBorder,
-  docExpanded,
-  onToggleDoc,
+  onViewDoc,
   onResolve,
-  patientId,
   isResolved,
 }: {
   flag: Flag;
   leftBorder: string;
-  docExpanded: boolean;
-  onToggleDoc: () => void;
+  onViewDoc: (docId: string) => void;
   onResolve: () => void;
-  patientId: string;
   isResolved?: boolean;
 }) {
   return (
@@ -186,28 +184,22 @@ function FlagCard({
 
         {flag.source_document_id && (
           <button
-            onClick={onToggleDoc}
-            className="flex items-center gap-1.5 mt-2 text-xs text-slate-500 hover:text-slate-700"
+            onClick={() => onViewDoc(flag.source_document_id)}
+            className="flex items-center gap-1.5 mt-2 text-xs text-blue-600 hover:text-blue-800 hover:underline"
           >
-            <ChevronIcon className={`transition-transform ${docExpanded ? "rotate-90" : ""}`} />
+            <DocIcon />
             {flag.source_document_id}
           </button>
         )}
       </div>
 
       {!isResolved && (
-        <div className="px-5 pb-4 flex gap-2">
+        <div className="px-5 pb-4">
           <button
             onClick={onResolve}
             className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors"
           >
             Mark resolved
-          </button>
-          <button
-            onClick={() => { window.location.href = `/patients/${patientId}/documents`; }}
-            className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors"
-          >
-            View source
           </button>
         </div>
       )}

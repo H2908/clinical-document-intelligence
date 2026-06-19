@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { api, BriefingResponse, Observation, DocumentRow } from "@/lib/api";
+import ImageViewer from "@/components/ImageViewer";
 import SeverityBadge from "@/components/SeverityBadge";
 
 function icdColor(code: string | null): string {
@@ -48,6 +49,7 @@ export default function BriefingPage() {
   const [documents, setDocuments] = useState<DocumentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewingDoc, setViewingDoc] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     if (!patientId) return;
@@ -252,7 +254,12 @@ export default function BriefingPage() {
             <ul className="divide-y divide-slate-100">
               {documents.map((d) => (
                 <li key={d.id} className="px-5 py-3 flex items-center justify-between">
-                  <span className="text-sm text-blue-600 cursor-pointer hover:underline">{d.name}</span>
+                  <button
+                    onClick={() => setViewingDoc({ id: d.id, name: d.name })}
+                    className="text-sm text-blue-600 hover:underline text-left"
+                  >
+                    {d.name}
+                  </button>
                   <span className="text-sm text-slate-500">{fmtDate(d.date)}</span>
                 </li>
               ))}
@@ -261,6 +268,12 @@ export default function BriefingPage() {
         )}
 
       </div>
+
+      <ImageViewer
+        documentId={viewingDoc?.id ?? null}
+        documentName={viewingDoc?.name ?? null}
+        onClose={() => setViewingDoc(null)}
+      />
     </main>
   );
 }
