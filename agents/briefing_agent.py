@@ -192,9 +192,13 @@ def _extract_medications(entities: list[dict]) -> list[dict]:
         key = text.split()[0].lower() if text.split() else ""
         if not key or key in seen:
             continue
+        # Parse dose out of text: anything after the drug-name root word
+        # is treated as dose+frequency (NER span extension captures it).
+        dose_part = text[len(key):].strip() if text.lower().startswith(key) else ""
         seen[key] = {
-            "drug": text,
+            "drug": text.split()[0] if text.split() else text,
             "normalised": e.get("normalised_value"),
+            "dose": dose_part if dose_part else None,
             "source_document_id": e["document_id"],
         }
     return list(seen.values())
