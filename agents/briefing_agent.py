@@ -178,8 +178,17 @@ def _extract_conditions(entities: list[dict]) -> list[dict]:
 def _extract_medications(entities: list[dict]) -> list[dict]:
     """
     Current medications = non-negated Drug entities, deduplicated by drug-name root.
+
+    Per-drug aggregation rules:
+      - drug name = display form from the LATEST entity (preserves casing)
+      - dose = the dose extracted from the LATEST entity's text
+      - last_prescribed_date = max document_date across all entities for
+        this drug. Defensible interpretation: "most recent document where
+        we have evidence of this prescription."
+      - source_document_id = document_id of the latest entity
     """
-    seen: OrderedDict[str, dict] = OrderedDict()
+    # First pass: bucket entities by drug-name root with their document_date
+    buckets: OrderedDict[str, list[dict]] = OrderedDict()
     for e in entities:
         if e.get("entity_type") != "Drug":
             continue
@@ -188,20 +197,36 @@ def _extract_medications(entities: list[dict]) -> list[dict]:
         text = (e.get("text") or "").strip()
         if not text or len(text) < 3:
             continue
-        # Dedupe on first word (drug name root)
         key = text.split()[0].lower() if text.split() else ""
-        if not key or key in seen:
+        if not key:
             continue
-        # Parse dose out of text: anything after the drug-name root word
-        # is treated as dose+frequency (NER span extension captures it).
+        buckets.setdefault(key, []).append(e)
+
+    # Second pass: collapse each bucket to its latest entity by document_date
+    meds: list[dict] = []
+    for key, bucket_entities in buckets.items():
+        # Sort by document_date descending; None dates sort last
+        bucket_entities.sort(
+            key=lambda e: (e.get("document_date") or ""),
+            reverse=True,
+        )
+        latest = bucket_entities[0]
+        text = (latest.get("text") or "").strip()
+        # Dose lives after the drug-name root in the entity text (NER
+        # span extension captures it).
         dose_part = text[len(key):].strip() if text.lower().startswith(key) else ""
-        seen[key] = {
+        # Stringify document_date - Snowflake may return date or datetime
+        last_prescribed = latest.get("document_date")
+        if last_prescribed is not None and not isinstance(last_prescribed, str):
+            last_prescribed = str(last_prescribed)
+        meds.append({
             "drug": text.split()[0] if text.split() else text,
-            "normalised": e.get("normalised_value"),
+            "normalised": latest.get("normalised_value"),
             "dose": dose_part if dose_part else None,
-            "source_document_id": e["document_id"],
-        }
-    return list(seen.values())
+            "last_prescribed_date": last_prescribed,
+            "source_document_id": latest["document_id"],
+        })
+    return meds
 
 
 # ─── LLM narrative ───────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api, PatientCard, NewPatient } from "@/lib/api";
@@ -33,13 +33,62 @@ const XIcon = () => (
   </svg>
 );
 
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 6h18" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" /><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+  </svg>
+);
+
 export default function LandingPage() {
   const [patients, setPatients] = useState<PatientCard[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [suggestions, setSuggestions] = useState<PatientCard[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
+
+  const handleSearchChange = (value: string) => {
+    // Auto-format as NHS number when input is purely numeric (leaves name searches untouched)
+    const formatted = /^[\d\s]*$/.test(value) ? formatNhsNumber(value) : value;
+    setSearch(formatted);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!formatted.trim()) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      load(); // cleared → return to full patient list
+      return;
+    }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const data = await api.listPatients(formatted);
+        setSuggestions(data.patients.slice(0, 6));
+        setShowSuggestions(true);
+      } catch { /* swallow — main search handles errors */ }
+    }, 300);
+  };
+
+  const clearSearch = () => {
+    setSearch("");
+    setSuggestions([]);
+    setShowSuggestions(false);
+    load();
+  };
+
+  const handleDeletePatient = async (p: PatientCard) => {
+    const confirmed = window.confirm(
+      `Delete "${p.name}" (NHS ${p.nhs_number})?\n\nThis permanently removes the patient and all their documents, flags, and extracted data. This cannot be undone.`
+    );
+    if (!confirmed) return;
+    try {
+      await api.deletePatient(p.id);
+      setPatients((prev) => prev.filter((x) => x.id !== p.id));
+    } catch (e) {
+      alert(`Delete failed: ${(e as Error).message}`);
+    }
+  };
 
   const load = async (q?: string) => {
     setLoading(true);
@@ -114,10 +163,50 @@ export default function LandingPage() {
                 type="text"
                 placeholder="Search by name or NHS number…"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && load(search)}
-                className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-nhs-blue focus:border-nhs-blue"
+                inputMode={/^[\d\s]*$/.test(search) && search.length > 0 ? "numeric" : "text"}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { setShowSuggestions(false); load(search); }
+                  if (e.key === "Escape") clearSearch();
+                }}
+                onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+                onBlur={() => setShowSuggestions(false)}
+                className={`w-full pl-9 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-nhs-blue focus:border-nhs-blue ${
+                  search ? "pr-8" : "pr-4"
+                } ${/^[\d\s]+$/.test(search) ? "font-mono" : ""}`}
               />
+              {search && (
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={clearSearch}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  aria-label="Clear search"
+                >
+                  <XIcon />
+                </button>
+              )}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg border border-slate-200 shadow-lg z-10 overflow-hidden">
+                  {suggestions.map((p) => (
+                    <button
+                      key={p.id}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => { setShowSuggestions(false); router.push(`/patients/${p.id}`); }}
+                      className="w-full px-4 py-2.5 text-left hover:bg-nhs-pale flex items-center justify-between gap-4 border-b border-slate-100 last:border-0"
+                    >
+                      <div>
+                        <div className="text-sm font-medium text-slate-900">{p.name}</div>
+                        <div className="text-xs text-slate-500">NHS {p.nhs_number} · {p.sex} · DOB {p.dob}</div>
+                      </div>
+                      {p.open_flag_count > 0 && (
+                        <span className="text-xs text-nhs-red font-semibold shrink-0">
+                          {p.open_flag_count} flag{p.open_flag_count !== 1 ? "s" : ""}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <button
               onClick={() => load(search)}
@@ -173,10 +262,10 @@ export default function LandingPage() {
 
             <ul className="divide-y divide-slate-100">
               {patients.map((p) => (
-                <li key={p.id}>
+                <li key={p.id} className="group flex items-stretch">
                   <Link
                     href={`/patients/${p.id}`}
-                    className="flex items-center gap-4 px-5 py-4 hover:bg-nhs-pale transition-colors group"
+                    className="flex-1 flex items-center gap-4 px-5 py-4 hover:bg-nhs-pale transition-colors"
                   >
                     {/* Risk dot */}
                     <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${
@@ -213,6 +302,14 @@ export default function LandingPage() {
                       </span>
                     </div>
                   </Link>
+                  <button
+                    onClick={() => handleDeletePatient(p)}
+                    title={`Delete ${p.name}`}
+                    className="px-3 flex items-center text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+                    aria-label={`Delete ${p.name}`}
+                  >
+                    <TrashIcon />
+                  </button>
                 </li>
               ))}
             </ul>
@@ -239,8 +336,16 @@ function SummaryChip({ value, label, highlight }: { value: number; label: string
   );
 }
 
+/* ── NHS number auto-formatter: strips non-digits, inserts spaces XXX XXX XXXX ── */
+function formatNhsNumber(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 10);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+  return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+}
+
 /* ── New patient form ───────────────────────────────────────── */
-function NewPatientForm({ onCreated }: { onCreated: () => void }) {
+function NewPatientForm({ onCreated }: { onCreated: (card: PatientCard) => void }) {
   const [form, setForm] = useState<NewPatient>({ name: "", dob: "", nhs_number: "", sex: "M" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -266,16 +371,25 @@ function NewPatientForm({ onCreated }: { onCreated: () => void }) {
       <input type="date" value={form.dob}
         onChange={(e) => setForm({ ...form, dob: e.target.value })}
         className="px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-nhs-blue" />
-      <input placeholder="NHS number (e.g. 485 621 3847)" value={form.nhs_number}
-        onChange={(e) => setForm({ ...form, nhs_number: e.target.value })}
-        className="px-3 py-2 rounded-lg border border-slate-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-nhs-blue" />
+      <div className="relative">
+        <input
+          placeholder="485 621 3847"
+          value={form.nhs_number}
+          inputMode="numeric"
+          onChange={(e) => setForm({ ...form, nhs_number: formatNhsNumber(e.target.value) })}
+          className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-nhs-blue"
+        />
+        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-mono pointer-events-none">
+          {form.nhs_number.replace(/\D/g, "").length}/10
+        </span>
+      </div>
       <select value={form.sex}
         onChange={(e) => setForm({ ...form, sex: e.target.value as NewPatient["sex"] })}
         className="px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-nhs-blue">
         <option>M</option><option>F</option><option>Other</option>
       </select>
       {error && <div className="col-span-2 text-sm text-nhs-red">{error}</div>}
-      <button onClick={submit} disabled={busy || !form.name || !form.dob || !form.nhs_number}
+      <button onClick={submit} disabled={busy || !form.name || !form.dob || form.nhs_number.replace(/\D/g, "").length !== 10}
         className="col-span-2 px-4 py-2.5 rounded-lg bg-nhs-blue text-white text-sm font-medium hover:bg-nhs-blue-dark disabled:bg-slate-300 transition-colors">
         {busy ? "Creating…" : "Create patient"}
       </button>
