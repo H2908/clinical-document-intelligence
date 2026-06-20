@@ -193,10 +193,15 @@ def _looks_like_condition(lower: str) -> bool:
 
     Accepts if ANY of:
       - Direct match on a known condition term (CONDITION_TERMS)
-      - Contains a known condition term as a substring
-      - Contains a known condition root suffix (CONDITION_ROOTS)
+      - Contains a known condition term as a WORD-BOUNDARY match
+      - Contains a known condition root suffix as a WORD-BOUNDARY match
       - Direct match on a known symptom term (SYMPTOM_TERMS)
-      - Contains a known symptom term as a substring
+      - Contains a known symptom term as a WORD-BOUNDARY match
+
+    Word boundaries (regex \\b) prevent short medical abbreviations from
+    leaking into unrelated common words. Before this fix, 'uti' (urinary
+    tract infection) leaked into 'routine' and 'pe' (pulmonary embolism)
+    leaked into 'specialist', producing false-positive Diagnosis entities.
 
     Symptoms are absorbed as "Diagnosis" because the 4-type entity schema
     does not model them separately. Signal preserved at the cost of
@@ -205,20 +210,23 @@ def _looks_like_condition(lower: str) -> bool:
     # Direct match on a known condition term
     if lower in CONDITION_TERMS:
         return True
-    # Contains a known condition term as a substring
+    # Word-boundary match on any condition term
     for term in CONDITION_TERMS:
-        if term in lower:
+        if re.search(rf"\b{re.escape(term)}\b", lower):
             return True
     # Direct match on a symptom term
     if lower in SYMPTOM_TERMS:
         return True
-    # Contains a symptom term as a substring
+    # Word-boundary match on any symptom term
     for term in SYMPTOM_TERMS:
-        if term in lower:
+        if re.search(rf"\b{re.escape(term)}\b", lower):
             return True
-    # Contains a known condition root suffix
+    # Word-boundary match on any condition root suffix.
+    # Roots like 'itis', 'osis', 'pathy' are intentional suffixes - they
+    # match at word END not as separate words. We use a different pattern:
+    # the root must appear at the end of any word in the span.
     for root in CONDITION_ROOTS:
-        if root in lower:
+        if re.search(rf"{re.escape(root)}\b", lower):
             return True
     return False
 

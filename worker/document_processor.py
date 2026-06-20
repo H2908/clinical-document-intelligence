@@ -25,6 +25,61 @@ from nlp.lab_parser import parse_labs
 from nlp.negation_detector import detect_negation
 from nlp.date_normaliser import normalise_dates
 
+
+# ---------------------------------------------------------------------------
+# Document date extraction
+# ---------------------------------------------------------------------------
+
+import re as _re
+from datetime import date as _date, datetime as _datetime
+
+# Patterns for labelled dates at the top of clinical documents. Ordered
+# specific-to-general. The first match wins.
+_DATE_LABEL_PATTERNS = [
+    # "Date: 12 Jan 2024" or "Date: 12 January 2024"
+    _re.compile(r"(?im)^\s*Date\s*[:\-]\s*(?P<d>\d{1,2}\s+\w+\s+\d{4})\s*$"),
+    # "Date: 2024-01-12" or "Date: 12/01/2024"
+    _re.compile(r"(?im)^\s*Date\s*[:\-]\s*(?P<d>\d{1,4}[-/]\d{1,2}[-/]\d{1,4})\s*$"),
+    # "Date of letter: 12 Jan 2024"
+    _re.compile(r"(?im)^\s*Date\s+of\s+(?:letter|report|admission|discharge)\s*[:\-]\s*(?P<d>[\w\s\-/]+?)\s*$"),
+]
+
+_DATE_FORMATS = [
+    "%d %b %Y", "%d %B %Y",
+    "%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y", "%Y/%m/%d",
+]
+
+
+def _extract_document_date(text: str) -> _date | None:
+    """Scan the top of the document text for a labelled date.
+
+    Returns the parsed date if extraction succeeds, None otherwise.
+    Looks at first 500 chars. Tries each labelled pattern; first match
+    wins. Tries each strptime format; first parse wins. Rejects pre-1900
+    (OCR noise) and dates more than 30 days in the future (typos).
+    """
+    if not text:
+        return None
+    head = text[:500]
+    for pattern in _DATE_LABEL_PATTERNS:
+        m = pattern.search(head)
+        if not m:
+            continue
+        date_str = m.group("d").strip()
+        for fmt in _DATE_FORMATS:
+            try:
+                parsed = _datetime.strptime(date_str, fmt).date()
+            except ValueError:
+                continue
+            today = _date.today()
+            if parsed.year < 1900:
+                continue
+            if (parsed - today).days > 30:
+                continue
+            return parsed
+    return None
+
+
 log = logging.getLogger(__name__)
 NLP_VERSION = "1.0.0"
 
@@ -137,6 +192,27 @@ def process_document(
         cleaned = clean_text(raw_text)
         payload["document"]["extracted_text"] = cleaned
 
+        # Bug 3 fix: extract document_date from the PDF text instead of
+        # trusting the user-supplied form field (which often defaults to
+        # today). Falls back to user-supplied if extraction fails.
+        # RAW.raw_documents retains user-supplied (audit); CORE.document
+        # gets the extracted value (truth).
+        extracted_date = _extract_document_date(cleaned)
+        if extracted_date is not None and extracted_date != document_date:
+            log.info(
+                "document_date extracted from text: %s (user supplied: %s)",
+                extracted_date, document_date,
+            )
+            document_date = extracted_date
+            payload["document"]["document_date_extracted"] = True
+        else:
+            payload["document"]["document_date_extracted"] = False
+        # Always stash the resolved date (extracted or original) so
+        # process_from_s3 can use it when writing to CORE.document.
+        payload["document"]["document_date_resolved"] = (
+            document_date.isoformat() if hasattr(document_date, "isoformat") else str(document_date)
+        )
+
         entities = extract_entities(cleaned)
         detect_negation(cleaned, entities)
         normalise_dates(entities, document_date)
@@ -231,13 +307,27 @@ def process_from_s3(
         # Promote to CORE + write entities and observations, only if processing succeeded
         if payload["status"] == "processed":
             from database.snowflake_writer import insert_core_document
+            from datetime import date as _date_cls
+            # Prefer the date resolved by process_document (which may have
+            # extracted it from the PDF text) over the user-supplied one.
+            resolved_iso = payload.get("document", {}).get("document_date_resolved")
+            try:
+                resolved_date = (
+                    _date_cls.fromisoformat(resolved_iso) if resolved_iso else document_date
+                )
+            except (TypeError, ValueError):
+                resolved_date = document_date
+            log.info(
+                "CORE.document write: document_id=%s document_date=%s (user supplied %s)",
+                document_id, resolved_date, document_date,
+            )
             insert_core_document(
                 document_id=document_id,
                 patient_id=patient_id,
                 file_name=Path(s3_key).name,
                 doc_type=doc_type,
                 s3_key=s3_key,
-                document_date=document_date,
+                document_date=resolved_date,
                 source=None,
                 extracted_text=payload.get("document", {}).get("extracted_text"),
                 status="processed",

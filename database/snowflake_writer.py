@@ -241,6 +241,36 @@ def refresh_summary(patient_id: str) -> None:
     _call_proc_with_array(sql, "refresh_summary", patient_id)
 
 # ---- write_briefing ----
+def _fetch_patient_block(patient_id: str) -> dict:
+    """Read patient demographics from CORE.patient. Returns the shape
+    the briefing JSON expects. Falls back to id-only if the row is
+    missing (shouldn't happen but defensive)."""
+    try:
+        conn = _get_connection()
+    except Exception:
+        return {"id": patient_id, "name": "", "dob": None, "nhs_number": "", "sex": ""}
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT name, dob, nhs_number, sex FROM clinical_db.core.patient "
+            "WHERE patient_id = %s",
+            (patient_id,),
+        )
+        row = cur.fetchone()
+        if row is None:
+            return {"id": patient_id, "name": "", "dob": None, "nhs_number": "", "sex": ""}
+        name, dob, nhs, sex = row
+        return {
+            "id": patient_id,
+            "name": name or "",
+            "dob": str(dob) if dob else None,
+            "nhs_number": nhs or "",
+            "sex": sex or "",
+        }
+    finally:
+        conn.close()
+
+
 def write_briefing(patient_id: str, briefing: dict) -> None:
     """
     Write the briefing agent's output directly to MART.patient_summary.
@@ -276,13 +306,7 @@ def write_briefing(patient_id: str, briefing: dict) -> None:
         "conditions":   briefing.get("active_conditions", []),
         "medications":  briefing.get("current_medications", []),
         "open_flags":   briefing.get("open_flags", []),
-        "patient": briefing.get("patient", {
-            "id":         patient_id,
-            "name":       "Test Patient",
-            "dob":        "1980-01-01",
-            "nhs_number": "000 000 0001",
-            "sex":        "Other",
-        }),
+        "patient": briefing.get("patient") or _fetch_patient_block(patient_id),
     }
 
     summary_json = json.dumps(summary_for_mart, default=str)
