@@ -194,6 +194,7 @@ def _check_allergy_drug_conflicts(entities: list[dict]) -> list[dict]:
                     flags.append({
                         "severity": "HIGH",
                         "category": "ALLERGY_CONFLICT",
+                        "clinical_subject": "",
                         "description": (
                             f"Patient has documented {allergy_term} but is on "
                             f"{drug['text'].strip()}. Verify before prescribing."
@@ -227,6 +228,7 @@ def _check_duplicate_medications(entities: list[dict]) -> list[dict]:
             flags.append({
                 "severity": "MEDIUM",
                 "category": "POSSIBLE_DUPLICATE_MEDICATION",
+                "clinical_subject": "",
                 "description": (
                     f"{drug_name.capitalize()} mentioned across "
                     f"{len(doc_ids)} documents. Confirm current dose."
@@ -272,6 +274,7 @@ def _check_overdue_followups(
             flags.append({
                 "severity": "MEDIUM",
                 "category": "OVERDUE_FOLLOWUP",
+                "clinical_subject": "",
                 "description": (
                     f"{condition.title()} last documented {days_since} days ago "
                     f"({latest_date.isoformat()}). Consider review."
@@ -369,7 +372,7 @@ def _llm_second_pass(
     MIN_QUOTE_WORDS_SOFT = 3  # soft branch word floor (with subject-overlap)
 
     required_fields = (
-        "severity", "category", "description",
+        "severity", "category", "clinical_subject", "description",
         "cited_document_id", "source_quote",
     )
 
@@ -709,7 +712,7 @@ def _llm_only_naive_pass(
 
     # No validation at all - this is the strawman. Return what the LLM said.
     # Minimal shape enforcement so downstream code doesn't crash.
-    required_fields = ("severity", "category", "description",
+    required_fields = ("severity", "category", "clinical_subject", "description",
                        "cited_document_id", "source_quote")
     out = []
     for f in parsed:
@@ -789,7 +792,7 @@ def _llm_only_thoughtful_pass(
     # No hard validation - this is a baseline. Return what the LLM said.
     # The metric module will compute grounding_status against doc text later.
     # We do enforce shape minimally so downstream code doesn't crash.
-    required_fields = ("severity", "category", "description",
+    required_fields = ("severity", "category", "clinical_subject", "description",
                        "cited_document_id", "source_quote")
     out = []
     for f in parsed:
