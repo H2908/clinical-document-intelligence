@@ -1,0 +1,167 @@
+{
+  "_meta": {
+    "spec_version": "1.0",
+    "spec_path": "docs/CLINICAL_SUBJECT_MATCHING_SPEC.md",
+    "purpose": "Defines the 8 cases the (category, clinical_subject) matcher must handle correctly. Four must-stay-distinct + four must-merge. Used by tests/test_clinical_subject_matcher.py.",
+    "ordering_principle": "must-stay-distinct cases first (these are the primary correctness constraints); must-merge cases second (these test normalisation behaviour)."
+  },
+
+  "must_stay_distinct": [
+    {
+      "id": "distinct_1_same_condition_different_subject",
+      "description": "Two heart failure flags: one about a missing ACEi, one about an overdue echocardiogram. Same condition context, different clinical subjects.",
+      "justification": "Medication gap (no ACEi) and investigation gap (echo overdue) are different clinical problems requiring different actions. A matcher that merges on condition context ('heart failure') alone fails here. The clinical_subject identifies the entity the flag acts on, not the condition that provides context.",
+      "flag_a": {
+        "category": "TREATMENT_GAP",
+        "clinical_subject": "ACEi",
+        "severity": "HIGH",
+        "description": "No ACE inhibitor prescribed for heart failure with reduced ejection fraction"
+      },
+      "flag_b": {
+        "category": "TREATMENT_GAP",
+        "clinical_subject": "echocardiogram",
+        "severity": "MEDIUM",
+        "description": "Echocardiogram overdue — last echo > 12 months ago in heart failure patient"
+      },
+      "expected": "distinct"
+    },
+
+    {
+      "id": "distinct_2_same_subject_different_category",
+      "description": "Two penicillin flags: one ALLERGY_CONFLICT (allergy undocumented), one DRUG_INTERACTION (beta-lactam prescribed). Same drug, different clinical problem.",
+      "justification": "Same drug, same patient, but these are genuinely different clinical problems requiring different actions (documentation vs prescribing change). The identity rule requires both category AND clinical_subject to match. Subject-only matching is insufficient.",
+      "flag_a": {
+        "category": "ALLERGY_CONFLICT",
+        "clinical_subject": "penicillin",
+        "severity": "HIGH",
+        "description": "Penicillin allergy mentioned in clinical note but not documented in allergy list"
+      },
+      "flag_b": {
+        "category": "DRUG_INTERACTION",
+        "clinical_subject": "penicillin",
+        "severity": "HIGH",
+        "description": "Beta-lactam antibiotic prescribed despite documented penicillin allergy"
+      },
+      "expected": "distinct"
+    },
+
+    {
+      "id": "distinct_3_same_identity_different_severity",
+      "description": "Two HbA1c monitoring flags in diabetes: one HIGH (18 months overdue, HbA1c 11.2%), one MEDIUM (8 months overdue, HbA1c 8.4%). Same identity, different urgency.",
+      "justification": "These ARE the same clinical concern (HbA1c monitoring overdue in diabetes). They must stay distinct in evaluation because severity reflects different gold tiers. A HIGH flag must match a HIGH gold flag; a MEDIUM flag must match a MEDIUM gold flag. Cross-severity matching inflates precision on tier-1 flags. Severity is NOT part of the identity pair, but the evaluation matcher must track severity separately and enforce tier-level matching.",
+      "flag_a": {
+        "category": "MONITORING_GAP",
+        "clinical_subject": "HbA1c",
+        "severity": "HIGH",
+        "description": "HbA1c last checked 18 months ago, most recent 11.2% — urgent diabetes review needed"
+      },
+      "flag_b": {
+        "category": "MONITORING_GAP",
+        "clinical_subject": "HbA1c",
+        "severity": "MEDIUM",
+        "description": "HbA1c last checked 8 months ago, most recent 8.4% — diabetes review due"
+      },
+      "expected": "distinct",
+      "note": "The matcher returns same-identity here (category and clinical_subject match). The distinct-ness is enforced by the evaluation layer treating severity as part of the match-key. This test asserts that the matcher correctly reports same-identity AND that severity is preserved on both flags so evaluation can separate them."
+    },
+
+    {
+      "id": "distinct_4_paraphrase_crosses_clinical_meaning",
+      "description": "Two eGFR flags: one MONITORING_GAP (not checked in 6 months), one CLINICAL_DETERIORATION (declining trend). Same subject word, different clinical action.",
+      "justification": "Category differs (MONITORING_GAP vs CLINICAL_DETERIORATION). Subject is the same ('eGFR') but the clinical action is entirely different: book a blood test vs urgent nephrology review. The identity rule correctly keeps them distinct because category is part of the pair. This confirms that surface-word overlap in clinical_subject is not sufficient for merging.",
+      "flag_a": {
+        "category": "MONITORING_GAP",
+        "clinical_subject": "eGFR",
+        "severity": "MEDIUM",
+        "description": "eGFR not checked in 6 months — renal function surveillance overdue"
+      },
+      "flag_b": {
+        "category": "CLINICAL_DETERIORATION",
+        "clinical_subject": "eGFR",
+        "severity": "HIGH",
+        "description": "eGFR declining from 45 to 28 over 6 months — renal function deteriorating, urgent nephrology review"
+      },
+      "expected": "distinct"
+    }
+  ],
+
+  "must_merge": [
+    {
+      "id": "merge_1_capitalisation_and_whitespace",
+      "description": "Same clinical subject with different capitalisation and whitespace. The matcher must normalise both to the same form.",
+      "justification": "Capitalisation and whitespace are surface variations that carry no clinical meaning. 'Metformin', 'metformin', and 'METFORMIN' all refer to the same drug. Whitespace differences ('ACE inhibitor' vs 'ACE  inhibitor') are typos. The normalisation pipeline handles both (lowercase + whitespace collapse).",
+      "flag_a": {
+        "category": "DRUG_INTERACTION",
+        "clinical_subject": "Metformin",
+        "severity": "HIGH",
+        "description": "Metformin contraindicated in CKD3b"
+      },
+      "flag_b": {
+        "category": "DRUG_INTERACTION",
+        "clinical_subject": "  metformin  ",
+        "severity": "HIGH",
+        "description": "Metformin prescribed despite eGFR below threshold"
+      },
+      "expected": "merge"
+    },
+
+    {
+      "id": "merge_2_abbreviation_vs_full_form",
+      "description": "Same clinical entity expressed as abbreviation in one flag and full form in another. The abbreviation table merges these to a canonical form.",
+      "justification": "'ACEi' and 'ACE inhibitor' refer to the same drug class. 'eGFR' and 'estimated glomerular filtration rate' refer to the same measurement. The abbreviation table is curated — only listed pairs merge — so the merge is conservative and won't accidentally collapse unrelated abbreviations.",
+      "flag_a": {
+        "category": "TREATMENT_GAP",
+        "clinical_subject": "ACEi",
+        "severity": "HIGH",
+        "description": "ACE inhibitor not prescribed in heart failure with reduced EF"
+      },
+      "flag_b": {
+        "category": "TREATMENT_GAP",
+        "clinical_subject": "ACE inhibitor",
+        "severity": "HIGH",
+        "description": "ACEi missing from heart failure medication regime"
+      },
+      "expected": "merge"
+    },
+
+    {
+      "id": "merge_3_dose_suffix_stripping",
+      "description": "Same drug with and without dose suffix. Dose stripping normalises drug-type subjects to the bare drug name.",
+      "justification": "'Furosemide' and 'Furosemide 80 mg' refer to the same drug. The dose is clinically meaningful but it's not part of the drug's identity — both flags concern the same medication. Dose stripping applies only to Drug-type subjects (not to measurement subjects like 'eGFR 32' where the number is clinically meaningful context).",
+      "flag_a": {
+        "category": "DOSING_CONCERN",
+        "clinical_subject": "Furosemide",
+        "severity": "MEDIUM",
+        "description": "Furosemide dose increased without monitoring"
+      },
+      "flag_b": {
+        "category": "DOSING_CONCERN",
+        "clinical_subject": "Furosemide 80 mg",
+        "severity": "MEDIUM",
+        "description": "Furosemide 80 mg OD — high-dose loop diuretic, monitor U&E"
+      },
+      "expected": "merge"
+    },
+
+    {
+      "id": "merge_4_rule_layer_vs_llm_layer_emission",
+      "description": "The rule layer emits the deterministic normalised drug name; the LLM emits a slightly different surface form. Both should match after normalisation.",
+      "justification": "The rule layer fills clinical_subject from the NER entity's normalised_value (already lowercased and dose-stripped). The LLM layer is instructed to emit a short noun phrase. The two may differ in surface form (capitalisation, included dose). After the full normalisation pipeline, both reduce to the same canonical form. This is the cross-layer integration check.",
+      "flag_a": {
+        "category": "DRUG_INTERACTION",
+        "clinical_subject": "metformin",
+        "severity": "HIGH",
+        "description": "Rule layer: Metformin contraindicated below eGFR threshold",
+        "_source_layer": "rule"
+      },
+      "flag_b": {
+        "category": "DRUG_INTERACTION",
+        "clinical_subject": "Metformin 500mg",
+        "severity": "HIGH",
+        "description": "LLM layer: patient on Metformin 500mg twice daily despite CKD3b",
+        "_source_layer": "llm"
+      },
+      "expected": "merge"
+    }
+  ]
+}
