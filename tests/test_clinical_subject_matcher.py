@@ -26,10 +26,16 @@ from pathlib import Path
 
 import pytest
 
-# Import target - does not exist yet (Step 6 will create it)
-# pytest will report ImportError until then; that is the expected red state.
+# The matcher lives in evaluation/metrics.py as _flag_key (tuple identity)
+# and normalise_subject. We bridge flags_have_same_identity as a tuple
+# equality wrapper so the test file reads naturally.
 try:
-    from agents.clinical_subject_matcher import flags_have_same_identity, normalise_subject
+    from evaluation.metrics import _flag_key, normalise_subject
+
+    def flags_have_same_identity(flag_a: dict, flag_b: dict) -> bool:
+        """Bridge: two flags share identity iff their _flag_key tuples match."""
+        return _flag_key(flag_a) == _flag_key(flag_b)
+
     MATCHER_AVAILABLE = True
 except ImportError:
     MATCHER_AVAILABLE = False
@@ -153,20 +159,30 @@ def test_normalise_subject(raw: str, expected: str) -> None:
 # Fixture sanity — assert the fixture itself is well-formed
 # ============================================================================
 
-def test_fixture_has_4_must_stay_distinct():
-    """The spec mandates exactly four must-stay-distinct cases."""
+def test_fixture_has_3_must_stay_distinct():
+    """The spec mandates exactly three must-stay-distinct cases.
+
+    Originally four, but Case 3 (same identity, different severity) was
+    reclassified to must_merge after the spec sec 3 review: severity is
+    NOT part of identity at the matcher layer; per-tier behaviour belongs
+    in the evaluation layer.
+    """
     fixture = _load_fixture()
-    assert len(fixture["must_stay_distinct"]) == 4, (
-        "Spec mandates 4 must-stay-distinct cases. "
+    assert len(fixture["must_stay_distinct"]) == 3, (
+        "After Case 3 reclassification, expected 3 must-stay-distinct cases. "
         f"Found {len(fixture['must_stay_distinct'])}."
     )
 
 
-def test_fixture_has_4_must_merge():
-    """The spec mandates exactly four must-merge cases."""
+def test_fixture_has_5_must_merge():
+    """The fixture has five must-merge cases.
+
+    Four original (capitalisation, abbreviation, dose-suffix, cross-layer)
+    plus Case 3 reclassified (same identity, different severity).
+    """
     fixture = _load_fixture()
-    assert len(fixture["must_merge"]) == 4, (
-        "Spec mandates 4 must-merge cases. "
+    assert len(fixture["must_merge"]) == 5, (
+        "After Case 3 reclassification, expected 5 must-merge cases. "
         f"Found {len(fixture['must_merge'])}."
     )
 

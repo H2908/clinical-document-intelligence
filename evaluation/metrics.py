@@ -31,6 +31,7 @@ Supervisor lock (Day 4):
 - Coverage must be reported stratified by severity; high-severity recall
   is the clinically meaningful number.
 """
+import re
 from typing import Iterable, Optional
 
 from evaluation.grounding import grade_flag, is_grounded
@@ -39,6 +40,58 @@ from evaluation.grounding import grade_flag, is_grounded
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# Clinical subject normalisation (spec sec 5-6)
+# ---------------------------------------------------------------------------
+
+# Curated abbreviation table. Maps spelled-out form -> canonical abbreviation.
+# Conservative: unlisted pairs do NOT merge. Add to this table only when a
+# pair appears in clinical text often enough to cause distinct-flag inflation.
+_ABBREVIATION_TABLE = {
+    "ace inhibitor":                          "acei",
+    "ace inhibitors":                         "acei",
+    "estimated glomerular filtration rate":   "egfr",
+    "glycated haemoglobin":                   "hba1c",
+    "glycated hemoglobin":                    "hba1c",
+    "left ventricular ejection fraction":     "lvef",
+    "b-type natriuretic peptide":             "bnp",
+    "n-terminal pro-bnp":                     "nt-probnp",
+}
+
+# Dose-suffix regex. Requires a unit token, so measurement subjects like
+# "eGFR 32" or "LVEF 28%" (no unit) are naturally NOT stripped. Drug
+# subjects "Furosemide 80 mg" / "Spironolactone 25 mg OD" are stripped
+# to the bare drug name.
+_DOSE_SUFFIX_RE = re.compile(
+    r"\s+\d+[\d.]*\s*(mg|mcg|g|ml|units?|iu)\b.*$",
+    flags=re.IGNORECASE,
+)
+
+
+def normalise_subject(subject: str) -> str:
+    """Normalise clinical_subject for identity comparison (spec sec 6).
+
+    Pipeline:
+      1. lowercase
+      2. strip leading/trailing whitespace
+      3. collapse internal whitespace
+      4. apply abbreviation table (full form -> canonical abbreviation)
+      5. strip dose suffix (drug-type subjects only, discriminated by unit)
+
+    Returns the normalised string used for matcher comparison.
+    Empty / None / whitespace-only inputs return empty string.
+    """
+    if not subject:
+        return ""
+    s = subject.lower().strip()
+    s = re.sub(r"\s+", " ", s)
+    s = _ABBREVIATION_TABLE.get(s, s)
+    s = _DOSE_SUFFIX_RE.sub("", s).strip()
+    return s
+
+
 def _flag_key(flag: dict) -> tuple[str, str]:
     """Canonical identity for a flag for set comparisons.
 
@@ -62,7 +115,7 @@ def _flag_key(flag: dict) -> tuple[str, str]:
     """
     return (
         (flag.get("category") or "").strip(),
-        (flag.get("clinical_subject") or "").strip().lower(),
+        normalise_subject(flag.get("clinical_subject") or ""),
     )
 
 

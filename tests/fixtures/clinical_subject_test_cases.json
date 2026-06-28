@@ -5,7 +5,6 @@
     "purpose": "Defines the 8 cases the (category, clinical_subject) matcher must handle correctly. Four must-stay-distinct + four must-merge. Used by tests/test_clinical_subject_matcher.py.",
     "ordering_principle": "must-stay-distinct cases first (these are the primary correctness constraints); must-merge cases second (these test normalisation behaviour)."
   },
-
   "must_stay_distinct": [
     {
       "id": "distinct_1_same_condition_different_subject",
@@ -25,7 +24,6 @@
       },
       "expected": "distinct"
     },
-
     {
       "id": "distinct_2_same_subject_different_category",
       "description": "Two penicillin flags: one ALLERGY_CONFLICT (allergy undocumented), one DRUG_INTERACTION (beta-lactam prescribed). Same drug, different clinical problem.",
@@ -44,27 +42,6 @@
       },
       "expected": "distinct"
     },
-
-    {
-      "id": "distinct_3_same_identity_different_severity",
-      "description": "Two HbA1c monitoring flags in diabetes: one HIGH (18 months overdue, HbA1c 11.2%), one MEDIUM (8 months overdue, HbA1c 8.4%). Same identity, different urgency.",
-      "justification": "These ARE the same clinical concern (HbA1c monitoring overdue in diabetes). They must stay distinct in evaluation because severity reflects different gold tiers. A HIGH flag must match a HIGH gold flag; a MEDIUM flag must match a MEDIUM gold flag. Cross-severity matching inflates precision on tier-1 flags. Severity is NOT part of the identity pair, but the evaluation matcher must track severity separately and enforce tier-level matching.",
-      "flag_a": {
-        "category": "MONITORING_GAP",
-        "clinical_subject": "HbA1c",
-        "severity": "HIGH",
-        "description": "HbA1c last checked 18 months ago, most recent 11.2% — urgent diabetes review needed"
-      },
-      "flag_b": {
-        "category": "MONITORING_GAP",
-        "clinical_subject": "HbA1c",
-        "severity": "MEDIUM",
-        "description": "HbA1c last checked 8 months ago, most recent 8.4% — diabetes review due"
-      },
-      "expected": "distinct",
-      "note": "The matcher returns same-identity here (category and clinical_subject match). The distinct-ness is enforced by the evaluation layer treating severity as part of the match-key. This test asserts that the matcher correctly reports same-identity AND that severity is preserved on both flags so evaluation can separate them."
-    },
-
     {
       "id": "distinct_4_paraphrase_crosses_clinical_meaning",
       "description": "Two eGFR flags: one MONITORING_GAP (not checked in 6 months), one CLINICAL_DETERIORATION (declining trend). Same subject word, different clinical action.",
@@ -84,7 +61,6 @@
       "expected": "distinct"
     }
   ],
-
   "must_merge": [
     {
       "id": "merge_1_capitalisation_and_whitespace",
@@ -104,7 +80,6 @@
       },
       "expected": "merge"
     },
-
     {
       "id": "merge_2_abbreviation_vs_full_form",
       "description": "Same clinical entity expressed as abbreviation in one flag and full form in another. The abbreviation table merges these to a canonical form.",
@@ -123,7 +98,6 @@
       },
       "expected": "merge"
     },
-
     {
       "id": "merge_3_dose_suffix_stripping",
       "description": "Same drug with and without dose suffix. Dose stripping normalises drug-type subjects to the bare drug name.",
@@ -142,7 +116,6 @@
       },
       "expected": "merge"
     },
-
     {
       "id": "merge_4_rule_layer_vs_llm_layer_emission",
       "description": "The rule layer emits the deterministic normalised drug name; the LLM emits a slightly different surface form. Both should match after normalisation.",
@@ -160,6 +133,24 @@
         "severity": "HIGH",
         "description": "LLM layer: patient on Metformin 500mg twice daily despite CKD3b",
         "_source_layer": "llm"
+      },
+      "expected": "merge"
+    },
+    {
+      "id": "merge_5_same_identity_different_severity",
+      "description": "Two HbA1c monitoring flags in diabetes: one HIGH (18 months overdue), one MEDIUM (8 months overdue). Same (category, clinical_subject); severity differs but is not part of identity per spec sec 3.",
+      "justification": "Per spec sec 3, severity is EXPLICITLY EXCLUDED from the identity pair. Two flags with the same category and clinical_subject share identity at the matcher layer regardless of severity. Per-tier distinct-ness in evaluation is enforced by a separate component (the evaluation layer tracks severity in its match-key). This case asserts that the matcher correctly returns same-identity here, preserving the spec's separation of concerns between matcher and evaluation.",
+      "flag_a": {
+        "category": "MONITORING_GAP",
+        "clinical_subject": "HbA1c",
+        "severity": "HIGH",
+        "description": "HbA1c last checked 18 months ago, most recent 11.2% — urgent diabetes review needed"
+      },
+      "flag_b": {
+        "category": "MONITORING_GAP",
+        "clinical_subject": "HbA1c",
+        "severity": "MEDIUM",
+        "description": "HbA1c last checked 8 months ago, most recent 8.4% — diabetes review due"
       },
       "expected": "merge"
     }
