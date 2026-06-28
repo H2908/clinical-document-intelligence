@@ -194,13 +194,15 @@ def _check_allergy_drug_conflicts(entities: list[dict]) -> list[dict]:
                     flags.append({
                         "severity": "HIGH",
                         "category": "ALLERGY_CONFLICT",
-                        "clinical_subject": "",
                         "description": (
                             f"Patient has documented {allergy_term} but is on "
                             f"{drug['text'].strip()}. Verify before prescribing."
                         ),
                         "source_document_id": drug["document_id"],
-                        "clinical_subject": f"{allergy_term} allergy",
+                        "clinical_subject": (
+                            drug.get("normalised_value")
+                            or drug.get("text", "").strip().lower()
+                        ),
                     })
     return flags
 
@@ -228,7 +230,6 @@ def _check_duplicate_medications(entities: list[dict]) -> list[dict]:
             flags.append({
                 "severity": "MEDIUM",
                 "category": "POSSIBLE_DUPLICATE_MEDICATION",
-                "clinical_subject": "",
                 "description": (
                     f"{drug_name.capitalize()} mentioned across "
                     f"{len(doc_ids)} documents. Confirm current dose."
@@ -274,7 +275,6 @@ def _check_overdue_followups(
             flags.append({
                 "severity": "MEDIUM",
                 "category": "OVERDUE_FOLLOWUP",
-                "clinical_subject": "",
                 "description": (
                     f"{condition.title()} last documented {days_since} days ago "
                     f"({latest_date.isoformat()}). Consider review."
