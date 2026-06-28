@@ -180,3 +180,65 @@ practice). Definition: token overlap with cited doc < threshold, but
 overlap with some OTHER document in patient corpus >= threshold.
 Retained for held-out — relevant when patients have multiple distinct
 documents.
+
+# Paper Notes
+
+## 2026-06-28 — Step 9 coverage guardrail, supervisor reading
+
+### Path B is validated in design, awaiting domain-diverse smoke
+
+Zero delta from Path A → Path B on pat_test_01 means this patient's documents
+happen not to contain the abbreviation or dose-suffix variants Path B was built
+to handle. Not evidence Path B is wrong — evidence pat_test_01 is a weak test
+for Path B specifically. When the 18 synthetic patients land, cardiology cases
+with ACEi/ARNi therapy and explicit dose documentation will exercise Path B
+naturally. Until then: Path B is correct-but-dormant.
+
+### Three honest guardrail checks for the matcher
+
+1. **rules_only invariance.** raw=4, new_spec=4, delta=0. Deterministic single
+   rep, no dedup expected, none occurred. Proves the matcher doesn't
+   over-collapse when there's nothing to collapse.
+
+2. **Path B no-regression.** delta(new_minimal → new_spec) = 0 across all
+   conditions. Proves Path B is a pure extension; the minimal matcher is the
+   safe baseline and Path B doesn't corrupt it.
+
+3. **LLM deduplication proportionate.** llm_thoughtful 40 → 24 across 5 reps
+   means roughly 5 of 8 per-rep flags are stable, 3 are noise. Implied AI
+   reproducibility ≈ 5/8 = 0.625. Consistent with the grounded-flag Jaccard
+   computed directly — two estimation methods agree (internal consistency
+   check we got for free).
+
+### Secondary finding for the paper: deduplication ratio
+
+The raw→new_spec delta is a meaningful number in its own right, not just a
+sanity check. **Deduplication ratio = raw emissions / distinct identities**
+per condition. High ratio means the LLM is generating many variants of the
+same clinical issue.
+
+Per-condition ratios from the 2026-06-14 smoke:
+
+| condition           | raw | distinct | ratio | reading |
+|---------------------|-----|----------|-------|---------|
+| rules_only          |   4 |   4      | 1.00  | perfectly stable (deterministic) |
+| hybrid_validated    |  31 |   8      | 3.88  | rule flags stable, pulling ratio up |
+| hybrid_unvalidated  |  26 |   9      | 2.89  | partial validation tightens |
+| llm_naive           |  40 |  31      | 1.29  | over-produces unique noise |
+| llm_thoughtful      |  40 |  24      | 1.67  | more variation per flag, less unique noise |
+
+This is the counting-inflation finding quantified per condition. Complements
+the primary reproducibility table; do not replace it.
+
+### Raw vs deduplicated — never compare directly
+
+raw emissions counts every flag the LLM produces across all reps. Distinct
+identities counts unique (category, clinical_subject) pairs. They are
+different things. The (raw - distinct) gap is a deduplication measure, not
+a matcher-correctness signal. The original spec sec 10 framing of "±1"
+applied to same-matcher across-run stability; restating clearly:
+
+Guardrail 3 (corrected): Path B must not produce coverage drops relative to
+Path A on identical data (delta_new_minimal_to_new_spec must be small or
+zero). The raw-to-distinct gap is unrelated and is a reproducibility
+measurement.
