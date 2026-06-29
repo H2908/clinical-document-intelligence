@@ -1,0 +1,58 @@
+{
+  "patient_id": "patient_006",
+  "patient_name": "Robert Patel",
+  "patient_dob": "1964-11-03",
+  "patient_nhs": "999 600 0006",
+  "construction_date": "2026-06-28",
+  "schema_version": "v2_three_tier",
+  "design_principle": "T2DM case with planted medication-reconciliation contradiction. Secondary care (diabetes clinic, doc 02) initiates dapagliflozin 10 mg OD with explicit start date 12 Feb 2024. Primary care (doc 03, Jun 2024) records the medication list without dapagliflozin AND with gliclazide added (gliclazide does not appear in any clinic letter). Documents are chronologically distinct (Nov 2023, Feb 2024, Jun 2024) and from different settings (GP / diabetes clinic / GP), targeting pairwise content-token Jaccard < 0.5.",
+  "tier_definitions": {
+    "1_gold_must_catch": "A competent clinician would consider missing this an error.",
+    "2_acceptable_credit_neutral": "Clinically correct, guideline-supported, but not an error to omit. Neither a coverage hit nor a precision penalty when emitted.",
+    "3_wrong": "Fabrications or ungrounded flags (measured at evaluation time; not pre-recorded)."
+  },
+  "needs_clinician_validation": true,
+  "validation_notes": "Tier 1 vs Tier 2 boundary requires clinical judgement. The boundaries below are our best construction-time guess. Awaiting clinical review.",
+  "gold_flags": [
+    {
+      "tier": 1,
+      "category": "MEDICATION_RECONCILIATION",
+      "clinical_subject": "dapagliflozin",
+      "severity": "HIGH",
+      "rationale": "Doc 02 (diabetes clinic, Feb 2024) explicitly initiates dapagliflozin 10 mg OD from 12 Feb 2024 with detailed counselling documented. Doc 03 (GP, Jun 2024) records the medication list with NO mention of dapagliflozin. This is a medication-reconciliation failure: the GP record does not reflect the specialist-initiated drug. Missing this is a HIGH-severity safety issue - DKA risk on SGLT2 inhibitors requires GP awareness, and if the patient runs out of dapagliflozin without the GP record showing it, repeat prescribing fails.",
+      "expected_source_document": "02_Diabetes_Clinic_Patel_09Feb2024.pdf"
+    },
+    {
+      "tier": 1,
+      "category": "MEDICATION_RECONCILIATION",
+      "clinical_subject": "gliclazide",
+      "severity": "MEDIUM",
+      "rationale": "Doc 03 (GP, Jun 2024) records gliclazide 80 mg BD in the medication list. Neither doc 01 (Nov 2023 GP review) nor doc 02 (Feb 2024 diabetes clinic) documents starting gliclazide. The drug appears in the GP record without any explicit initiation event in the document set. This is the inverse reconciliation failure: a drug appearing in primary care without corresponding specialist initiation, which could indicate (a) a separate consultation not captured here, (b) a prescribing error, or (c) medication-list drift.",
+      "expected_source_document": "03_GP_Hypertension_Review_Patel_18Jun2024.pdf"
+    },
+    {
+      "tier": 1,
+      "category": "OVERDUE_FOLLOWUP",
+      "clinical_subject": "type 2 diabetes",
+      "severity": "MEDIUM",
+      "rationale": "Last diabetes-specific review is doc 02 (09 Feb 2024). Doc 03 (Jun 2024) is a hypertension review and only incidentally addresses diabetes via capillary glucose. At evaluation time (mid-2026) this is well over the 90-day OVERDUE_FOLLOWUP threshold for a patient with HbA1c 8.7% on dual therapy.",
+      "expected_source_document": "02_Diabetes_Clinic_Patel_09Feb2024.pdf"
+    },
+    {
+      "tier": 2,
+      "category": "AI_INVESTIGATION_NO_RESULT",
+      "clinical_subject": "hba1c",
+      "severity": "MEDIUM",
+      "rationale": "Doc 02 plans repeat HbA1c at 3 months. Doc 03 (4 months later) does not record the result of that planned HbA1c. The 3-month dapagliflozin response is a load-bearing measurement that should have been recorded. Acceptable for the system to flag this; acceptable to omit because inference of 'no result' requires cross-document reasoning.",
+      "needs_clinician_validation": true
+    },
+    {
+      "tier": 2,
+      "category": "AI_DOSE_CONCERN",
+      "clinical_subject": "ramipril",
+      "severity": "LOW",
+      "rationale": "Doc 03 documents a postural BP drop of 16 mmHg with morning dizziness. Ramipril was titrated from 5 to 10 mg OD between doc 01 and doc 02. The plan in doc 03 considers reducing ramipril if symptoms persist - the system flagging this as a dose-concern observation is clinically supported but lower-priority.",
+      "needs_clinician_validation": true
+    }
+  ]
+}

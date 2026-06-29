@@ -1,0 +1,22 @@
+{
+  "patient_id": "patient_006",
+  "construction_date": "2026-06-28",
+  "schema_version": "v2_claim_based_matching",
+  "match_rule": "A gold contradiction is satisfied if the agent emits a contradiction where one side cites any document in claim_a_sources and the other side cites any document in claim_b_sources. The clinical fact is what matters, not which specific document-pair is cited.",
+  "gold_contradictions": [
+    {
+      "category": "MEDICATION_LIST_RECONCILIATION",
+      "severity": "HIGH",
+      "claim_a": "patient is on dapagliflozin 10 mg OD (specialist-initiated 12 Feb 2024)",
+      "claim_b": "patient's medication list does not include dapagliflozin (Jun 2024 GP record)",
+      "claim_a_sources": [
+        "02_Diabetes_Clinic_Patel_09Feb2024.pdf"
+      ],
+      "claim_b_sources": [
+        "03_GP_Hypertension_Review_Patel_18Jun2024.pdf"
+      ],
+      "explanation": "Doc 02 is the explicit initiation event for dapagliflozin with start date, dose, and counselling all documented. Doc 03, four months later, records the GP-held medication list without dapagliflozin. The contradiction is a real EHR failure mode: specialist letters do not always result in primary care record updates, leading to medication reconciliation failures at the patient-list level. The agent should detect this as a substantive contradiction about the patient's current medication regime.",
+      "rationale_for_planting": "Tests whether the contradiction agent detects medication-list disagreement across primary and secondary care - the most common real-world medication reconciliation failure mode. Unlike patient_001's allergy contradiction (symmetric NKDA vs allergy), this contradiction is asymmetric: doc 02 asserts a drug exists; doc 03's silence is the disagreement. Tests the agent's ability to reason about absence-as-claim."
+    }
+  ]
+}
