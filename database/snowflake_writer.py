@@ -15,13 +15,7 @@ Functions:
     refresh_summary(pat)                -> None   -> SP_REFRESH_SUMMARY
     delete_patient(pat)                 -> dict   -> SP_DELETE_PATIENT (GDPR)
 
-    # Identity layer (Problem 1 — landing/login/register PR)
-    register_user(token, email, hash, name) -> dict -> SP_REGISTER_USER
-    authenticate_user(email)                -> dict -> SP_AUTHENTICATE_USER
-    issue_invite_token(tenant_id, role)     -> dict -> SP_ISSUE_INVITE_TOKEN
-    record_login(user_id)                   -> None
-
-Called by: worker/document_processor.py, agents/*, api/routes/auth.py
+Called by: worker/document_processor.py, agents/*
 """
 
 import os
@@ -405,141 +399,7 @@ def delete_patient(patient_id: str) -> dict:
         conn.close()
 
 
-# ══════════════════════════════════════════════════════════════════
-# IDENTITY LAYER (Problem 1 — landing/login/register)
-# ══════════════════════════════════════════════════════════════════
-
-
-def _identity_conn():
-    """Snowflake connection scoped to identity schema. Mirrors
-    snowflake_writer._get_connection style but with schema='identity'."""
-    return snowflake.connector.connect(
-        account=os.environ["SNOWFLAKE_ACCOUNT"],
-        user=os.environ["SNOWFLAKE_USER"],
-        password=os.environ["SNOWFLAKE_PASSWORD"],
-        database="clinical_db",
-        schema="identity",
-        warehouse="clinical_wh",
-        role=os.environ["SNOWFLAKE_ROLE"],
-    )
-
-
-def register_user(
-    token: str,
-    email: str,
-    password_hash: str,
-    display_name: str,
-) -> dict:
-    """Call SP_REGISTER_USER and return the JSON result dict.
-
-    Returns one of:
-        {user_id, tenant_id, role}    on success
-        {error, message}              on failure
-    """
-    conn = _identity_conn()
-    try:
-        cur = conn.cursor()
-        sql = (
-            "CALL clinical_db.identity.SP_REGISTER_USER("
-            f"'{token.replace(chr(39), chr(39) * 2)}', "
-            f"'{email.replace(chr(39), chr(39) * 2)}', "
-            f"'{password_hash.replace(chr(39), chr(39) * 2)}', "
-            f"'{display_name.replace(chr(39), chr(39) * 2)}')"
-        )
-        result = cur.execute(sql).fetchone()
-        # SP returns its JSON as the first column of the first row
-        payload = json.loads(result[0]) if isinstance(result[0], str) else result[0]
-        return payload
-    except Exception as e:
-        raise RuntimeError(f"register_user failed: {e}") from e
-    finally:
-        conn.close()
-
-
-def authenticate_user(email: str) -> dict:
-    """Call SP_AUTHENTICATE_USER. Returns dict with user_id, tenant_id,
-    password_hash, display_name, role — or {error: 'not_found'}."""
-    conn = _identity_conn()
-    try:
-        cur = conn.cursor()
-        sql = (
-            "CALL clinical_db.identity.SP_AUTHENTICATE_USER("
-            f"'{email.replace(chr(39), chr(39) * 2)}')"
-        )
-        result = cur.execute(sql).fetchone()
-        payload = json.loads(result[0]) if isinstance(result[0], str) else result[0]
-        return payload
-    except Exception as e:
-        raise RuntimeError(f"authenticate_user failed: {e}") from e
-    finally:
-        conn.close()
-
-
-def issue_invite_token(
-    tenant_id: str,
-    role: str = "doctor",
-    ttl_seconds: int = 604800,
-) -> dict:
-    """Admin: produce a 32-char URL-safe invite token bound to tenant_id.
-
-    Returns dict {token, tenant_id, role, expires_at} or
-    {error, message}.
-    """
-    conn = _identity_conn()
-    try:
-        cur = conn.cursor()
-        sql = (
-            "CALL clinical_db.identity.SP_ISSUE_INVITE_TOKEN("
-            f"'{tenant_id.replace(chr(39), chr(39) * 2)}', "
-            f"'{role}', {int(ttl_seconds)})"
-        )
-        result = cur.execute(sql).fetchone()
-        payload = json.loads(result[0]) if isinstance(result[0], str) else result[0]
-        return payload
-    except Exception as e:
-        raise RuntimeError(f"issue_invite_token failed: {e}") from e
-    finally:
-        conn.close()
-
-
-def record_login(user_id: str) -> None:
-    """Update users.last_login_at = CURRENT_TIMESTAMP for the given user.
-    Best-effort: an error here should not block sign-in.
-    """
-    try:
-        conn = _identity_conn()
-        try:
-            cur = conn.cursor()
-            cur.execute(
-                "UPDATE clinical_db.identity.users "
-                "SET last_login_at = CURRENT_TIMESTAMP() WHERE user_id = %s",
-                (user_id,),
-            )
-            conn.commit()
-        finally:
-            conn.close()
-    except Exception as e:
-        # Non-fatal: log via stderr; do not raise.
-        import sys
-        print(f"[snowflake_writer] record_login: warning {e}", file=sys.stderr)
-
-
-def create_tenant(tenant_id: str, slug: str, name: str) -> None:
-    """Admin: insert one row into identity.tenants.
-    Used by onboarding scripts (script/seed_invite.py).
-    """
-    conn = _identity_conn()
-    try:
-        cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO clinical_db.identity.tenants (tenant_id, slug, name) "
-            "VALUES (%s, %s, %s)",
-            (tenant_id, slug, name),
-        )
-        conn.commit()
-    finally:
-        conn.close()
-
+# ---- Quick test ----
 if __name__ == "__main__":
     test_entities = [
         {"entity_type": "Diagnosis", "text": "dilated cardiomyopathy",
