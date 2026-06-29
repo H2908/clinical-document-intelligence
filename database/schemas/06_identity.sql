@@ -31,7 +31,7 @@ USE SCHEMA identity;
 create or replace table tenants (
     tenant_id    string primary key,
     slug         string unique not null,    -- e.g. 'demo-trust', 'kings-college'
-    name         string not null,           -- e.g. King's College Hospital NHS Trust
+    name         string not null,           -- 'King's College Hospital NHS Trust'
     created_at   timestamp_ntz default current_timestamp()
 );
 
