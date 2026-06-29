@@ -12,9 +12,9 @@
 --   ) RETURNS STRING  -- JSON: {user_id, tenant_id, role} or {error}
 --
 -- Error codes (returned in JSON):
---   'invalid_token'      — token does not exist, used, or expired
---   'email_taken'        — users.email already exists
---   'invalid_email'      — email is empty or not a valid form
+--   'invalid_token'      -- token does not exist, used, or expired
+--   'email_taken'        -- users.email already exists
+--   'invalid_email'      -- email is empty or not a valid form
 --
 -- Called by: api/routes/auth.py -> database/snowflake_writer.register_user
 -- ─────────────────────────────────────────────────────────────────
@@ -38,35 +38,35 @@ $$
     if (!PASSWORD_HASH) throw new Error("password_hash is required");
     if (!DISPLAY_NAME)  throw new Error("display_name is required");
 
-    // basic email shape check — application layer does fuller validation
+    // basic email shape check (full validation in api/auth.py)
     if (!/.+@.+\..+/.test(EMAIL)) {
         return JSON.stringify({error: "invalid_email", message: "Email format invalid"});
     }
 
-    // ── Tx body ──────────────────────────────────────────────────
     try {
         // 1. Validate invite token
         const tokStmt = snowflake.createStatement({
             sqlText: `SELECT tenant_id, role, used_by_user_id, expires_at
                       FROM identity.invite_tokens WHERE token = ? LIMIT 1`
         });
-        const tokRes = tokStmt.execute();
-        if (!tokStmt.getResultSet().next()) {
+        tokStmt.setParameter(1, TOKEN);
+        const tokRs = tokStmt.execute().getResultSet();
+        if (!tokRs.next()) {
             return JSON.stringify({error: "invalid_token", message: "Invite token not found"});
         }
-        tokRes.getColumnValue; // (the .next() above consumed the row)
 
-        const rs = tokStmt.getResultSet();
-        rs.next();
-        const tenant_id       = rs.getColumnValue("TENANT_ID");
-        const role            = rs.getColumnValue("ROLE");
-        const used_by_user_id = rs.getColumnValue("USED_BY_USER_ID");
-        const expires_at      = rs.getColumnValue("EXPIRES_AT");
+        const tenant_id       = tokRs.getColumnValue("TENANT_ID");
+        const role            = tokRs.getColumnValue("ROLE");
+        const used_by_user_id = tokRs.getColumnValue("USED_BY_USER_ID");
+        const expires_at_raw  = tokRs.getColumnValue("EXPIRES_AT");
 
         if (used_by_user_id !== null) {
             return JSON.stringify({error: "invalid_token", message: "Invite token already used"});
         }
-        if (new Date(expires_at).getTime() < Date.now()) {
+        const expires_ms = (expires_at_raw && expires_at_raw.getTime)
+            ? expires_at_raw.getTime()
+            : new Date(expires_at_raw).getTime();
+        if (expires_ms < Date.now()) {
             return JSON.stringify({error: "invalid_token", message: "Invite token expired"});
         }
 
@@ -75,19 +75,18 @@ $$
             sqlText: `SELECT 1 FROM identity.users WHERE email = ? LIMIT 1`
         });
         emailStmt.setParameter(1, EMAIL.toLowerCase());
-        if (emailStmt.execute().getResultSet().next()) {
+        const emailRs = emailStmt.execute().getResultSet();
+        if (emailRs.next()) {
             return JSON.stringify({error: "email_taken", message: "Email already registered"});
         }
 
-        // 3. Insert user with a UUID
-        const user_id = require('snowflake-sdk').uuid ? null : null; // (left to caller-supplied UUID via separate caller-side INSERT is also acceptable; here we generate inline)
-        const new_user_id = (function () {
-            // Simple UUIDv4 — Snowflake's snowflake-sdk exposes crypto; we
-            // generate ourselves so we don't need to import a heavy lib
-            function u() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1); }
-            return `${u()}${u()}-${u()}-4${u().substring(1)}-${u()}-${u()}${u()}${u()}`;
-        })();
+        // 3. Generate a UUID-shaped id (no crypto dep on snowflake-sdk)
+        function hex4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1); }
+        const new_user_id =
+            hex4() + hex4() + "-" + hex4() + "-4" + hex4().substring(1) +
+            "-" + hex4() + "-" + hex4() + hex4() + hex4();
 
+        // 4. Insert user
         const insUser = snowflake.createStatement({
             sqlText: `INSERT INTO identity.users
                         (user_id, tenant_id, email, password_hash, display_name, role)
@@ -101,7 +100,7 @@ $$
         insUser.setParameter(6, role);
         insUser.execute();
 
-        // 4. Mark invite consumed
+        // 5. Mark invite consumed
         const updTok = snowflake.createStatement({
             sqlText: `UPDATE identity.invite_tokens
                       SET used_by_user_id = ?, used_at = CURRENT_TIMESTAMP()
