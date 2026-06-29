@@ -1,24 +1,9 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-/**
- * Read the JWT from localStorage if available. We deliberately do this
- * lazily inside request() so a server-side render never reads it (and
- * never crashes when localStorage is absent).
- */
-function bearerHeader(): Record<string, string> {
-  if (typeof window === "undefined") return {};
-  const t = window.localStorage.getItem("auth_token");
-  return t ? { Authorization: `Bearer ${t}` } : {};
-}
-
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...bearerHeader(),
-      ...(init?.headers || {}),
-    },
+    headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
     cache: "no-store",
   });
   if (!res.ok) {
@@ -244,7 +229,6 @@ export const api = {
     const res = await fetch(`${API_URL}/patients/${id}/documents`, {
       method: "POST",
       body: form,
-      headers: bearerHeader(),
       cache: "no-store",
     });
     if (!res.ok) {
@@ -270,7 +254,6 @@ export const api = {
     const res = await fetch(`${API_URL}/patients/${id}/labs`, {
       method: "POST",
       body: form,
-      headers: bearerHeader(),
       cache: "no-store",
     });
     if (!res.ok) {
