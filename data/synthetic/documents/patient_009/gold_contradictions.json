@@ -1,0 +1,37 @@
+{
+  "patient_id": "patient_009",
+  "construction_date": "2026-06-28",
+  "schema_version": "v2_claim_based_matching",
+  "match_rule": "A gold contradiction is satisfied if the agent emits a contradiction where one side cites any document in claim_a_sources and the other side cites any document in claim_b_sources. The clinical fact is what matters, not which specific document-pair is cited.",
+  "gold_contradictions": [
+    {
+      "category": "SEVERITY_CLASSIFICATION",
+      "severity": "HIGH",
+      "claim_a": "asthma classified as moderate persistent (GINA step 3) with explicit clinical justification",
+      "claim_b": "asthma classified as mild",
+      "claim_a_sources": [
+        "02_Respiratory_Clinic_Bennett_22Aug2024.pdf"
+      ],
+      "claim_b_sources": [
+        "01_GP_Asthma_Review_Bennett_11Mar2024.pdf",
+        "03_AE_Discharge_Bennett_09Nov2024.pdf"
+      ],
+      "explanation": "Doc 01 (Mar 2024) classifies the patient as mild intermittent based on then-current symptom pattern. Doc 02 (Aug 2024) reclassifies as moderate persistent with comprehensive justification (ACT 15/25, PEFR variability 22%, FEV1 72%, reversibility 12%). Doc 03 (Nov 2024) records mild again in the past medical history without acknowledging the Aug reclassification. The contradiction is between the specialist reclassification (claim_a) and the primary/emergency-care record (claim_b). Doc 01's mild label is historically defensible (it pre-dates the reclassification); doc 03's mild label is the error.",
+      "rationale_for_planting": "Tests whether the contradiction agent detects disease-classification disagreement - a distinct shape from medication-list (patient_006) or allergy (patient_001) contradictions. Disease classification drives treatment ladders, so misclassification is a high-stakes EHR failure. The 1-vs-2 source split tests that the agent can identify the specialist reclassification as the authoritative claim, even though two documents support the alternative. Tests claim_a_sources=specialist vs claim_b_sources={primary, emergency} matching."
+    },
+    {
+      "category": "MEDICATION_HISTORY",
+      "severity": "HIGH",
+      "claim_a": "patient on beclometasone 200 mcg BD as established preventer since Aug 2024",
+      "claim_b": "beclometasone started today (Nov 2024) as new preventer",
+      "claim_a_sources": [
+        "02_Respiratory_Clinic_Bennett_22Aug2024.pdf"
+      ],
+      "claim_b_sources": [
+        "03_AE_Discharge_Bennett_09Nov2024.pdf"
+      ],
+      "explanation": "Doc 02 initiates beclometasone 200 mcg BD as preventer with explicit start. Doc 03 (3 months later) describes beclometasone as 'started today as new preventer inhaler'. These are contradictory claims about whether the patient is preventer-naive at the time of A&E presentation. Realistic of how A&E documentation often defaults to the patient's primary care record rather than cross-checking specialist letters.",
+      "rationale_for_planting": "A second contradiction in the same chart, distinct in category from the severity contradiction. Tests that the agent doesn't conflate two distinct disagreements into one. Also tests dose-stripped matching ('beclometasone' vs 'beclometasone 200 mcg BD') under Path B normalisation."
+    }
+  ]
+}
