@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import RequestValidationError, HTTPException
 import logging
 
 from api.routes import (
@@ -24,6 +24,7 @@ from api.routes import (
     timeline,
     jobs,
     fhir,
+    auth,
 )
 
 # ----------------------------------------------------------------------
@@ -99,6 +100,26 @@ async def validation_handler(_: Request, exc: RequestValidationError):
     )
 
 
+@app.exception_handler(HTTPException)
+async def http_exception_handler(_: Request, exc: HTTPException):
+    """
+    Normalise HTTPException -> the contract error envelope
+        {"error": {"code": ..., "message": ...}}
+
+    Routes raise HTTPException(detail={"error": {"code", "message"}})
+    already in the canonical shape, so we just unwind FastAPI's
+    default {"detail": ...} wrapper.
+    """
+    detail = exc.detail
+    if isinstance(detail, dict) and "error" in detail:
+        # Already in our envelope — pass through (drops the "detail" wrapper)
+        body = detail
+    else:
+        # Generic HTTPException (status-only or string detail) — synthesise
+        body = error_body(f"http_{exc.status_code}", str(detail))
+    return JSONResponse(status_code=exc.status_code, content=body)
+
+
 @app.exception_handler(404)
 async def not_found_handler(_: Request, __):
     return JSONResponse(
@@ -135,6 +156,7 @@ app.include_router(briefing.router,        prefix="/api", tags=["briefing"])
 app.include_router(timeline.router, prefix="/api", tags=["timeline"])
 app.include_router(jobs.router,     prefix="/api", tags=["jobs"])
 app.include_router(fhir.router,     prefix="/api", tags=["fhir"])
+app.include_router(auth.router,     prefix="/api", tags=["auth"])
 
 # ----------------------------------------------------------------------
 # Health

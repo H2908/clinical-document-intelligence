@@ -1,11 +1,12 @@
 """
-Snowflake reader — reads patient state from CORE for the agent orchestrator.
+Snowflake reader — reads patient state from CORE for the agent orchestrator
+and identity state from IDENTITY for the auth layer.
 
 Owner: DE member (this file drafted by ML, needs DE review for column-name
        alignment with the actual schema).
-Used by: agents/orchestrator.py
+Used by: agents/orchestrator.py, api/routes/auth.py
 
-Contract: see docs/DB_SCHEMA.md §7.
+Contract: see docs/DB_SCHEMA.md §7 (CORE) and CONTRACT.md §1.4 (IDENTITY).
 """
 
 from __future__ import annotations
@@ -165,6 +166,132 @@ def read_observations_for_patient(patient_id: str) -> list[dict[str, Any]]:
     except Exception as e:
         log.exception("read_observations_for_patient failed for %s", patient_id)
         raise RuntimeError(f"read_observations_for_patient failed: {e}") from e
+    finally:
+        conn.close()
+
+
+# ---------------------------------------------------------------------------
+# Identity layer reads (Problem 1 — landing/login/register PR)
+# ---------------------------------------------------------------------------
+
+def _identity_conn():
+    """Connection scoped to identity schema."""
+    return snowflake.connector.connect(
+        account=os.environ["SNOWFLAKE_ACCOUNT"],
+        user=os.environ["SNOWFLAKE_USER"],
+        password=os.environ["SNOWFLAKE_PASSWORD"],
+        database="clinical_db",
+        schema="identity",
+        warehouse="clinical_wh",
+        role=os.environ["SNOWFLAKE_ROLE"],
+    )
+
+
+def get_user_by_id(user_id: str) -> dict | None:
+    """Return {user_id, tenant_id, email, display_name, role, created_at}
+    or None when no row matches."""
+    log.info("get_user_by_id: %s", user_id)
+    conn = _identity_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """
+            select user_id, tenant_id, email, display_name, role, created_at
+            from clinical_db.identity.users
+            where user_id = %s
+            limit 1
+            """,
+            (user_id,),
+        )
+        rows = _rows_to_dicts(cur)
+        return rows[0] if rows else None
+    except Exception as e:
+        log.exception("get_user_by_id failed for %s", user_id)
+        raise RuntimeError(f"get_user_by_id failed: {e}") from e
+    finally:
+        conn.close()
+
+
+def get_tenant_by_slug(slug: str) -> dict | None:
+    """Return {tenant_id, slug, name} or None."""
+    log.info("get_tenant_by_slug: %s", slug)
+    conn = _identity_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "select tenant_id, slug, name from clinical_db.identity.tenants "
+            "where slug = %s limit 1",
+            (slug,),
+        )
+        rows = _rows_to_dicts(cur)
+        return rows[0] if rows else None
+    except Exception as e:
+        log.exception("get_tenant_by_slug failed for %s", slug)
+        raise RuntimeError(f"get_tenant_by_slug failed: {e}") from e
+    finally:
+        conn.close()
+
+
+def get_tenant_by_id(tenant_id: str) -> dict | None:
+    """Return {tenant_id, slug, name} or None."""
+    log.info("get_tenant_by_id: %s", tenant_id)
+    conn = _identity_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "select tenant_id, slug, name from clinical_db.identity.tenants "
+            "where tenant_id = %s limit 1",
+            (tenant_id,),
+        )
+        rows = _rows_to_dicts(cur)
+        return rows[0] if rows else None
+    except Exception as e:
+        log.exception("get_tenant_by_id failed for %s", tenant_id)
+        raise RuntimeError(f"get_tenant_by_id failed: {e}") from e
+    finally:
+        conn.close()
+
+
+def validate_invite_token(token: str) -> dict | None:
+    """Return {token, tenant_id, role, expires_at, used_by_user_id} for
+    a still-valid, unused token, or None.
+
+    Used to display a tenant-label preview on /register before the form
+    is submitted.
+    """
+    log.info("validate_invite_token: %s...", (token or "")[:6])
+    conn = _identity_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """
+            select token, tenant_id, role, expires_at, used_by_user_id
+            from clinical_db.identity.invite_tokens
+            where token = %s
+            limit 1
+            """,
+            (token,),
+        )
+        rows = _rows_to_dicts(cur)
+        if not rows:
+            return None
+        row = rows[0]
+        if row.get("used_by_user_id"):
+            return None
+        if row.get("expires_at") is None:
+            return None
+        # Compare expiry to now (Snowflake TIMESTAMP_NTZ comes back as datetime)
+        from datetime import datetime, timezone
+        exp = row["expires_at"]
+        if isinstance(exp, datetime):
+            if exp.tzinfo is None:
+                exp = exp.replace(tzinfo=timezone.utc)
+            if exp < datetime.now(timezone.utc):
+                return None
+        return row
+    except Exception as e:
+        log.exception("validate_invite_token failed")
+        raise RuntimeError(f"validate_invite_token failed: {e}") from e
     finally:
         conn.close()
 
