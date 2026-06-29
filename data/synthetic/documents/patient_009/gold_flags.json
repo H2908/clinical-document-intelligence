@@ -1,0 +1,58 @@
+{
+  "patient_id": "patient_009",
+  "patient_name": "Lauren Bennett",
+  "patient_dob": "1991-04-18",
+  "patient_nhs": "999 900 0009",
+  "construction_date": "2026-06-28",
+  "schema_version": "v2_three_tier",
+  "design_principle": "Asthma case with planted severity-classification contradiction. GP (doc 01, Mar 2024) classifies as mild intermittent on reliever-only regime. Respiratory clinic (doc 02, Aug 2024) reclassifies as moderate persistent with full justification (ACT, PEFR variability, FEV1) and initiates beclometasone preventer. A&E (doc 03, Nov 2024) records the asthma as 'mild' again and labels beclometasone as 'new today', erasing the August initiation. Documents span 8 months across primary, secondary, and emergency care settings, targeting pairwise content-token Jaccard < 0.5.",
+  "tier_definitions": {
+    "1_gold_must_catch": "A competent clinician would consider missing this an error.",
+    "2_acceptable_credit_neutral": "Clinically correct, guideline-supported, but not an error to omit. Neither a coverage hit nor a precision penalty when emitted.",
+    "3_wrong": "Fabrications or ungrounded flags (measured at evaluation time; not pre-recorded)."
+  },
+  "needs_clinician_validation": true,
+  "validation_notes": "Tier 1 vs Tier 2 boundary requires clinical judgement. The boundaries below are our best construction-time guess. Awaiting clinical review.",
+  "gold_flags": [
+    {
+      "tier": 1,
+      "category": "CLASSIFICATION_CONFLICT",
+      "clinical_subject": "asthma severity",
+      "severity": "HIGH",
+      "rationale": "Doc 02 (respiratory clinic, Aug 2024) reclassifies asthma as moderate persistent with explicit justification (ACT 15/25, PEFR variability 22%, FEV1 72% predicted, reversibility 12%). Doc 03 (A&E, Nov 2024) records asthma as 'mild' in the past medical history. The classification has regressed without clinical justification. Missing this is an error - severity classification drives the asthma management ladder; misclassifying moderate persistent as mild leads to under-treatment and avoidable exacerbations.",
+      "expected_source_document": "02_Respiratory_Clinic_Bennett_22Aug2024.pdf"
+    },
+    {
+      "tier": 1,
+      "category": "MEDICATION_HISTORY_ERROR",
+      "clinical_subject": "beclometasone",
+      "severity": "HIGH",
+      "rationale": "Doc 02 (Aug 2024) initiates beclometasone 200 mcg BD as preventer with full counselling and follow-up plan. Doc 03 (Nov 2024) labels beclometasone as 'started today as new preventer', erasing the 3-month preceding history. This is a medication-history error: the patient has been on the preventer for 3 months before A&E presentation. If treated as a newly-initiated drug, response monitoring and titration timelines reset incorrectly.",
+      "expected_source_document": "03_AE_Discharge_Bennett_09Nov2024.pdf"
+    },
+    {
+      "tier": 1,
+      "category": "OVERDUE_FOLLOWUP",
+      "clinical_subject": "asthma",
+      "severity": "MEDIUM",
+      "rationale": "Last respiratory-specific review is doc 02 (22 Aug 2024). Doc 03 explicitly states 'no respiratory clinic follow-up arranged' after the exacerbation. The 12-week respiratory clinic follow-up planned in doc 02 has not been documented. At evaluation time (mid-2026) this is well over the threshold for a patient who has had an exacerbation requiring oral steroids.",
+      "expected_source_document": "02_Respiratory_Clinic_Bennett_22Aug2024.pdf"
+    },
+    {
+      "tier": 2,
+      "category": "AI_TREATMENT_INADEQUATE_RESPONSE",
+      "clinical_subject": "asthma exacerbation",
+      "severity": "MEDIUM",
+      "rationale": "Patient on beclometasone 200 mcg BD preventer (started Aug 2024) presents with moderate exacerbation in Nov 2024. Per GINA step-up logic, an exacerbation on step 3 therapy suggests step-up to ICS/LABA combination. Doc 02 explicitly notes 'if poor response, consider step-up to ICS/LABA combination'. The Nov exacerbation is arguably that trigger. Acceptable for the system to flag; acceptable to omit because it requires reading the doc-02 plan.",
+      "needs_clinician_validation": true
+    },
+    {
+      "tier": 2,
+      "category": "AI_INVESTIGATION_NO_RESULT",
+      "clinical_subject": "pefr diary",
+      "severity": "LOW",
+      "rationale": "Doc 02 requests an 8-week PEFR diary continuation. Doc 03 (12 weeks later) makes no mention of the PEFR diary results or whether the patient continued recording. Acceptable to flag; acceptable to omit as cross-document inference.",
+      "needs_clinician_validation": true
+    }
+  ]
+}
