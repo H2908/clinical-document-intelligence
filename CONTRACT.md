@@ -143,51 +143,6 @@ CREATE OR REPLACE TABLE summary (
 );
 ```
 
-### 1.4 IDENTITY layer — `identity` schema
-
-Auth lives in its own schema and is intentionally decoupled from
-clinical data so multi-tenancy (Problem 2) can wire `users.tenant_id`
-into every clinical read without retrofitting the schema.
-
-```sql
-CREATE OR REPLACE TABLE identity.tenants (
-    tenant_id    STRING PRIMARY KEY,
-    slug         STRING UNIQUE NOT NULL,        -- 'demo-trust', 'kings-college'
-    name         STRING NOT NULL,               -- 'King's College Hospital NHS Trust'
-    created_at   TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
-);
-
-CREATE OR REPLACE TABLE identity.users (
-    user_id        STRING PRIMARY KEY,
-    tenant_id      STRING NOT NULL,
-    email          STRING UNIQUE NOT NULL,
-    password_hash  STRING NOT NULL,             -- bcrypt cost-12
-    display_name   STRING NOT NULL,
-    role           STRING NOT NULL DEFAULT 'doctor',  -- 'doctor' | 'admin'
-    created_at     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
-    last_login_at  TIMESTAMP_NTZ
-);
-
-CREATE OR REPLACE TABLE identity.invite_tokens (
-    token             STRING PRIMARY KEY,        -- 32-char URL-safe random
-    tenant_id         STRING NOT NULL,
-    role              STRING NOT NULL DEFAULT 'doctor',
-    used_by_user_id   STRING,
-    expires_at        TIMESTAMP_NTZ NOT NULL,
-    used_at           TIMESTAMP_NTZ,
-    created_at        TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
-    created_by        STRING
-);
-```
-
-#### 1.4.1 IDENTITY stored procedures
-
-| Procedure | Signature | Purpose |
-|---|---|---|
-| `identity.SP_REGISTER_USER` | `(token, email, password_hash, display_name) → STRING` | Atomic signup + token consume. Returns `{user_id, tenant_id, role}` or `{error, message}`. |
-| `identity.SP_AUTHENTICATE_USER` | `(email) → STRING` | Returns `{user_id, tenant_id, password_hash, display_name, role}` or `{error: "not_found"}`. Password verify is done in `api/auth.py` with bcrypt. |
-| `identity.SP_ISSUE_INVITE_TOKEN` | `(tenant_id, role, ttl_seconds) → STRING` | Admin-side: produce a fresh 32-char token. Returns `{token, tenant_id, role, expires_at}`. |
-
 ### 1.3 MART layer — views for frontend
 
 ```sql
@@ -715,110 +670,6 @@ Response 200:
 }
 ```
 
-### 3.11 Auth endpoints (Problem 1)
-
-Auth endpoints are how a clinician acquires a JWT. They are the ONLY
-routes that do not require `X-API-Key` — they pre-date it. After
-successful register/login, subsequent calls include
-`Authorization: Bearer <jwt>`.
-
-JWT format: HS256, payload `{sub, tid, role, email, iat, exp}`,
-12-hour TTL. Secret from env var `JWT_SECRET`; missing env var in
-dev logs a warning and uses an ephemeral per-process secret.
-
-```
-POST /api/auth/register
-Content-Type: application/json
-
-Request:
-{
-  "token":        "a8Kp2QwL9XrN4bYc7vMzT3jH6dF5gU1q",
-  "email":        "alice@nhs.uk",
-  "password":     "correcthorse1",     # ≥10 chars, ≥1 letter, ≥1 digit
-  "display_name": "Dr Alice Patel"
-}
-
-Response 201:
-{
-  "token": "eyJ…",
-  "user": {
-    "user_id":      "u_0001",
-    "tenant_id":    "t_demo",
-    "email":        "alice@nhs.uk",
-    "display_name": "Dr Alice Patel",
-    "role":         "doctor"
-  }
-}
-
-Response 400: {error: {code: "invalid_token" | "weak_password" | "invalid_email", message: …}}
-Response 409: {error: {code: "email_taken",         message: …}}
-```
-
-```
-POST /api/auth/login
-Content-Type: application/json
-
-Request:
-{
-  "email":    "alice@nhs.uk",
-  "password": "correcthorse1"
-}
-
-Response 200: same shape as /auth/register response.
-Response 401: {error: {code: "invalid_credentials", message: …}}
-```
-
-```
-GET /api/auth/me
-Authorization: Bearer <jwt>
-
-Response 200:
-{
-  "user_id":      "u_0001",
-  "tenant_id":    "t_demo",
-  "email":        "alice@nhs.uk",
-  "display_name": "Dr Alice Patel",
-  "role":         "doctor"
-}
-
-Response 401: {error: {code: "INVALID_TOKEN" | "TOKEN_EXPIRED", message: …}}
-```
-
-```
-GET /api/auth/invite-preview?token=<token>
-
-Response 200 (valid):
-{
-  "valid":       true,
-  "tenant_id":   "t_demo",
-  "tenant_slug": "demo-trust",
-  "tenant_name": "Demo NHS Trust",
-  "role":        "doctor"
-}
-
-Response 200 (invalid):
-{
-  "valid": false
-}
-```
-
-#### 3.11.1 Invite token lifecycle
-
-1. **Seed tenant** — admin runs
-   `python -m scripts.seed_tenant --slug demo-trust --name "Demo NHS Trust"`.
-2. **Issue token** — admin runs
-   `python -m scripts.issue_invite --tenant demo-trust --role doctor`.
-   Script prints a 32-char token; admin copy-pastes it into a welcome
-   email / WhatsApp / printed slip. Or sends the magic link
-   `<APP_URL>/register?invite=<token>`.
-3. **Consume** — clinician visits `/register`, pastes the token (or
-   follows the link so the field is pre-filled), completes the form.
-   `SP_REGISTER_USER` atomically inserts the user and marks the token
-   consumed (`used_by_user_id`, `used_at`).
-4. **Session** — frontend stores the JWT in `localStorage` and a
-   parallel non-HttpOnly `auth_token` cookie so `proxy.ts` (Next.js 16
-   server-side gate) can read it. TTL: 12 hours.
-
 ---
 
 ## 4. Error Response Format
@@ -873,11 +724,6 @@ ANTHROPIC_API_KEY=sk-ant-xxx
 API_KEY=dev-key-123
 API_PORT=8000
 WORKER_CONCURRENCY=2
-
-# Auth (Problem 1)
-JWT_SECRET=change-me-in-production
-JWT_TTL_SECONDS=43200                # 12 hours
-PUBLIC_APP_URL=http://localhost:3000 # used by scripts/issue_invite.py
 
 # Frontend
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
