@@ -1,0 +1,58 @@
+{
+  "patient_id": "patient_013",
+  "patient_name": "Christopher Walsh",
+  "patient_dob": "1959-09-27",
+  "patient_nhs": "999 130 0013",
+  "construction_date": "2026-06-29",
+  "schema_version": "v2_three_tier",
+  "design_principle": "CKD case with planted staging-classification contradiction. GP (doc 01, Jan 2024) records CKD stage 3a with eGFR 52. Renal clinic (doc 02, May 2024) measures eGFR 28 and reclassifies as CKD stage 4 with comprehensive management plan (vaccination, vascular access planning, low-K diet, anaemia workup, metformin hold). GP locum (doc 03, Oct 2024) records CKD stage 3a again with eGFR 35 - both the stage label and the eGFR value disagree with the May renal clinic finding. Realistic of how locum staff fail to incorporate specialist reclassifications. Documents span 9 months across primary and secondary care, targeting pairwise content-token Jaccard < 0.5. Exercises Path B measurement-value preservation: eGFR values must NOT collapse under normalisation.",
+  "tier_definitions": {
+    "1_gold_must_catch": "A competent clinician would consider missing this an error.",
+    "2_acceptable_credit_neutral": "Clinically correct, guideline-supported, but not an error to omit. Neither a coverage hit nor a precision penalty when emitted.",
+    "3_wrong": "Fabrications or ungrounded flags (measured at evaluation time; not pre-recorded)."
+  },
+  "needs_clinician_validation": true,
+  "validation_notes": "Tier 1 vs Tier 2 boundary requires clinical judgement. The boundaries below are our best construction-time guess. Awaiting clinical review.",
+  "gold_flags": [
+    {
+      "tier": 1,
+      "category": "CLASSIFICATION_CONFLICT",
+      "clinical_subject": "ckd stage",
+      "severity": "HIGH",
+      "rationale": "Doc 02 (renal clinic, May 2024) explicitly reclassifies CKD as stage 4 (eGFR 28) with comprehensive justification and updated management plan. Doc 03 (GP locum, Oct 2024) records CKD stage 3a in the active conditions list. The classification has regressed without clinical justification. Missing this is unambiguously an error - stage 4 vs stage 3a drives fundamentally different management (vaccination programme, vascular access planning, dietitian referral, metformin contraindication assessment, transplant workup eligibility). The locum has rolled back the renal team's reclassification.",
+      "expected_source_document": "02_Renal_Clinic_Walsh_14May2024.pdf"
+    },
+    {
+      "tier": 1,
+      "category": "INVESTIGATION_VALUE_CONFLICT",
+      "clinical_subject": "egfr",
+      "severity": "HIGH",
+      "rationale": "Doc 02 records eGFR 28 (May 2024). Doc 03 records eGFR 35 (Oct 2024) without any documented intervention that would explain the apparent improvement. eGFR improvements from 28 to 35 over 5 months are clinically implausible without specific intervention (hydration correction post-AKI, removal of nephrotoxin, etc) - none of which are documented. This is either a measurement error, a lab/transcription error, or a different eGFR-estimating equation in use. Either way, the discrepancy is clinically meaningful and should be flagged.",
+      "expected_source_document": "03_GP_Locum_Walsh_22Oct2024.pdf"
+    },
+    {
+      "tier": 1,
+      "category": "MEDICATION_RECONCILIATION",
+      "clinical_subject": "metformin",
+      "severity": "HIGH",
+      "rationale": "Doc 02 (renal clinic, May 2024) explicitly says 'Hold metformin and review for alternative agent given eGFR 28 (close to contraindication threshold of 30)'. Doc 03 (GP locum, Oct 2024) shows metformin 1 g BD still on the current medication list with no mention of the renal team's hold instruction. Metformin in stage 4 CKD carries lactic acidosis risk. The hold instruction has not been actioned.",
+      "expected_source_document": "02_Renal_Clinic_Walsh_14May2024.pdf"
+    },
+    {
+      "tier": 1,
+      "category": "OVERDUE_FOLLOWUP",
+      "clinical_subject": "chronic kidney disease",
+      "severity": "MEDIUM",
+      "rationale": "Doc 02 plans renal clinic follow-up at 3 months (August 2024). No record of this follow-up exists in the document set. Doc 03 (October locum visit) makes no reference to the renal clinic plan and arranges only routine GP follow-up in 6 months. At evaluation time the patient with progressive CKD stage 4 has had no specialist input in over a year.",
+      "expected_source_document": "02_Renal_Clinic_Walsh_14May2024.pdf"
+    },
+    {
+      "tier": 2,
+      "category": "AI_TREATMENT_INADEQUATE_RESPONSE",
+      "clinical_subject": "anaemia of ckd",
+      "severity": "MEDIUM",
+      "rationale": "Doc 02 documents Hb 108 g/L with plan for iron studies and ESA consideration if Hb<100. Doc 03 (5 months later) records Hb 106 g/L with only an iron studies request - no progression of the anaemia workup or ESA discussion. Acceptable for the system to flag inadequate response to the doc-02 plan; acceptable to omit as it requires reading the doc-02 plan to recognise.",
+      "needs_clinician_validation": true
+    }
+  ]
+}

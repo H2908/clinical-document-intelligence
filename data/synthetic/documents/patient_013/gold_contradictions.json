@@ -1,0 +1,37 @@
+{
+  "patient_id": "patient_013",
+  "construction_date": "2026-06-29",
+  "schema_version": "v2_claim_based_matching",
+  "match_rule": "A gold contradiction is satisfied if the agent emits a contradiction where one side cites any document in claim_a_sources and the other side cites any document in claim_b_sources. The clinical fact is what matters, not which specific document-pair is cited.",
+  "gold_contradictions": [
+    {
+      "category": "STAGE_CLASSIFICATION",
+      "severity": "HIGH",
+      "claim_a": "CKD stage 4 (eGFR 28)",
+      "claim_b": "CKD stage 3a",
+      "claim_a_sources": [
+        "02_Renal_Clinic_Walsh_14May2024.pdf"
+      ],
+      "claim_b_sources": [
+        "01_GP_CKD_Review_Walsh_16Jan2024.pdf",
+        "03_GP_Locum_Walsh_22Oct2024.pdf"
+      ],
+      "explanation": "Doc 01 (Jan 2024) classifies as CKD stage 3a based on eGFR 52 - historically defensible at that point. Doc 02 (May 2024) reclassifies as CKD stage 4 with comprehensive justification (eGFR 28, repeated measurement, complete CKD-MBD and anaemia workup, ultrasound). Doc 03 (Oct 2024) records CKD stage 3a again, rolling back the specialist reclassification. The contradiction is between the renal clinic (claim_a) and the GP records (claim_b). Doc 01's stage 3a is historical truth at the time; doc 03's stage 3a is the error that does not incorporate the May reclassification.",
+      "rationale_for_planting": "Tests whether the contradiction agent detects lab-value-driven disease-stage disagreement. Distinct from patient_009's text-narrative severity contradiction (mild/moderate/severe asthma) because CKD staging is anchored to eGFR cutoffs (stage 3a: 45-59, stage 3b: 30-44, stage 4: 15-29). The agent should recognise that 'stage 3a' and 'stage 4' are concrete, lab-anchored categories whose disagreement is a substantive clinical contradiction, not paraphrase. Also tests 1-vs-2 source split (specialist vs two primary care records)."
+    },
+    {
+      "category": "INVESTIGATION_VALUE",
+      "severity": "MEDIUM",
+      "claim_a": "eGFR 28 mL/min/1.73m2 (May 2024 renal clinic)",
+      "claim_b": "eGFR 35 mL/min/1.73m2 (Oct 2024 GP locum)",
+      "claim_a_sources": [
+        "02_Renal_Clinic_Walsh_14May2024.pdf"
+      ],
+      "claim_b_sources": [
+        "03_GP_Locum_Walsh_22Oct2024.pdf"
+      ],
+      "explanation": "Both measurements are 'current eGFR' but recorded 5 months apart. eGFR increases of this magnitude in established CKD with no documented intervention are clinically implausible. The contradiction is not the time gap (CKD trajectory can vary) but the absence of an intervening clinical narrative explaining the apparent improvement. Either lab error, measurement-equation change, or transcription error - all clinically meaningful.",
+      "rationale_for_planting": "Tests measurement-value contradictions where the values themselves are the contradiction (not derived classifications). Also tests Path B's measurement-value preservation: the matcher must NOT collapse eGFR 28 and eGFR 35 into a single 'egfr' identity because the dose-stripping regex requires a unit token (mg/mcg/g/ml/units/iu) which eGFR lacks. If Path B over-merges here, both values disappear into one and the contradiction is invisible to the matcher."
+    }
+  ]
+}
