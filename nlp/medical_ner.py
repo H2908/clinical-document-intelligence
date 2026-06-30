@@ -55,6 +55,18 @@ DRUG_NAMES: set[str] = {
     "beclometasone", "furosemide", "gliclazide", "levothyroxine",
     "metformin", "omeprazole", "ramipril", "salbutamol", "sertraline",
     "spironolactone", "tiotropium", "alendronic acid", "adcal-d3",
+    # SGLT2 inhibitors (added: found in synthetic patient_006 plan section)
+    "dapagliflozin", "empagliflozin", "canagliflozin", "ertugliflozin",
+    # GLP-1 receptor agonists
+    "semaglutide", "liraglutide", "dulaglutide", "exenatide",
+    # Respiratory
+    "ipratropium", "tiotropium", "formoterol", "salmeterol",
+    "budesonide", "fluticasone", "prednisolone",
+    # Cardiology / HF
+    "sacubitril", "valsartan", "eplerenone", "ivabradine",
+    "dapagliflozin", "empagliflozin",
+    # CKD / nephrology
+    "cinacalcet", "sevelamer", "alfacalcidol",
 }
 
 CONFLICT_MARKERS: set[str] = {
@@ -245,7 +257,22 @@ def _classify_span(span_text: str) -> EntityType | None:
     if first_token in DRUG_NAMES:
         return "Drug"
 
+    # Diagnosis-noun compounds containing allerg* are diagnoses, not conflicts.
+    # e.g. "allergic rhinitis", "seasonal allergic rhinitis", "allergic asthma"
+    _DIAG_NOUN_RE = re.compile(
+        r"allerg\w*\s+(?:rhinitis|conjunctivitis|asthma|dermatitis"
+        r"|eczema|urticaria|bronchitis|sinusitis)",
+        re.IGNORECASE,
+    )
+    if _DIAG_NOUN_RE.search(lower):
+        return "Diagnosis"
+
     # Conflict markers
+    import re as _re2
+    _diag_nouns = r"\ballerg\w*\s+(?:rhinitis|conjunctivitis|asthma|dermatitis|eczema|urticaria|bronchitis|sinusitis)\b"
+    if _re2.search(_diag_nouns, lower, _re2.IGNORECASE):
+        return "Diagnosis"
+
     if any(m in lower for m in CONFLICT_MARKERS):
         return "Conflict"
 
@@ -400,27 +427,76 @@ def _find_drugs_by_dictionary(text: str) -> list[Entity]:
             ))
     return found
 
+
+def _find_conditions_by_pattern(text: str) -> list[Entity]:
+    """Pattern-based condition extraction for disease-classification
+    statements that scispaCy en_core_sci_sm misses."""
+    import re as _re
+    PATS = [
+        _re.compile(
+            r"\b(mild\s+intermittent|mild\s+persistent|moderate\s+persistent|severe\s+persistent)\s+asthma\b",
+            _re.IGNORECASE,
+        ),
+        _re.compile(r"\bCKD\s+stage\s+[1-5][ab]?\b", _re.IGNORECASE),
+        _re.compile(
+            r"\bchronic\s+kidney\s+disease\s+stage\s+[1-5][ab]?\b",
+            _re.IGNORECASE,
+        ),
+        _re.compile(r"\bHF(?:rEF|pEF|mrEF)\b"),
+        _re.compile(r"\bNYHA\s+class\s+[IViv]+\b", _re.IGNORECASE),
+        _re.compile(r"\bGOLD\s+(?:stage\s+)?[1-4]\b", _re.IGNORECASE),
+    ]
+    found: list[Entity] = []
+    for pat in PATS:
+        for match in pat.finditer(text):
+            span = match.group(0)
+            if "\n" in span or "\r" in span:
+                continue
+            found.append(Entity(
+                entity_type="Diagnosis",
+                text=span,
+                start_offset=match.start(),
+                end_offset=match.end(),
+                negated=False,
+                icd10_code=None,
+                bnf_code=None,
+                normalised_value=span.lower().strip(),
+            ))
+    return found
+
 def _find_conflicts_by_dictionary(text: str) -> list[Entity]:
+    """Independent conflict/allergy pass - catches what scispaCy misses.
+    Matches allergy-related terms so the negation detector has something
+    to mark in "no known drug allergies" sentences.
     """
-    Independent conflict/allergy pass — catches what scispaCy misses.
-    Matches allergy-related terms directly so the negation detector has
-    something to mark in 'no known drug allergies' sentences.
-    """
-    # Words that, when found, mean this span is allergy/conflict-related.
     CONFLICT_PHRASES = [
-        r"drug\s+allerg\w*",       # 'drug allergy', 'drug allergies'
-        r"\ballerg\w+",            # 'allergy', 'allergies', 'allergic'
-        r"\bintoleran\w+",         # 'intolerance', 'intolerant'
+        r"drug\s+allerg\w*",
+        r"\ballerg\w+",
+        r"\bintoleran\w+",
         r"\bNKDA\b",
         r"\bNKA\b",
     ]
+    # Diagnosis compounds containing allerg* are NOT allergy-conflict
+    # markers (e.g. "allergic rhinitis", "allergic asthma").
+    DIAGNOSIS_NOUNS_RE = re.compile(
+        r"\ballerg\w*\s+(?:rhinitis|conjunctivitis|asthma|dermatitis|eczema|urticaria|bronchitis|sinusitis)\b",
+        re.IGNORECASE,
+    )
     found: list[Entity] = []
     for pat in CONFLICT_PHRASES:
         for match in re.finditer(pat, text, flags=re.IGNORECASE):
             start, end = match.start(), match.end()
+            span_text = text[start:end]
+            # Skip paragraph-boundary bleed
+            if "\n" in span_text or "\r" in span_text:
+                continue
+            # Skip diagnosis compounds
+            context = text[max(0, start - 5):min(len(text), end + 30)]
+            if DIAGNOSIS_NOUNS_RE.search(context):
+                continue
             found.append(Entity(
                 entity_type="Conflict",
-                text=text[start:end],
+                text=span_text,
                 start_offset=start,
                 end_offset=end,
                 negated=False,
@@ -429,7 +505,6 @@ def _find_conflicts_by_dictionary(text: str) -> list[Entity]:
                 normalised_value=None,
             ))
     return found
-
 
 def _find_dates(text: str) -> list[Entity]:
     found: list[Entity] = []
@@ -556,7 +631,8 @@ def extract_entities(text: str) -> list[Entity]:
 
     # Pass 2: dictionary-based drug detection (catches what scispaCy misses)
     entities.extend(_find_drugs_by_dictionary(text))
-    # Pass 2.5: dictionary-based conflict/allergy detection
+    # Pass 2.5: pattern-based condition classification + conflict/allergy detection
+    entities.extend(_find_conditions_by_pattern(text))
     entities.extend(_find_conflicts_by_dictionary(text))
     # Pass 3: dates via regex
     entities.extend(_find_dates(text))
