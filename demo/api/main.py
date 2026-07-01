@@ -14,6 +14,7 @@ Run:
 """
 from __future__ import annotations
 import json
+import re
 import uuid
 import time
 from datetime import datetime
@@ -49,6 +50,19 @@ def _load(patient_id: str) -> dict:
 
 def _all_fixtures() -> list[dict]:
     return [json.loads(p.read_text(encoding="utf-8")) for p in sorted(FIXTURES_DIR.glob("*.json"))]
+
+
+def _parse_dose(drug_text: str) -> str:
+    """Extract dose from drug name text e.g. 'Ramipril 5 mg OD' -> '5 mg'."""
+    m = re.search(r"\d+[\d.]*\s*(?:mg|mcg|g|ml|units?|iu)", drug_text, re.IGNORECASE)
+    return m.group(0) if m else ""
+
+
+def _is_noise_med(drug_text: str) -> bool:
+    """Filter out NER artefacts like 'furosemide dose', 'insulin therapy'."""
+    noise = {"dose", "therapy", "treatment", "use", "review", "clinic", "started"}
+    tokens = drug_text.strip().lower().split()
+    return bool(tokens and tokens[-1] in noise) or len(tokens) > 5
 
 # ── In-memory job store (demo only) ─────────────────────────────────────────
 
@@ -137,11 +151,12 @@ def get_patient(patient_id: str):
             {
                 "drug": m.get("drug", ""),
                 "dose": m.get("dose", ""),
+                "last_prescribed": m.get("document_date", ""),
                 "started": m.get("started"),
                 "flag": m.get("flag_text"),
                 "normalised": m.get("normalised_value", ""),
             }
-            for m in f.get("medications", [])
+            for m in f.get("medications_deduped", f.get("medications", []))
         ],
         "top_flags": [
             {
@@ -183,11 +198,12 @@ def get_briefing(patient_id: str):
                 {
                     "drug": m.get("drug", ""),
                     "dose": m.get("dose", ""),
+                    "last_prescribed": m.get("document_date", ""),
                     "started": m.get("started"),
                     "flag": m.get("flag_text"),
                     "normalised": m.get("normalised_value", ""),
                 }
-                for m in f.get("medications", [])
+                for m in f.get("medications_deduped", f.get("medications", []))
             ],
             "open_flags": [
                 {
@@ -266,29 +282,64 @@ def get_contradictions(patient_id: str):
 @app.get("/api/patients/{patient_id}/timeline")
 def get_timeline(patient_id: str, event_type: Optional[str] = Query(None), limit: int = Query(200)):
     f = _load(patient_id)
-    # Build timeline events from documents + flags
     events = []
+
+    # Document events
     for doc in f.get("documents", []):
         events.append({
             "event_id": str(uuid.uuid4()),
             "event_date": doc.get("document_date"),
-            "event_type": doc.get("doc_type", "document"),
+            "event_type": "Document",
             "title": doc.get("file_name", "Document"),
             "icd10_code": None,
             "source_document_id": doc.get("document_id", ""),
             "created_at": datetime.utcnow().isoformat() + "Z",
         })
-    for fl in f.get("flags", []):
-        events.append({
-            "event_id": str(uuid.uuid4()),
-            "event_date": None,
-            "event_type": "flag",
-            "title": f"[{fl.get('severity','MEDIUM')}] {fl.get('category','')}",
-            "icd10_code": None,
-            "source_document_id": fl.get("source_document_id", ""),
-            "created_at": datetime.utcnow().isoformat() + "Z",
-        })
-    if event_type:
+
+    # Condition/Diagnosis events - one per condition per document (with date)
+    for c in f.get("conditions", []):
+        name = c.get("name", "").strip()
+        if name:
+            events.append({
+                "event_id": str(uuid.uuid4()),
+                "event_date": c.get("document_date"),
+                "event_type": "Diagnosis",
+                "title": name,
+                "icd10_code": c.get("icd10_code"),
+                "source_document_id": c.get("document_id", ""),
+                "created_at": datetime.utcnow().isoformat() + "Z",
+            })
+
+    # Medication events - one per unique drug
+    for m in f.get("medications", []):
+        drug = m.get("drug", "").strip()
+        if drug:
+            events.append({
+                "event_id": str(uuid.uuid4()),
+                "event_date": m.get("document_date"),
+                "event_type": "Medication",
+                "title": drug,
+                "icd10_code": None,
+                "source_document_id": m.get("document_id", ""),
+                "created_at": datetime.utcnow().isoformat() + "Z",
+            })
+
+    # Conflict events - from entities
+    for e in f.get("entities", []):
+        if e.get("entity_type") == "Conflict" and not e.get("negated"):
+            text = (e.get("text") or "").strip()
+            if text and len(text) > 4:
+                events.append({
+                    "event_id": str(uuid.uuid4()),
+                    "event_date": e.get("document_date"),
+                    "event_type": "Conflict",
+                    "title": text,
+                    "icd10_code": None,
+                    "source_document_id": e.get("document_id", ""),
+                    "created_at": datetime.utcnow().isoformat() + "Z",
+                })
+
+    if event_type and event_type != "all":
         events = [e for e in events if e["event_type"] == event_type]
     events = events[:limit]
     return {"patient_id": patient_id, "count": len(events), "events": events}
