@@ -1,0 +1,785 @@
+{
+  "patient_id": "patient_002",
+  "patient_name": "Daniel Ofori",
+  "patient_dob": "1968-03-22",
+  "patient_nhs": "999 200 0002",
+  "patient_sex": "M",
+  "domain": "Type 2 Diabetes",
+  "generated_at": "2026-07-01",
+  "performance": {
+    "total_documents": 3,
+    "total_entities": 38,
+    "total_wall_seconds": 0.64,
+    "per_doc_avg_seconds": 0.21
+  },
+  "documents": [
+    {
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "patient_id": "patient_002",
+      "file_name": "01_GP_Annual_Diabetes_Review_Ofori_22May2023.pdf",
+      "doc_type": "gp_referral",
+      "document_date": "2023-05-22",
+      "extracted_text": "Acacia Medical Centre\nDate: 22 May 2023\nANNUAL DIABETES REVIEW\nPatient: Daniel Ofori\nDOB: 1968-03-22 (age 55)\nNHS Number: 999 200 0002\nAddress: 27 Oakfield Road, Birmingham, B12 8QR\nActive Medical Conditions:\n\u2022 Type 2 diabetes mellitus (ICD-10: E11.9) \u2014 diagnosed 2019-11-04\n\u2022 Hypertension (ICD-10: I10) \u2014 diagnosed 2017-06-12\n\u2022 Obesity (ICD-10: E66.9) \u2014 BMI 31.2\nCurrent Medications:\n\u2022 Metformin 500 mg \u2014 1 g BD (started 2019-12-01)\n\u2022 Amlodipine 5 mg \u2014 5 mg OD (started 2017-07-08)\nAllergies: NKDA \u2014 no known drug allergies recorded.\nReview findings:\nPatient attended for annual diabetes review. Reports good adherence with metformin. Reports occasional\npolyuria and fatigue. No symptoms of hypoglycaemia. Diet review \u2014 high carbohydrate intake, limited\nexercise. Foot exam normal, no neuropathy. Fundoscopy referral arranged. BP 142/86, weight 92 kg, BMI\n31.2.\nRecent bloods: HbA1c 8.4% (68 mmol/mol), eGFR 78 mL/min/1.73m2, total cholesterol 5.2, LDL 3.1,\nACR 1.8 mg/mmol.\nPlan:\n\u2022 HbA1c above target; reinforce lifestyle measures\n\u2022 Refer to dietitian for weight management\n\u2022 Continue metformin at current dose\n\u2022 Repeat HbA1c in 3 months \u2014 if persistently >7.5% consider escalating therapy\n\u2022 Annual retinal screening due",
+      "wall_clock_seconds": 0.28
+    },
+    {
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "patient_id": "patient_002",
+      "file_name": "02_Diabetes_Clinic_Ofori_18Sep2023.pdf",
+      "doc_type": "clinic_letter",
+      "document_date": "2023-09-18",
+      "extracted_text": "Birmingham City Hospital \u2014 Diabetes Clinic\nDate: 18 Sep 2023\nOUTPATIENT CLINIC LETTER\nPatient: Daniel Ofori\nDOB: 1968-03-22 (age 55)\nNHS Number: 999 200 0002\nDear Dr Acacia,\nI reviewed Mr Ofori today in the diabetes outpatient clinic, referred for sub-optimal glycaemic control.\nHistory: Type 2 diabetes diagnosed 2019. Currently on metformin 1 g BD \u2014 tolerated well, no GI side\neffects. Reports continued polyuria and nocturia. Has attempted dietary modification with limited success;\nweight unchanged since May review. No symptoms suggestive of macrovascular complications.\nExamination: Weight 92 kg, BMI 31.2, BP 144/88. Peripheral pulses preserved. Sensation intact to\nmonofilament.\nInvestigations: Repeat HbA1c 8.7% (72 mmol/mol) \u2014 worsened from May despite stated adherence.\neGFR 76, ACR 2.1. Lipids stable.\nImpression: Type 2 diabetes with suboptimal control on metformin monotherapy. Renal function\npreserved.\nPlan:\n\u2022 Add gliclazide 40 mg OD \u2014 titrate as required\n\u2022 Continue metformin 1 g BD\n\u2022 Reinforce lifestyle measures \u2014 referred to community weight management programme\n\u2022 Repeat HbA1c, U&E, lipids in 3 months\n\u2022 Review in clinic at 6 months\nYours sincerely,\nDr R. Patel, Consultant Diabetologist",
+      "wall_clock_seconds": 0.25
+    },
+    {
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "patient_id": "patient_002",
+      "file_name": "03_Lab_Report_Ofori_14Feb2024.pdf",
+      "doc_type": "lab_report",
+      "document_date": "2024-02-14",
+      "extracted_text": "Birmingham Pathology Services \u2014 Laboratory Report\nDate of report: 14 Feb 2024\nLABORATORY REPORT\nPatient: Daniel Ofori\nDOB: 1968-03-22\nNHS Number: 999 200 0002\nSample type: Venous blood\nSample date: 12 Feb 2024\nRequesting clinician: Dr R. Patel (Diabetes Clinic)\nGlycaemic markers:\nHbA1c: 9.1 % (76 mmol/mol) [target <7.0 %]\nRandom glucose: 12.4 mmol/L [reference 4.0-7.8]\nRenal function:\nSodium: 139 mmol/L [135-145]\nPotassium: 4.4 mmol/L [3.5-5.0]\nUrea: 5.8 mmol/L [2.5-7.8]\nCreatinine: 88 umol/L [60-110]\neGFR: 74 mL/min/1.73m2 [>60]\nLipid profile:\nTotal cholesterol: 5.0 mmol/L\nLDL cholesterol: 3.0 mmol/L\nHDL cholesterol: 1.1 mmol/L\nTriglycerides: 1.9 mmol/L\nUrine albumin:\nAlbumin:creatinine ratio: 2.4 mg/mmol [<3.0]\nComment:\nGlycaemic control has further deteriorated since previous result (HbA1c 8.7% in September 2023). Renal\nfunction preserved with eGFR 74 mL/min/1.73m2 and ACR within normal range. Lipid profile acceptable.\nRecommend clinical review.",
+      "wall_clock_seconds": 0.11
+    }
+  ],
+  "entities": [
+    {
+      "entity_type": "Date",
+      "text": "22 May 2023",
+      "start_offset": 28,
+      "end_offset": 39,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2023-05-22",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Date",
+      "text": "1968-03-22",
+      "start_offset": 90,
+      "end_offset": 100,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "1968-03-22",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Type 2 diabetes mellitus",
+      "start_offset": 211,
+      "end_offset": 235,
+      "negated": false,
+      "icd10_code": "E11.9",
+      "bnf_code": null,
+      "normalised_value": "explicit",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2019-11-04",
+      "start_offset": 264,
+      "end_offset": 274,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2019-11-04",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Hypertension",
+      "start_offset": 277,
+      "end_offset": 289,
+      "negated": false,
+      "icd10_code": "I10",
+      "bnf_code": null,
+      "normalised_value": "explicit",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2017-06-12",
+      "start_offset": 316,
+      "end_offset": 326,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2017-06-12",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Obesity",
+      "start_offset": 329,
+      "end_offset": 336,
+      "negated": false,
+      "icd10_code": "E66.9",
+      "bnf_code": null,
+      "normalised_value": "explicit",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Metformin 500 mg",
+      "start_offset": 387,
+      "end_offset": 403,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0601022B0",
+      "normalised_value": "metformin",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2019-12-01",
+      "start_offset": 422,
+      "end_offset": 432,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2019-12-01",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Amlodipine 5 mg",
+      "start_offset": 436,
+      "end_offset": 451,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0206020A0",
+      "normalised_value": "amlodipine",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2017-07-08",
+      "start_offset": 471,
+      "end_offset": 481,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2017-07-08",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "Allergies",
+      "start_offset": 483,
+      "end_offset": 492,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "NKDA",
+      "start_offset": 494,
+      "end_offset": 498,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "drug allergies",
+      "start_offset": 510,
+      "end_offset": 524,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "diabetes review",
+      "start_offset": 580,
+      "end_offset": 595,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "metformin",
+      "start_offset": 625,
+      "end_offset": 634,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0601022B0",
+      "normalised_value": "metformin",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "fatigue",
+      "start_offset": 668,
+      "end_offset": 675,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "hypoglycaemia",
+      "start_offset": 692,
+      "end_offset": 705,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "no neuropathy",
+      "start_offset": 783,
+      "end_offset": 796,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "metformin",
+      "start_offset": 1087,
+      "end_offset": 1096,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0601022B0",
+      "normalised_value": "metformin",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Date",
+      "text": "in 3 months",
+      "start_offset": 1128,
+      "end_offset": 1139,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2023-08-20",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_date": "2023-05-22"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Diabetes",
+      "start_offset": 27,
+      "end_offset": 35,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Date",
+      "text": "18 Sep 2023",
+      "start_offset": 49,
+      "end_offset": 60,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2023-09-18",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Date",
+      "text": "1968-03-22",
+      "start_offset": 113,
+      "end_offset": 123,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "1968-03-22",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "diabetes outpatient clinic",
+      "start_offset": 207,
+      "end_offset": 233,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Type 2 diabetes",
+      "start_offset": 288,
+      "end_offset": 303,
+      "negated": false,
+      "icd10_code": "E11.9",
+      "bnf_code": null,
+      "normalised_value": "mapper-high",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "metformin 1 g BD",
+      "start_offset": 333,
+      "end_offset": 349,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": "0601022B0",
+      "normalised_value": "metformin",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "polyuria",
+      "start_offset": 406,
+      "end_offset": 414,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "nocturia",
+      "start_offset": 419,
+      "end_offset": 427,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Type 2 diabetes",
+      "start_offset": 826,
+      "end_offset": 841,
+      "negated": false,
+      "icd10_code": "E11.9",
+      "bnf_code": null,
+      "normalised_value": "mapper-high",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "metformin",
+      "start_offset": 869,
+      "end_offset": 878,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0601022B0",
+      "normalised_value": "metformin",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "gliclazide 40 mg OD",
+      "start_offset": 930,
+      "end_offset": 949,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0601023A0",
+      "normalised_value": "gliclazide",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "metformin 1 g BD",
+      "start_offset": 983,
+      "end_offset": 999,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0601022B0",
+      "normalised_value": "metformin",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Date",
+      "text": "in 3 months",
+      "start_offset": 1111,
+      "end_offset": 1122,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2023-12-17",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Date",
+      "text": "6 months",
+      "start_offset": 1145,
+      "end_offset": 1153,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-03-16",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_date": "2023-09-18"
+    },
+    {
+      "entity_type": "Date",
+      "text": "14 Feb 2024",
+      "start_offset": 66,
+      "end_offset": 77,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-02-14",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_date": "2024-02-14"
+    },
+    {
+      "entity_type": "Date",
+      "text": "1968-03-22",
+      "start_offset": 123,
+      "end_offset": 133,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "1968-03-22",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_date": "2024-02-14"
+    },
+    {
+      "entity_type": "Date",
+      "text": "12 Feb 2024",
+      "start_offset": 198,
+      "end_offset": 209,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-02-12",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_date": "2024-02-14"
+    }
+  ],
+  "observations": [
+    {
+      "test": "Total Cholesterol",
+      "value": "5.2",
+      "unit": null,
+      "observation_date": "2023-05-22",
+      "source_document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    },
+    {
+      "test": "HbA1c",
+      "value": "8.4",
+      "unit": "%",
+      "observation_date": "2023-05-22",
+      "source_document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    },
+    {
+      "test": "eGFR",
+      "value": "78",
+      "unit": "mL/min/1.73m2",
+      "observation_date": "2023-05-22",
+      "source_document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    },
+    {
+      "test": "LDL",
+      "value": "3.1",
+      "unit": null,
+      "observation_date": "2023-05-22",
+      "source_document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    },
+    {
+      "test": "HbA1c",
+      "value": "8.7",
+      "unit": "%",
+      "observation_date": "2023-09-18",
+      "source_document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023"
+    },
+    {
+      "test": "eGFR",
+      "value": "76",
+      "unit": null,
+      "observation_date": "2023-09-18",
+      "source_document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023"
+    },
+    {
+      "test": "Total Cholesterol",
+      "value": "5.0",
+      "unit": "mmol/L",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "LDL",
+      "value": "3.0",
+      "unit": "mmol/L",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "HDL",
+      "value": "1.1",
+      "unit": "mmol/L",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "Glucose",
+      "value": "12.4",
+      "unit": "mmol/L",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "Triglycerides",
+      "value": "1.9",
+      "unit": "mmol/L",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "Creatinine",
+      "value": "88",
+      "unit": "umol/L",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "Potassium",
+      "value": "4.4",
+      "unit": "mmol/L",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "Sodium",
+      "value": "139",
+      "unit": "mmol/L",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "HbA1c",
+      "value": "9.1",
+      "unit": "%",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "HbA1c",
+      "value": "8.7",
+      "unit": "%",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "eGFR",
+      "value": "74",
+      "unit": "mL/min/1.73m2",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "eGFR",
+      "value": "74",
+      "unit": "mL/min/1.73m2",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    },
+    {
+      "test": "Urea",
+      "value": "5.8",
+      "unit": "mmol/L",
+      "observation_date": "2024-02-14",
+      "source_document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024",
+      "document_id": "patient_002_03_Lab_Report_Ofori_14Feb2024"
+    }
+  ],
+  "conditions": [
+    {
+      "name": "Type 2 diabetes mellitus",
+      "icd10_code": "E11.9",
+      "document_date": "2023-05-22",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    },
+    {
+      "name": "Hypertension",
+      "icd10_code": "I10",
+      "document_date": "2023-05-22",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    },
+    {
+      "name": "Obesity",
+      "icd10_code": "E66.9",
+      "document_date": "2023-05-22",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    },
+    {
+      "name": "diabetes review",
+      "icd10_code": null,
+      "document_date": "2023-05-22",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    },
+    {
+      "name": "fatigue",
+      "icd10_code": null,
+      "document_date": "2023-05-22",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    },
+    {
+      "name": "Diabetes",
+      "icd10_code": null,
+      "document_date": "2023-09-18",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023"
+    },
+    {
+      "name": "diabetes outpatient clinic",
+      "icd10_code": null,
+      "document_date": "2023-09-18",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023"
+    },
+    {
+      "name": "Type 2 diabetes",
+      "icd10_code": "E11.9",
+      "document_date": "2023-09-18",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023"
+    },
+    {
+      "name": "polyuria",
+      "icd10_code": null,
+      "document_date": "2023-09-18",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023"
+    }
+  ],
+  "medications": [
+    {
+      "drug": "Metformin 500 mg",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2023-05-22",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    },
+    {
+      "drug": "Amlodipine 5 mg",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2023-05-22",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    },
+    {
+      "drug": "metformin",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2023-09-18",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023"
+    },
+    {
+      "drug": "gliclazide 40 mg OD",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2023-09-18",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023"
+    }
+  ],
+  "flags": [
+    {
+      "severity": "MEDIUM",
+      "category": "POSSIBLE_DUPLICATE_MEDICATION",
+      "description": "Metformin mentioned across 2 documents. Confirm current dose.",
+      "source_document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023",
+      "clinical_subject": "metformin"
+    }
+  ],
+  "contradictions": [],
+  "medications_deduped": [
+    {
+      "drug": "metformin",
+      "dose": "",
+      "document_date": "2023-09-18",
+      "started": null,
+      "flag_text": null,
+      "normalised_value": "",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023"
+    },
+    {
+      "drug": "gliclazide 40 mg OD",
+      "dose": "40 mg",
+      "document_date": "2023-09-18",
+      "started": null,
+      "flag_text": null,
+      "normalised_value": "",
+      "document_id": "patient_002_02_Diabetes_Clinic_Ofori_18Sep2023"
+    },
+    {
+      "drug": "Amlodipine 5 mg",
+      "dose": "5 mg",
+      "document_date": "2023-05-22",
+      "started": null,
+      "flag_text": null,
+      "normalised_value": "",
+      "document_id": "patient_002_01_GP_Annual_Diabetes_Review_Ofori_22May2023"
+    }
+  ]
+}

@@ -1,0 +1,1324 @@
+{
+  "patient_id": "patient_001",
+  "patient_name": "Margaret Thompson",
+  "patient_dob": "1954-08-15",
+  "patient_nhs": "999 100 0001",
+  "patient_sex": "F",
+  "domain": "Cardiology + CKD",
+  "generated_at": "2026-07-01",
+  "performance": {
+    "total_documents": 3,
+    "total_entities": 71,
+    "total_wall_seconds": 1.97,
+    "per_doc_avg_seconds": 0.66
+  },
+  "documents": [
+    {
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "patient_id": "patient_001",
+      "file_name": "01_GP_Referral_Thompson_12Jan2024.pdf",
+      "doc_type": "gp_referral",
+      "document_date": "2024-01-12",
+      "extracted_text": "Whitfield Surgery\nDate: 12 Jan 2024\nREFERRAL LETTER\nPatient: Margaret Thompson\nDOB: 1954-08-15 (age 69)\nNHS Number: 999 100 0001\nAddress: 14 Beech Avenue, Manchester, M14 5RT\nActive Medical Conditions:\n\u2022 Chronic heart failure with reduced ejection fraction (ICD-10: I50.22) \u2014 diagnosed 2022-03-14\n\u2022 Chronic kidney disease stage 3b (ICD-10: N18.32) \u2014 diagnosed 2021-11-09\n\u2022 Hypertension (ICD-10: I10) \u2014 diagnosed 2015-04-22\n\u2022 Type 2 diabetes mellitus (ICD-10: E11.9) \u2014 diagnosed 2017-08-30\nCurrent Medications:\n\u2022 Ramipril 5 mg \u2014 5 mg OD (started 2022-04-01)\n\u2022 Bisoprolol 5 mg \u2014 5 mg OD (started 2022-04-01)\n\u2022 Furosemide 40 mg \u2014 40 mg OD (started 2023-05-12)\n\u2022 Metformin 500 mg \u2014 1 g BD (started 2017-09-15)\n\u2022 Atorvastatin 40 mg \u2014 40 mg ON (started 2019-02-03)\nAllergies: NKDA \u2014 no known drug allergies recorded.\nReason for Referral:\nReferring to cardiology for review of worsening exertional dyspnoea over the past 6 weeks. Recent eGFR\n32 mL/min/1.73m2. Patient reports orthopnoea and ankle swelling. Echocardiogram requested; please\nreview and advise on heart failure therapy optimisation.",
+      "wall_clock_seconds": 1.34
+    },
+    {
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "patient_id": "patient_001",
+      "file_name": "02_Cardiology_Thompson_28Feb2024.pdf",
+      "doc_type": "clinic_letter",
+      "document_date": "2024-02-28",
+      "extracted_text": "Manchester Royal Infirmary \u2014 Cardiology Department\nDate: 28 Feb 2024\nCLINIC LETTER\nPatient: Margaret Thompson\nDOB: 1954-08-15 (age 69)\nNHS Number: 999 100 0001\nDear Dr Whitfield,\nThank you for referring Mrs Thompson. I reviewed her today in the heart failure clinic.\nHistory: 6-week history of worsening exertional dyspnoea, NYHA class III. Orthopnoea on two pillows.\nBilateral ankle oedema. No chest pain or palpitations. No recent admissions.\nExamination: BP 138/82, HR 72 regular. JVP elevated 4 cm. Bibasal crackles. Pitting oedema to mid-shin\nbilaterally.\nInvestigations: Echocardiogram (today) confirms severe LV systolic dysfunction with LVEF 28% (down\nfrom 35% in 2022). Moderate mitral regurgitation. ECG: sinus rhythm, LBBB. Bloods: Na 138, K 4.6, urea\n12.1, creatinine 168, eGFR 32. NT-proBNP 4200 pg/mL.\nAllergies: Patient reports penicillin allergy (rash, 2018). Avoid beta-lactams.\nPlan:\n\u2022 Increase furosemide to 80 mg OD\n\u2022 Add spironolactone 25 mg OD \u2014 monitor U&E in 2 weeks\n\u2022 Consider sacubitril/valsartan in 4 weeks if eGFR stable\n\u2022 Repeat eGFR and electrolytes in 2 weeks\n\u2022 Referral to heart failure nurse specialist for education and titration\n\u2022 Routine cardiology follow-up in 3 months\nYours sincerely,\nDr S. Mitchell, Consultant Cardiologist",
+      "wall_clock_seconds": 0.34
+    },
+    {
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "patient_id": "patient_001",
+      "file_name": "03_AE_Discharge_Thompson_04Apr2024.pdf",
+      "doc_type": "discharge_summary",
+      "document_date": "2024-04-04",
+      "extracted_text": "Manchester Royal Infirmary \u2014 Emergency Department\nDate: 04 Apr 2024\nDISCHARGE SUMMARY\nPatient: Margaret Thompson\nDOB: 1954-08-15 (age 69)\nNHS Number: 999 100 0001\nAddress: 14 Beech Avenue, Manchester, M14 5RT\nPresentation: Brought in by ambulance with acute shortness of breath at rest, worsening over 48 hours.\nUnable to lie flat. Productive cough, no fever.\nDiagnosis: Acute decompensated heart failure (ICD-10: I50.21) on background of chronic HFrEF. Likely\nprecipitated by suboptimal compliance with new furosemide dose.\nExamination on arrival: SpO2 88% on room air, RR 28, BP 156/94, HR 104. Bibasal crackles to\nmid-zones. Bilateral pitting oedema to knees. CXR: pulmonary oedema with bilateral pleural effusions.\nTreatment given: IV furosemide 80 mg, oxygen via nasal cannulae, GTN infusion. Symptoms improved\nover 6 hours. Admitted to AMU overnight for monitoring; discharged following day.\nAllergies: NKDA.\nDischarge medications:\n\u2022 Furosemide 80 mg OD \u2014 continue at increased dose from cardiology review\n\u2022 Ramipril 5 mg OD \u2014 continue\n\u2022 Bisoprolol 5 mg OD \u2014 continue\n\u2022 Spironolactone 25 mg OD \u2014 continue\n\u2022 Atorvastatin 40 mg ON \u2014 continue\n\u2022 Metformin 1 g BD \u2014 continue\nFollow-up: GP review within 7 days. Heart failure nurse contact within 2 weeks. Cardiology clinic follow-up\nas previously arranged.",
+      "wall_clock_seconds": 0.28
+    }
+  ],
+  "entities": [
+    {
+      "entity_type": "Date",
+      "text": "12 Jan 2024",
+      "start_offset": 24,
+      "end_offset": 35,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "1954-08-15",
+      "start_offset": 84,
+      "end_offset": 94,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "1954-08-15",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Chronic heart failure",
+      "start_offset": 204,
+      "end_offset": 225,
+      "negated": false,
+      "icd10_code": "I50.22",
+      "bnf_code": null,
+      "normalised_value": "explicit",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2022-03-14",
+      "start_offset": 286,
+      "end_offset": 296,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2022-03-14",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Chronic kidney disease stage 3b",
+      "start_offset": 299,
+      "end_offset": 330,
+      "negated": false,
+      "icd10_code": "N18.32",
+      "bnf_code": null,
+      "normalised_value": "explicit",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2021-11-09",
+      "start_offset": 360,
+      "end_offset": 370,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2021-11-09",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Hypertension",
+      "start_offset": 373,
+      "end_offset": 385,
+      "negated": false,
+      "icd10_code": "I10",
+      "bnf_code": null,
+      "normalised_value": "explicit",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2015-04-22",
+      "start_offset": 412,
+      "end_offset": 422,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2015-04-22",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Type 2 diabetes mellitus",
+      "start_offset": 425,
+      "end_offset": 449,
+      "negated": false,
+      "icd10_code": "E11.9",
+      "bnf_code": null,
+      "normalised_value": "explicit",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2017-08-30",
+      "start_offset": 478,
+      "end_offset": 488,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2017-08-30",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Ramipril 5 mg",
+      "start_offset": 512,
+      "end_offset": 525,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0205051F0",
+      "normalised_value": "ramipril",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2022-04-01",
+      "start_offset": 545,
+      "end_offset": 555,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2022-04-01",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Bisoprolol 5 mg",
+      "start_offset": 559,
+      "end_offset": 574,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0204000H0",
+      "normalised_value": "bisoprolol",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2022-04-01",
+      "start_offset": 594,
+      "end_offset": 604,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2022-04-01",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Furosemide 40 mg",
+      "start_offset": 608,
+      "end_offset": 624,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0202020T0",
+      "normalised_value": "furosemide",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2023-05-12",
+      "start_offset": 645,
+      "end_offset": 655,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2023-05-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Metformin 500 mg",
+      "start_offset": 659,
+      "end_offset": 675,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0601022B0",
+      "normalised_value": "metformin",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2017-09-15",
+      "start_offset": 694,
+      "end_offset": 704,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2017-09-15",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Atorvastatin 40 mg",
+      "start_offset": 708,
+      "end_offset": 726,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0209000C0",
+      "normalised_value": "atorvastatin",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2019-02-03",
+      "start_offset": 747,
+      "end_offset": 757,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2019-02-03",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "Allergies",
+      "start_offset": 759,
+      "end_offset": 768,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "NKDA",
+      "start_offset": 770,
+      "end_offset": 774,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "drug allergies",
+      "start_offset": 786,
+      "end_offset": 800,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "exertional dyspnoea",
+      "start_offset": 880,
+      "end_offset": 899,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "6 weeks",
+      "start_offset": 914,
+      "end_offset": 921,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-02-23",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "orthopnoea",
+      "start_offset": 969,
+      "end_offset": 979,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "ankle swelling",
+      "start_offset": 984,
+      "end_offset": 998,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "heart failure",
+      "start_offset": 1054,
+      "end_offset": 1067,
+      "negated": false,
+      "icd10_code": "I50.9",
+      "bnf_code": null,
+      "normalised_value": "mapper-high",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_date": "2024-01-12"
+    },
+    {
+      "entity_type": "Date",
+      "text": "28 Feb 2024",
+      "start_offset": 57,
+      "end_offset": 68,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Date",
+      "text": "1954-08-15",
+      "start_offset": 115,
+      "end_offset": 125,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "1954-08-15",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "heart failure",
+      "start_offset": 245,
+      "end_offset": 258,
+      "negated": false,
+      "icd10_code": "I50.9",
+      "bnf_code": null,
+      "normalised_value": "mapper-high",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "exertional dyspnoea",
+      "start_offset": 304,
+      "end_offset": 323,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "NYHA class III",
+      "start_offset": 325,
+      "end_offset": 339,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "nyha class iii",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Orthopnoea",
+      "start_offset": 341,
+      "end_offset": 351,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "oedema",
+      "start_offset": 384,
+      "end_offset": 390,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "No chest pain",
+      "start_offset": 392,
+      "end_offset": 405,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "palpitations",
+      "start_offset": 409,
+      "end_offset": 421,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Pitting oedema",
+      "start_offset": 521,
+      "end_offset": 535,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "NT-proBNP 4200 pg/mL.\nAllergies",
+      "start_offset": 794,
+      "end_offset": 825,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "penicillin allergy",
+      "start_offset": 843,
+      "end_offset": 861,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "rash",
+      "start_offset": 863,
+      "end_offset": 867,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "furosemide",
+      "start_offset": 913,
+      "end_offset": 923,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0202020T0",
+      "normalised_value": "furosemide",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "spironolactone 25 mg OD",
+      "start_offset": 942,
+      "end_offset": 965,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0202020U0",
+      "normalised_value": "spironolactone",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Date",
+      "text": "in 2 weeks",
+      "start_offset": 980,
+      "end_offset": 990,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-03-13",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "sacubitril",
+      "start_offset": 1002,
+      "end_offset": 1012,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "sacubitril",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "valsartan",
+      "start_offset": 1013,
+      "end_offset": 1022,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0205052V0",
+      "normalised_value": "valsartan",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Date",
+      "text": "in 4 weeks",
+      "start_offset": 1023,
+      "end_offset": 1033,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-03-27",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Date",
+      "text": "in 2 weeks",
+      "start_offset": 1080,
+      "end_offset": 1090,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-03-13",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "heart failure",
+      "start_offset": 1105,
+      "end_offset": 1118,
+      "negated": false,
+      "icd10_code": "I50.9",
+      "bnf_code": null,
+      "normalised_value": "mapper-high",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Date",
+      "text": "in 3 months",
+      "start_offset": 1195,
+      "end_offset": 1206,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-05-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_date": "2024-02-28"
+    },
+    {
+      "entity_type": "Date",
+      "text": "04 Apr 2024",
+      "start_offset": 56,
+      "end_offset": 67,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Date",
+      "text": "1954-08-15",
+      "start_offset": 118,
+      "end_offset": 128,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "1954-08-15",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Productive cough",
+      "start_offset": 332,
+      "end_offset": 348,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "no fever",
+      "start_offset": 350,
+      "end_offset": 358,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Acute decompensated heart failure",
+      "start_offset": 371,
+      "end_offset": 404,
+      "negated": false,
+      "icd10_code": "I50.21",
+      "bnf_code": null,
+      "normalised_value": "explicit",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "HFrEF",
+      "start_offset": 447,
+      "end_offset": 452,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "hfref",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "furosemide dose",
+      "start_offset": 508,
+      "end_offset": 523,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0202020T0",
+      "normalised_value": "furosemide",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "oedema",
+      "start_offset": 646,
+      "end_offset": 652,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "pulmonary oedema",
+      "start_offset": 668,
+      "end_offset": 684,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "furosemide 80 mg",
+      "start_offset": 739,
+      "end_offset": 755,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0202020T0",
+      "normalised_value": "furosemide",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "Allergies",
+      "start_offset": 898,
+      "end_offset": 907,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Conflict",
+      "text": "NKDA",
+      "start_offset": 909,
+      "end_offset": 913,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null,
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Furosemide 80 mg OD",
+      "start_offset": 940,
+      "end_offset": 959,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0202020T0",
+      "normalised_value": "furosemide",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Ramipril 5 mg OD",
+      "start_offset": 1014,
+      "end_offset": 1030,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0205051F0",
+      "normalised_value": "ramipril",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Bisoprolol 5 mg OD",
+      "start_offset": 1044,
+      "end_offset": 1062,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0204000H0",
+      "normalised_value": "bisoprolol",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Spironolactone 25 mg OD",
+      "start_offset": 1076,
+      "end_offset": 1099,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0202020U0",
+      "normalised_value": "spironolactone",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Atorvastatin 40 mg",
+      "start_offset": 1113,
+      "end_offset": 1131,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0209000C0",
+      "normalised_value": "atorvastatin",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Metformin 1 g BD",
+      "start_offset": 1148,
+      "end_offset": 1164,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": "0601022B0",
+      "normalised_value": "metformin",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Date",
+      "text": "7 days",
+      "start_offset": 1204,
+      "end_offset": 1210,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-04-11",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Heart failure",
+      "start_offset": 1212,
+      "end_offset": 1225,
+      "negated": false,
+      "icd10_code": "I50.9",
+      "bnf_code": null,
+      "normalised_value": "mapper-high",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2 weeks",
+      "start_offset": 1247,
+      "end_offset": 1254,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "2024-04-18",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "document_date": "2024-04-04"
+    }
+  ],
+  "observations": [
+    {
+      "test": "eGFR",
+      "value": "32",
+      "unit": "mL/min/1.73m2",
+      "observation_date": "2024-01-12",
+      "source_document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "test": "Creatinine",
+      "value": "168",
+      "unit": null,
+      "observation_date": "2024-02-28",
+      "source_document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "test": "NT-proBNP",
+      "value": "4200",
+      "unit": "pg/mL",
+      "observation_date": "2024-02-28",
+      "source_document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "test": "eGFR",
+      "value": "32",
+      "unit": null,
+      "observation_date": "2024-02-28",
+      "source_document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "test": "Urea",
+      "value": "12.1",
+      "unit": null,
+      "observation_date": "2024-02-28",
+      "source_document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "test": "LVEF",
+      "value": "28",
+      "unit": "%",
+      "observation_date": "2024-02-28",
+      "source_document_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    }
+  ],
+  "conditions": [
+    {
+      "name": "Chronic heart failure",
+      "icd10_code": "I50.22",
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "name": "Chronic kidney disease stage 3b",
+      "icd10_code": "N18.32",
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "name": "Hypertension",
+      "icd10_code": "I10",
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "name": "Type 2 diabetes mellitus",
+      "icd10_code": "E11.9",
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "name": "exertional dyspnoea",
+      "icd10_code": null,
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "name": "orthopnoea",
+      "icd10_code": null,
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "name": "ankle swelling",
+      "icd10_code": null,
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "name": "heart failure",
+      "icd10_code": "I50.9",
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "name": "heart failure",
+      "icd10_code": "I50.9",
+      "document_date": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "name": "exertional dyspnoea",
+      "icd10_code": null,
+      "document_date": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "name": "NYHA class III",
+      "icd10_code": null,
+      "document_date": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "name": "Orthopnoea",
+      "icd10_code": null,
+      "document_date": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "name": "oedema",
+      "icd10_code": null,
+      "document_date": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "name": "Pitting oedema",
+      "icd10_code": null,
+      "document_date": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "name": "rash",
+      "icd10_code": null,
+      "document_date": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "name": "Acute decompensated heart failure",
+      "icd10_code": "I50.21",
+      "document_date": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "name": "HFrEF",
+      "icd10_code": null,
+      "document_date": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "name": "oedema",
+      "icd10_code": null,
+      "document_date": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "name": "pulmonary oedema",
+      "icd10_code": null,
+      "document_date": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "name": "Heart failure",
+      "icd10_code": "I50.9",
+      "document_date": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    }
+  ],
+  "medications": [
+    {
+      "drug": "Ramipril 5 mg",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "drug": "Bisoprolol 5 mg",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "drug": "Furosemide 40 mg",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "drug": "Metformin 500 mg",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "drug": "Atorvastatin 40 mg",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-01-12",
+      "document_id": "patient_001_01_GP_Referral_Thompson_12Jan2024"
+    },
+    {
+      "drug": "furosemide",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "drug": "spironolactone 25 mg OD",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "drug": "sacubitril",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "drug": "valsartan",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-02-28",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "drug": "furosemide dose",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "drug": "Ramipril 5 mg OD",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "drug": "Bisoprolol 5 mg OD",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "drug": "Spironolactone 25 mg OD",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "drug": "Atorvastatin 40 mg",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "drug": "Metformin 1 g BD",
+      "dose": "",
+      "started": null,
+      "flag_text": null,
+      "document_date": "2024-04-04",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    }
+  ],
+  "flags": [
+    {
+      "severity": "MEDIUM",
+      "category": "POSSIBLE_DUPLICATE_MEDICATION",
+      "description": "Ramipril mentioned across 2 documents. Confirm current dose.",
+      "source_document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "clinical_subject": "ramipril"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "POSSIBLE_DUPLICATE_MEDICATION",
+      "description": "Bisoprolol mentioned across 2 documents. Confirm current dose.",
+      "source_document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "clinical_subject": "bisoprolol"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "POSSIBLE_DUPLICATE_MEDICATION",
+      "description": "Furosemide mentioned across 3 documents. Confirm current dose.",
+      "source_document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "clinical_subject": "furosemide"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "POSSIBLE_DUPLICATE_MEDICATION",
+      "description": "Metformin mentioned across 2 documents. Confirm current dose.",
+      "source_document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "clinical_subject": "metformin"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "POSSIBLE_DUPLICATE_MEDICATION",
+      "description": "Atorvastatin mentioned across 2 documents. Confirm current dose.",
+      "source_document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "clinical_subject": "atorvastatin"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "POSSIBLE_DUPLICATE_MEDICATION",
+      "description": "Spironolactone mentioned across 2 documents. Confirm current dose.",
+      "source_document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024",
+      "clinical_subject": "spironolactone"
+    }
+  ],
+  "contradictions": [
+    {
+      "contradiction_id": "27e3a459-0938-422a-ba05-f3223a1ef25c",
+      "severity": "HIGH",
+      "category": "ALLERGY",
+      "doc_a_id": "patient_001_01_GP_Referral_Thompson_12Jan2024",
+      "doc_a_statement": "No known drug allergies (NKDA) \u2014 GP referral Jan 2024",
+      "doc_b_id": "patient_001_02_Cardiology_Thompson_28Feb2024",
+      "doc_b_statement": "Penicillin allergy documented (rash, 2018) \u2014 avoid beta-lactams",
+      "explanation": "Documents 01 and 03 record NKDA. Document 02 (cardiology clinic) records a specific penicillin allergy with reaction date. These are directly opposing factual claims about the same patient's allergy status. Allergy record disagreements are the highest-stakes contradiction type in clinical practice.",
+      "status": "open",
+      "created_at": "2026-07-01T19:10:29.693575Z"
+    }
+  ],
+  "medications_deduped": [
+    {
+      "drug": "Ramipril 5 mg OD",
+      "dose": "5 mg",
+      "document_date": "2024-04-04",
+      "started": null,
+      "flag_text": null,
+      "normalised_value": "",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "drug": "Bisoprolol 5 mg OD",
+      "dose": "5 mg",
+      "document_date": "2024-04-04",
+      "started": null,
+      "flag_text": null,
+      "normalised_value": "",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "drug": "Spironolactone 25 mg OD",
+      "dose": "25 mg",
+      "document_date": "2024-04-04",
+      "started": null,
+      "flag_text": null,
+      "normalised_value": "",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "drug": "Atorvastatin 40 mg",
+      "dose": "40 mg",
+      "document_date": "2024-04-04",
+      "started": null,
+      "flag_text": null,
+      "normalised_value": "",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "drug": "Metformin 1 g BD",
+      "dose": "1 g",
+      "document_date": "2024-04-04",
+      "started": null,
+      "flag_text": null,
+      "normalised_value": "",
+      "document_id": "patient_001_03_AE_Discharge_Thompson_04Apr2024"
+    },
+    {
+      "drug": "furosemide",
+      "dose": "",
+      "document_date": "2024-02-28",
+      "started": null,
+      "flag_text": null,
+      "normalised_value": "",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "drug": "sacubitril",
+      "dose": "",
+      "document_date": "2024-02-28",
+      "started": null,
+      "flag_text": null,
+      "normalised_value": "",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    },
+    {
+      "drug": "valsartan",
+      "dose": "",
+      "document_date": "2024-02-28",
+      "started": null,
+      "flag_text": null,
+      "normalised_value": "",
+      "document_id": "patient_001_02_Cardiology_Thompson_28Feb2024"
+    }
+  ]
+}
