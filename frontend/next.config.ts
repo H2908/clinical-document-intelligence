@@ -1,7 +1,15 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    const internal = process.env.API_INTERNAL_URL || 'http://localhost:8000';
+    return [
+      {
+        source: '/api/:path*',
+        destination: internal + '/api/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
