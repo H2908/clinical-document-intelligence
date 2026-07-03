@@ -17,6 +17,7 @@ Output contract (per DB_SCHEMA.md CORE.flag):
 
 from __future__ import annotations
 import os
+import re
 import json
 import logging
 from datetime import date, timedelta
@@ -344,12 +345,19 @@ def _llm_second_pass(
     )
     raw = response.content[0].text.strip()
 
-    # Strip markdown fences if present
-    if raw.startswith("```"):
+    # Extract JSON payload: search for a fenced ```json ... ``` block
+    # anywhere in the response (not just at the start), since the model
+    # occasionally reasons in prose before emitting the fenced block
+    # despite being instructed not to. Falls back to the old
+    # startswith-fence behaviour, then to raw-as-is if no fence found.
+    _fence_match = re.search(r"```(?:json)?\s*\n?(.*?)```", raw, re.DOTALL)
+    if _fence_match:
+        raw = _fence_match.group(1)
+    elif raw.startswith("```"):
         raw = raw.split("```")[1]
         if raw.startswith("json"):
             raw = raw[4:]
-        raw = raw.strip()
+    raw = raw.strip()
 
     try:
         parsed = json.loads(raw)
@@ -499,9 +507,19 @@ def _llm_second_pass(
             NGRAM_FLOOR = 5               # minimum contiguous content-token match
 
             def _content_tokens(text: str) -> list[str]:
-                """Tokenise to lowercase content tokens (>=4 chars, alpha, not stopwords)."""
-                tokens = re.findall(r"[a-z]{4,}", text.lower())
-                return [t for t in tokens if t not in STOPWORDS_AND_GENERIC]
+                """Tokenise to lowercase content tokens for contiguous-run
+                matching. Includes alphabetic tokens >=4 chars, numeric
+                tokens (dose numbers), and short clinical unit tokens
+                (mg, mcg, ml, iu etc). Fixed after MTSamples spot-check
+                found the alpha-only version silently dropped dose
+                numbers, collapsing 'Metformin 1000 mg' to a single
+                token and capping longest-run at 1 regardless of true
+                quote fidelity."""
+                _UNIT_TOKENS = {"mg", "mcg", "ml", "iu", "kg", "cm"}
+                lower = text.lower()
+                combined_pattern = r"[a-z]{4,}|\b\d+(?:\.\d+)?\b|\b(?:mg|mcg|ml|iu|kg|cm)\b"
+                all_tokens = re.findall(combined_pattern, lower)
+                return [t for t in all_tokens if t not in STOPWORDS_AND_GENERIC]
 
             def _longest_contiguous_match(a: list[str], b: list[str]) -> int:
                 """Length of longest contiguous sequence shared by lists a and b."""
@@ -579,9 +597,18 @@ def _llm_second_pass(
                 continue
 
             # Tier 1b - contiguous n-gram floor
+            # Fixed after MTSamples spot-check: the previous double-OR
+            # condition was dead code that always effectively required
+            # longest_run >= NGRAM_FLOOR regardless of quote length,
+            # making short quotes (e.g. "Metformin 1000 mg", 3 tokens)
+            # structurally unable to pass even when genuinely, fully
+            # contiguous in the source. Fix: short quotes must match
+            # FULLY (100% of their own tokens); long quotes still need
+            # >= NGRAM_FLOOR contiguous tokens. No loophole - a short
+            # quote can only pass by being entirely contiguous.
             longest_run = _longest_contiguous_match(quote_tokens, cited_tokens)
-            ngram_required = max(NGRAM_FLOOR, len(quote_tokens) // 2)
-            if longest_run < min(NGRAM_FLOOR, ngram_required) or longest_run < min(NGRAM_FLOOR, max(1, len(quote_tokens) // 2)):
+            required_run = min(NGRAM_FLOOR, len(quote_tokens))
+            if longest_run < required_run:
                 # Decision rule: longest contiguous run must be either >= NGRAM_FLOOR
                 # OR >= 50% of quote content tokens (whichever is achievable on a
                 # short quote). A 4-token quote can't have a 5-token run; allow it
@@ -694,12 +721,19 @@ def _llm_only_naive_pass(
     )
     raw = response.content[0].text.strip()
 
-    # Strip markdown fences if present
-    if raw.startswith("```"):
+    # Extract JSON payload: search for a fenced ```json ... ``` block
+    # anywhere in the response (not just at the start), since the model
+    # occasionally reasons in prose before emitting the fenced block
+    # despite being instructed not to. Falls back to the old
+    # startswith-fence behaviour, then to raw-as-is if no fence found.
+    _fence_match = re.search(r"```(?:json)?\s*\n?(.*?)```", raw, re.DOTALL)
+    if _fence_match:
+        raw = _fence_match.group(1)
+    elif raw.startswith("```"):
         raw = raw.split("```")[1]
         if raw.startswith("json"):
             raw = raw[4:]
-        raw = raw.strip()
+    raw = raw.strip()
 
     try:
         parsed = json.loads(raw)
@@ -773,12 +807,19 @@ def _llm_only_thoughtful_pass(
     )
     raw = response.content[0].text.strip()
 
-    # Strip markdown fences if present
-    if raw.startswith("```"):
+    # Extract JSON payload: search for a fenced ```json ... ``` block
+    # anywhere in the response (not just at the start), since the model
+    # occasionally reasons in prose before emitting the fenced block
+    # despite being instructed not to. Falls back to the old
+    # startswith-fence behaviour, then to raw-as-is if no fence found.
+    _fence_match = re.search(r"```(?:json)?\s*\n?(.*?)```", raw, re.DOTALL)
+    if _fence_match:
+        raw = _fence_match.group(1)
+    elif raw.startswith("```"):
         raw = raw.split("```")[1]
         if raw.startswith("json"):
             raw = raw[4:]
-        raw = raw.strip()
+    raw = raw.strip()
 
     try:
         parsed = json.loads(raw)

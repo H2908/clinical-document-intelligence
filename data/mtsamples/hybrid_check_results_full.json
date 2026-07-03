@@ -1,0 +1,54 @@
+{
+  "pneumonia_copd_discharge": {
+    "source": "MTSamples - Pneumonia & COPD - Discharge Summary",
+    "mode": "hybrid",
+    "wall_clock_seconds": 21.67,
+    "accepted_flag_count": 2,
+    "accepted_flags": [
+      {
+        "severity": "HIGH",
+        "category": "AI_DRUG_RENAL_CONTRAINDICATION",
+        "description": "Metformin prescribed alongside documented acute and chronic renal failure; verify renal function and suitability of Metformin 1000 mg.",
+        "clinical_subject": "metformin in renal failure",
+        "cited_document_id": "mtsamples_pneumonia_copd_discharge",
+        "source_quote": "Metformin 1000 mg",
+        "grounding_status": "verbatim"
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "AI_STEROID_HYPERGLYCEMIA",
+        "description": "Prednisone 40 mg prescribed in context of documented hyperglycemia; verify glycaemic monitoring plan on discharge.",
+        "clinical_subject": "corticosteroid-induced hyperglycemia",
+        "cited_document_id": "mtsamples_pneumonia_copd_discharge",
+        "source_quote": "Prednisone 40 mg",
+        "grounding_status": "verbatim"
+      }
+    ],
+    "rejected_candidate_count": 2,
+    "rejected_candidates": [
+      {
+        "document_id": "mtsamples_pneumonia_copd_discharge",
+        "quote": "Atrial fibrillation",
+        "verdict_raw": "VERDICT: trivial-quote (chars=19, words=2; strict needs chars>=30 AND words>=6; soft needs words>=3 AND subject-overlap; subject_shared=True)",
+        "verdict": "trivial-quote"
+      },
+      {
+        "verdict_raw": "VERDICT: trivial-quote (chars=19, words=2; strict needs chars>=30 AND words>=6; soft needs words>=3 AND subject-overlap; subject_shared=True)",
+        "verdict": "trivial-quote"
+      }
+    ],
+    "verdict_summary": {
+      "trivial-quote": 2
+    }
+  },
+  "afib_consult": {
+    "source": "MTSamples - Atrial Fibrillation - Consult",
+    "mode": "hybrid",
+    "wall_clock_seconds": 15.05,
+    "accepted_flag_count": 0,
+    "accepted_flags": [],
+    "rejected_candidate_count": 0,
+    "rejected_candidates": [],
+    "verdict_summary": {}
+  }
+}
