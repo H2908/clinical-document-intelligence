@@ -1,0 +1,54 @@
+{
+  "pneumonia_copd_discharge": {
+    "source": "MTSamples - Pneumonia & COPD - Discharge Summary",
+    "doc_type": "discharge_summary",
+    "wall_clock_seconds": 2.82,
+    "entity_count": 33,
+    "condition_count": 10,
+    "conditions": [
+      "Pneumonia",
+      "Chronic obstructive pulmonary disease",
+      "Systemic inflammatory response syndrome",
+      "Hyperglycemia",
+      "Aspiration pneumonia",
+      "chronic respiratory failure",
+      "Atrial fibrillation",
+      "Hyperlipidemia",
+      "Acute renal failure",
+      "chronic renal failure"
+    ],
+    "medication_count": 2,
+    "medications": [
+      "Metformin 1000 mg",
+      "Aspirin 325 mg"
+    ],
+    "observation_count": 0,
+    "flag_count": 0,
+    "flags": []
+  },
+  "afib_consult": {
+    "source": "MTSamples - Atrial Fibrillation - Consult",
+    "doc_type": "clinic_letter",
+    "wall_clock_seconds": 1.57,
+    "entity_count": 29,
+    "condition_count": 8,
+    "conditions": [
+      "Atrial Fibrillation",
+      "hypertension",
+      "renal failure",
+      "right upper extremity edema",
+      "hyperlipidemia",
+      "CVA",
+      "pulmonary hypertension",
+      "true ischemia"
+    ],
+    "medication_count": 2,
+    "medications": [
+      "Aspirin 81 mg",
+      "Sertraline 100 mg"
+    ],
+    "observation_count": 7,
+    "flag_count": 0,
+    "flags": []
+  }
+}
