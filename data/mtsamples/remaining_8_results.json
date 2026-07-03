@@ -1,0 +1,347 @@
+{
+  "multiple_medical_problems": {
+    "source": "Multiple Medical Problems - Discharge Summary",
+    "doc_type": "discharge_summary",
+    "ner_wall_clock_seconds": 2.0,
+    "entity_count": 36,
+    "condition_count": 16,
+    "conditions": [
+      "Hypoglycemia",
+      "Anemia",
+      "Dyspnea",
+      "Edema",
+      "Colon cancer",
+      "Hospital-acquired pneumonia",
+      "Hypertension",
+      "Congestive heart failure",
+      "diabetes mellitus",
+      "coronary artery disease",
+      "GERD",
+      "bipolar disorder",
+      "hyperglycemia",
+      "cancer",
+      "Infectious Disease specialist",
+      "Infectious Disease"
+    ],
+    "medication_count": 3,
+    "medications": [
+      "insulin",
+      "Lasix 40 mg",
+      "Lipitor"
+    ],
+    "observation_count": 0,
+    "rules_only_flag_count": 0,
+    "hybrid_wall_clock_seconds": 12.99,
+    "hybrid_accepted_count": 2,
+    "hybrid_accepted_flags": [
+      {
+        "severity": "MEDIUM",
+        "category": "AI_CONDITION_WITHOUT_TREATMENT",
+        "description": "Coronary artery disease documented but no antiplatelet or specific cardiac medication recorded. Verify treatment regimen.",
+        "clinical_subject": "coronary artery disease",
+        "cited_document_id": "mtsamples_multiple_medical_problems",
+        "source_quote": "coronary artery disease",
+        "grounding_status": "verbatim"
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "AI_CONDITION_WITHOUT_TREATMENT",
+        "description": "Congestive heart failure and hypertension documented; only Lasix and Lipitor recorded. Verify ACE inhibitor or beta-blocker prescribing.",
+        "clinical_subject": "congestive heart failure medication",
+        "cited_document_id": "mtsamples_multiple_medical_problems",
+        "source_quote": "Lasix 40 mg",
+        "grounding_status": "verbatim"
+      }
+    ],
+    "hybrid_rejected_count": 3,
+    "hybrid_rejected_candidates": [
+      {
+        "document_id": "mtsamples_multiple_medical_problems",
+        "quote": "bipolar disorder",
+        "verdict_raw": "VERDICT: trivial-quote (chars=16, words=2; strict needs chars>=30 AND words>=6; soft needs words>=3 AND subject-overlap; subject_shared=True)",
+        "verdict": "trivial-quote"
+      },
+      {
+        "document_id": "mtsamples_multiple_medical_problems",
+        "quote": "hypoglycemia",
+        "verdict_raw": "VERDICT: trivial-quote (chars=12, words=1; strict needs chars>=30 AND words>=6; soft needs words>=3 AND subject-overlap; subject_shared=True)",
+        "verdict": "trivial-quote"
+      },
+      {
+        "document_id": "mtsamples_multiple_medical_problems",
+        "quote": "Anemia",
+        "verdict_raw": "VERDICT: trivial-quote (chars=6, words=1; strict needs chars>=30 AND words>=6; soft needs words>=3 AND subject-overlap; subject_shared=True)",
+        "verdict": "trivial-quote"
+      }
+    ]
+  },
+  "peripheral_vascular_disease": {
+    "source": "Discharge Summary - Peripheral vascular disease",
+    "doc_type": "discharge_summary",
+    "ner_wall_clock_seconds": 1.05,
+    "entity_count": 21,
+    "condition_count": 10,
+    "conditions": [
+      "Peripheral vascular disease",
+      "carotid artery stenosis",
+      "Hypertension",
+      "Diverticulosis",
+      "Hypothyroidism",
+      "coronary artery disease",
+      "thrombosis",
+      "infection",
+      "wheezing",
+      "pulmonary edema"
+    ],
+    "medication_count": 7,
+    "medications": [
+      "Lasix",
+      "Aspirin 81 mg",
+      "Plavix 75 mg",
+      "Hydrochlorothiazide 25 mg",
+      "Ativan 0.5 mg",
+      "Omeprazole 20 mg",
+      "Zocor 40 mg"
+    ],
+    "observation_count": 0,
+    "rules_only_flag_count": 0,
+    "hybrid_wall_clock_seconds": 8.34,
+    "hybrid_accepted_count": 0,
+    "hybrid_accepted_flags": [],
+    "hybrid_rejected_count": 0,
+    "hybrid_rejected_candidates": []
+  },
+  "discharge_summary_18": {
+    "source": "Discharge Summary - 18",
+    "doc_type": "discharge_summary",
+    "ner_wall_clock_seconds": 1.06,
+    "entity_count": 32,
+    "condition_count": 12,
+    "conditions": [
+      "Atypical chest pain",
+      "Nausea",
+      "Vomiting",
+      "Diabetes",
+      "Hypokalemia",
+      "Diarrhea",
+      "depression",
+      "Hypertension",
+      "Serotonin syndrome",
+      "myocardial infarction",
+      "Diabetes mellitus",
+      "anxiety"
+    ],
+    "medication_count": 3,
+    "medications": [
+      "Omeprazole 20 mg",
+      "Ativan 1 mg",
+      "Aspirin 81 mg"
+    ],
+    "observation_count": 6,
+    "rules_only_flag_count": 0,
+    "hybrid_wall_clock_seconds": 3.4,
+    "hybrid_accepted_count": 0,
+    "hybrid_accepted_flags": [],
+    "hybrid_rejected_count": 0,
+    "hybrid_rejected_candidates": []
+  },
+  "er_chest_pain_fever": {
+    "source": "ER Report - Chest Pain & Fever",
+    "doc_type": "discharge_summary",
+    "ner_wall_clock_seconds": 1.22,
+    "entity_count": 32,
+    "condition_count": 11,
+    "conditions": [
+      "Chest pain",
+      "fever",
+      "urinary tract infection",
+      "diabetes",
+      "hypertension",
+      "hyperlipidemia",
+      "cardiovascular disease",
+      "coronary artery disease",
+      "back pain",
+      "Arthritis",
+      "myocardial disease"
+    ],
+    "medication_count": 5,
+    "medications": [
+      "insulin",
+      "aspirin 81 mg",
+      "Lisinopril 20 mg",
+      "Metformin 500 mg",
+      "Zocor 20 mg"
+    ],
+    "observation_count": 10,
+    "rules_only_flag_count": 0,
+    "hybrid_wall_clock_seconds": 10.9,
+    "hybrid_accepted_count": 0,
+    "hybrid_accepted_flags": [],
+    "hybrid_rejected_count": 0,
+    "hybrid_rejected_candidates": []
+  },
+  "neurologic_consultation_5": {
+    "source": "Neurologic Consultation - 5",
+    "doc_type": "clinic_letter",
+    "ner_wall_clock_seconds": 3.12,
+    "entity_count": 55,
+    "condition_count": 18,
+    "conditions": [
+      "pneumonia",
+      "general weakness",
+      "constipation",
+      "history of type II diabetes",
+      "lumbar spinal stenosis",
+      "stenosis",
+      "neural foraminal stenosis",
+      "neuropathy",
+      "sensory neuropathy",
+      "axonal neuropathy",
+      "diffuse polyradiculopathy",
+      "sensorimotor neuropathy",
+      "rheumatoid arthritis",
+      "connective tissue disease",
+      "paraneoplastic syndrome",
+      "unsuspected neoplasm",
+      "atherosclerosis",
+      "neoplasm"
+    ],
+    "medication_count": 4,
+    "medications": [
+      "Prilosec 20 mg",
+      "aspirin",
+      "Colace 200 mg",
+      "Protonix 40 mg"
+    ],
+    "observation_count": 0,
+    "rules_only_flag_count": 0,
+    "hybrid_wall_clock_seconds": 2.45,
+    "hybrid_accepted_count": 0,
+    "hybrid_accepted_flags": [],
+    "hybrid_rejected_count": 0,
+    "hybrid_rejected_candidates": []
+  },
+  "psych_consult_lethargy": {
+    "source": "Psych Consult - Lethargy",
+    "doc_type": "clinic_letter",
+    "ner_wall_clock_seconds": 0.83,
+    "entity_count": 26,
+    "condition_count": 9,
+    "conditions": [
+      "infection",
+      "DVT",
+      "hypertension",
+      "depression",
+      "cancer therapy",
+      "prostate cancer",
+      "STEVENS-JOHNSON SYNDROME",
+      "lung cancer",
+      "heart disease"
+    ],
+    "medication_count": 5,
+    "medications": [
+      "Norvasc 5 mg",
+      "aspirin",
+      "Colace 100 mg",
+      "insulin",
+      "PHENYTOIN"
+    ],
+    "observation_count": 0,
+    "rules_only_flag_count": 0,
+    "hybrid_wall_clock_seconds": 11.9,
+    "hybrid_accepted_count": 1,
+    "hybrid_accepted_flags": [
+      {
+        "severity": "HIGH",
+        "category": "AI_ALLERGY_DRUG_CONFLICT",
+        "description": "Patient has documented phenytoin allergy causing Stevens-Johnson Syndrome. Verify no current or planned antiepileptic prescribing conflicts.",
+        "clinical_subject": "phenytoin allergy with stevens-johnson syndrome",
+        "cited_document_id": "mtsamples_psych_consult_lethargy",
+        "source_quote": "PHENYTOIN ... STEVENS-JOHNSON SYNDROME",
+        "grounding_status": "paraphrase"
+      }
+    ],
+    "hybrid_rejected_count": 3,
+    "hybrid_rejected_candidates": [
+      {
+        "document_id": "mtsamples_psych_consult_lethargy",
+        "quote": "Norvasc 5 mg ... Norvasc 10 mg",
+        "description": "Two different doses of Norvasc (5mg and 10mg) documented in the same record. Verify which dose is current.",
+        "verdict_raw": "VERDICT: composition-fabrication (token-overlap=1.00 passes, but longest contiguous run=3 below required 4 - quote stitches scattered words)",
+        "verdict": "composition-fabrication"
+      },
+      {
+        "document_id": "mtsamples_psych_consult_lethargy",
+        "quote": "insulin",
+        "verdict_raw": "VERDICT: trivial-quote (chars=7, words=1; strict needs chars>=30 AND words>=6; soft needs words>=3 AND subject-overlap; subject_shared=True)",
+        "verdict": "trivial-quote"
+      },
+      {
+        "document_id": "mtsamples_psych_consult_lethargy",
+        "quote": "DVT ... aspirin",
+        "verdict_raw": "VERDICT: trivial-quote (chars=15, words=2; strict needs chars>=30 AND words>=6; soft needs words>=3 AND subject-overlap; subject_shared=True)",
+        "verdict": "trivial-quote"
+      }
+    ]
+  },
+  "pain_management_consult_1": {
+    "source": "Pain Management Consult - 1",
+    "doc_type": "clinic_letter",
+    "ner_wall_clock_seconds": 5.07,
+    "entity_count": 23,
+    "condition_count": 11,
+    "conditions": [
+      "low back pain",
+      "weakness",
+      "depression",
+      "diabetes",
+      "His hypertension",
+      "hypertension",
+      "hypercholesterolemia",
+      "History of depression",
+      "low back syndrome",
+      "Left L5-S1 radiculopathy",
+      "prognosis"
+    ],
+    "medication_count": 0,
+    "medications": [],
+    "observation_count": 0,
+    "rules_only_flag_count": 0,
+    "hybrid_wall_clock_seconds": 3.78,
+    "hybrid_accepted_count": 0,
+    "hybrid_accepted_flags": [],
+    "hybrid_rejected_count": 0,
+    "hybrid_rejected_candidates": []
+  },
+  "huntingtons_disease_consult": {
+    "source": "Huntington's Disease - Consult",
+    "doc_type": "clinic_letter",
+    "ner_wall_clock_seconds": 1.39,
+    "entity_count": 33,
+    "condition_count": 8,
+    "conditions": [
+      "Huntington's Disease",
+      "Huntington disease",
+      "depression",
+      "anxiety",
+      "dementia",
+      "hypertension",
+      "leukocytosis",
+      "depressive disorder"
+    ],
+    "medication_count": 4,
+    "medications": [
+      "Norvasc 10 mg",
+      "Prilosec 200 mg",
+      "amlodipine 10 mg",
+      "lorazepam 0.5 mg"
+    ],
+    "observation_count": 1,
+    "rules_only_flag_count": 0,
+    "hybrid_wall_clock_seconds": 14.53,
+    "hybrid_accepted_count": 0,
+    "hybrid_accepted_flags": [],
+    "hybrid_rejected_count": 0,
+    "hybrid_rejected_candidates": []
+  }
+}
