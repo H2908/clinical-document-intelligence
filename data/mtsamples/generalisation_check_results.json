@@ -1,0 +1,72 @@
+{
+  "pneumonia_copd_discharge": {
+    "source": "MTSamples - Pneumonia & COPD - Discharge Summary",
+    "doc_type": "discharge_summary",
+    "wall_clock_seconds": 2.63,
+    "entity_count": 45,
+    "condition_count": 10,
+    "conditions": [
+      "Pneumonia",
+      "Chronic obstructive pulmonary disease",
+      "Systemic inflammatory response syndrome",
+      "Hyperglycemia",
+      "Aspiration pneumonia",
+      "chronic respiratory failure",
+      "Atrial fibrillation",
+      "Hyperlipidemia",
+      "Acute renal failure",
+      "chronic renal failure"
+    ],
+    "medication_count": 12,
+    "medications": [
+      "insulin",
+      "diltiazem",
+      "digoxin",
+      "clindamycin",
+      "Ativan 1 mg",
+      "Metformin 1000 mg",
+      "Glucotrol 5 mg",
+      "Cardizem CD 180 mg",
+      "Aspirin 325 mg",
+      "Lipitor 10 mg",
+      "Lisinopril 20 mg",
+      "Prednisone 40 mg"
+    ],
+    "observation_count": 0,
+    "flag_count": 0,
+    "flags": []
+  },
+  "afib_consult": {
+    "source": "MTSamples - Atrial Fibrillation - Consult",
+    "doc_type": "clinic_letter",
+    "wall_clock_seconds": 1.65,
+    "entity_count": 46,
+    "condition_count": 8,
+    "conditions": [
+      "Atrial Fibrillation",
+      "hypertension",
+      "renal failure",
+      "right upper extremity edema",
+      "hyperlipidemia",
+      "CVA",
+      "pulmonary hypertension",
+      "true ischemia"
+    ],
+    "medication_count": 10,
+    "medications": [
+      "Sensipar",
+      "Norvasc 10 mg",
+      "Aspirin 81 mg",
+      "Colace 200 mg",
+      "Labetalol 100 mg",
+      "Dilantin 100 mg",
+      "Renagel 1600 mg",
+      "Sertraline 100 mg",
+      "Zocor 20 mg",
+      "Coumadin"
+    ],
+    "observation_count": 7,
+    "flag_count": 0,
+    "flags": []
+  }
+}

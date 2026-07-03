@@ -67,6 +67,19 @@ DRUG_NAMES: set[str] = {
     "dapagliflozin", "empagliflozin",
     # CKD / nephrology
     "cinacalcet", "sevelamer", "alfacalcidol",
+    # Generics missing from original UK-focused list (found via
+    # MTSamples generalisation check)
+    "digoxin", "lisinopril", "prednisone", "clindamycin", "labetalol",
+    "phenytoin", "docusate", "simvastatin", "glipizide", "diltiazem",
+    "lorazepam", "insulin", "warfarin", "heparin", "morphine",
+    "hydrochlorothiazide", "amiodarone", "clopidogrel", "pantoprazole",
+    # Common US brand names (found via MTSamples generalisation check).
+    # Extraction-layer only - normalised_value still reflects raw span
+    # text; brand-to-generic mapping is a separate future improvement.
+    "ativan", "glucotrol", "cardizem", "cardizem cd", "lipitor",
+    "norvasc", "colace", "dilantin", "renagel", "sensipar", "zocor",
+    "coumadin", "lasix", "prilosec", "protonix", "plavix", "toprol",
+    "glucophage",
 }
 
 CONFLICT_MARKERS: set[str] = {

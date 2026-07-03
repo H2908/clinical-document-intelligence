@@ -88,27 +88,60 @@ NLP_VERSION = "1.0.0"
 # Derivations - entities -> conditions / medications
 # ---------------------------------------------------------------------------
 
+# Curated condition-name abbreviation table. Maps full-form (lowercase)
+# to canonical abbreviation. Conservative: unlisted pairs do NOT merge.
+# Mirrors the spirit of evaluation/metrics.py's drug abbreviation table
+# but is entirely independent - this is entity-aggregation normalisation,
+# not flag-identity matching, and does not touch the locked AAAI matcher.
+_CONDITION_ABBREVIATIONS: dict[str, str] = {
+    "chronic obstructive pulmonary disease": "copd",
+    "atrial fibrillation": "afib",
+    "cerebrovascular accident": "cva",
+    "myocardial infarction": "mi",
+    "congestive heart failure": "chf",
+    "chronic kidney disease": "ckd",
+    "type 2 diabetes mellitus": "t2dm",
+    "type 2 diabetes": "t2dm",
+    "deep vein thrombosis": "dvt",
+    "pulmonary embolism": "pe",
+    "urinary tract infection": "uti",
+    "systemic inflammatory response syndrome": "sirs",
+    "chronic respiratory failure": "crf",
+}
+
+
+def _normalise_condition_name(name: str) -> str:
+    """Normalise a condition name for dedup comparison.
+    lowercase -> whitespace collapse -> abbreviation table lookup.
+    Unlisted terms return their lowercase-stripped form unchanged."""
+    key = " ".join(name.lower().strip().split())
+    return _CONDITION_ABBREVIATIONS.get(key, key)
+
+
 def _derive_conditions(entities: list[Entity]) -> list[dict[str, Any]]:
     """
     From non-negated Diagnosis entities, build the conditions[] list.
-    Deduplicated by lowercase text.
+    Deduplicated by normalised condition name (abbreviation-aware),
+    not raw lowercase text. When two entities collapse to the same
+    normalised key, the longer/more-specific original text is kept
+    as the display name (e.g. prefer 'Chronic obstructive pulmonary
+    disease' over 'COPD' for readability), but only one entry survives.
     """
-    seen: set[str] = set()
-    out: list[dict[str, Any]] = []
+    best_by_key: dict[str, dict[str, Any]] = {}
     for e in entities:
         if e["entity_type"] != "Diagnosis":
             continue
         if e.get("negated"):
             continue
-        key = e["text"].lower().strip()
-        if key in seen:
-            continue
-        seen.add(key)
-        out.append({
-            "name": e["text"],
-            "icd10_code": e.get("icd10_code"),
-        })
-    return out
+        raw_text = e["text"].strip()
+        norm_key = _normalise_condition_name(raw_text)
+        existing = best_by_key.get(norm_key)
+        if existing is None or len(raw_text) > len(existing["name"]):
+            best_by_key[norm_key] = {
+                "name": raw_text,
+                "icd10_code": e.get("icd10_code"),
+            }
+    return list(best_by_key.values())
 
 
 def _derive_medications(entities: list[Entity]) -> list[dict[str, Any]]:
