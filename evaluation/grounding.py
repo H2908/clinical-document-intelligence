@@ -49,9 +49,29 @@ GROUNDED_VERDICTS = frozenset({"verbatim", "paraphrase"})
 # Helpers (mirror flag_agent.py's local helpers)
 # ---------------------------------------------------------------------------
 def _content_tokens(text: str) -> list[str]:
-    """Tokenise to lowercase content tokens (>=4 chars, alpha, not stopwords)."""
-    tokens = re.findall(r"[a-z]{4,}", text.lower())
-    return [t for t in tokens if t not in STOPWORDS_AND_GENERIC]
+    """Tokenise to lowercase content tokens for contiguous-run matching.
+
+    Includes: alphabetic tokens >=4 chars (content words, not stopwords),
+    numeric tokens (dose numbers - clinically load-bearing, e.g. the
+    '1000' in 'Metformin 1000 mg'), and short clinical unit tokens
+    (mg, mcg, ml, iu etc - under 4 chars but clinically meaningful).
+
+    Fixed after MTSamples spot-check found the alpha-only, >=4-char
+    version silently dropped dose numbers, collapsing quotes like
+    'Metformin 1000 mg' to a single token and making genuine contiguous
+    matches structurally undetectable (longest-run capped at 1
+    regardless of true quote fidelity).
+    """
+    UNIT_TOKENS = {"mg", "mcg", "ml", "iu", "kg", "cm"}
+    lower = text.lower()
+    alpha_tokens = re.findall(r"[a-z]{4,}", lower)
+    numeric_tokens = re.findall(r"\b\d+(?:\.\d+)?\b", lower)
+    unit_tokens = [t for t in re.findall(r"[a-z]+", lower) if t in UNIT_TOKENS]
+    # Reconstruct in original order using a single combined regex pass
+    # so contiguity is preserved (critical for the n-gram-run check).
+    combined_pattern = r"[a-z]{4,}|\b\d+(?:\.\d+)?\b|\b(?:mg|mcg|ml|iu|kg|cm)\b"
+    all_tokens = re.findall(combined_pattern, lower)
+    return [t for t in all_tokens if t not in STOPWORDS_AND_GENERIC]
 
 
 def _longest_contiguous_match(a: list[str], b: list[str]) -> int:
