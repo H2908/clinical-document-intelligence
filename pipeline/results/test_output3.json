@@ -1,0 +1,522 @@
+{
+  "input_file": "../data/mtsamples/pdfs/pneumonia_copd_discharge.pdf",
+  "extracted_text_length": 5668,
+  "entities": [
+    {
+      "entity_type": "Diagnosis",
+      "text": "Pneumonia",
+      "start_offset": 0,
+      "end_offset": 9,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "COPD",
+      "start_offset": 12,
+      "end_offset": 16,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Chronic obstructive pulmonary disease",
+      "start_offset": 106,
+      "end_offset": 143,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "COPD",
+      "start_offset": 145,
+      "end_offset": 149,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Systemic inflammatory response syndrome",
+      "start_offset": 168,
+      "end_offset": 207,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Hyperglycemia",
+      "start_offset": 212,
+      "end_offset": 225,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Aspiration pneumonia",
+      "start_offset": 251,
+      "end_offset": 271,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "chronic obstructive pulmonary disease",
+      "start_offset": 317,
+      "end_offset": 354,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Chronic obstructive pulmonary disease",
+      "start_offset": 359,
+      "end_offset": 396,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "COPD",
+      "start_offset": 398,
+      "end_offset": 402,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "chronic respiratory failure",
+      "start_offset": 442,
+      "end_offset": 469,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "chronic obstructive pulmonary disease",
+      "start_offset": 483,
+      "end_offset": 520,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "chronic obstructive pulmonary disease",
+      "start_offset": 576,
+      "end_offset": 613,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Systemic inflammatory response syndrome",
+      "start_offset": 618,
+      "end_offset": 657,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "aspiration pneumonia",
+      "start_offset": 671,
+      "end_offset": 691,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Atrial fibrillation",
+      "start_offset": 758,
+      "end_offset": 777,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Hyperglycemia",
+      "start_offset": 836,
+      "end_offset": 849,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Drug",
+      "text": "insulin",
+      "start_offset": 907,
+      "end_offset": 914,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "insulin"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "chronic obstructive pulmonary disease",
+      "start_offset": 1063,
+      "end_offset": 1100,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Hyperlipidemia",
+      "start_offset": 1136,
+      "end_offset": 1150,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "Acute renal failure",
+      "start_offset": 1156,
+      "end_offset": 1175,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "chronic renal failure",
+      "start_offset": 1179,
+      "end_offset": 1200,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "COPD",
+      "start_offset": 1344,
+      "end_offset": 1348,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Date",
+      "text": "04/23/08",
+      "start_offset": 1415,
+      "end_offset": 1423,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "COPD",
+      "start_offset": 1845,
+      "end_offset": 1849,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Drug",
+      "text": "diltiazem",
+      "start_offset": 2005,
+      "end_offset": 2014,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "diltiazem"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "digoxin",
+      "start_offset": 2034,
+      "end_offset": 2041,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "digoxin"
+    },
+    {
+      "entity_type": "Date",
+      "text": "3 days",
+      "start_offset": 3681,
+      "end_offset": 3687,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Drug",
+      "text": "clindamycin",
+      "start_offset": 3776,
+      "end_offset": 3787,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "clindamycin"
+    },
+    {
+      "entity_type": "Date",
+      "text": "2 weeks",
+      "start_offset": 3801,
+      "end_offset": 3808,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Ativan 1 mg",
+      "start_offset": 4211,
+      "end_offset": 4222,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "ativan"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Metformin 1000 mg",
+      "start_offset": 4238,
+      "end_offset": 4255,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "metformin"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Glucotrol 5 mg",
+      "start_offset": 4272,
+      "end_offset": 4286,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "glucotrol"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Cardizem CD 180 mg",
+      "start_offset": 4359,
+      "end_offset": 4377,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "cardizem cd"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Aspirin 325 mg",
+      "start_offset": 4522,
+      "end_offset": 4536,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "aspirin"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Lipitor 10 mg",
+      "start_offset": 4553,
+      "end_offset": 4566,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "lipitor"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Digoxin 0.25 mg",
+      "start_offset": 4585,
+      "end_offset": 4600,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "digoxin"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Lisinopril 20 mg",
+      "start_offset": 4617,
+      "end_offset": 4633,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "lisinopril"
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Prednisone 40 mg",
+      "start_offset": 4772,
+      "end_offset": 4788,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "prednisone"
+    },
+    {
+      "entity_type": "Date",
+      "text": "30 days",
+      "start_offset": 4940,
+      "end_offset": 4947,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Drug",
+      "text": "Clindamycin 300 mg",
+      "start_offset": 4978,
+      "end_offset": 4996,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": "clindamycin"
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "aspiration pneumonia",
+      "start_offset": 5063,
+      "end_offset": 5083,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Date",
+      "text": "2 weeks",
+      "start_offset": 5173,
+      "end_offset": 5180,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "community-acquired pneumonia",
+      "start_offset": 5231,
+      "end_offset": 5259,
+      "negated": true,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    },
+    {
+      "entity_type": "Diagnosis",
+      "text": "aspiration pneumonia",
+      "start_offset": 5288,
+      "end_offset": 5308,
+      "negated": false,
+      "icd10_code": null,
+      "bnf_code": null,
+      "normalised_value": null
+    }
+  ],
+  "flags": {
+    "accepted": [
+      {
+        "severity": "HIGH",
+        "category": "AI_DRUG_DISEASE_INTERACTION",
+        "description": "Metformin is listed in the medication record despite concurrent diagnoses of acute and chronic renal failure, which is a contraindication due to risk of lactic acidosis.",
+        "clinical_subject": "metformin in renal failure",
+        "cited_document_id": "input_document",
+        "source_quote": "Metformin 1000 mg",
+        "grounding_status": null,
+        "passed_guards": true,
+        "failed_guard": null,
+        "grounding_verdict": "verbatim"
+      },
+      {
+        "severity": "HIGH",
+        "category": "AI_DRUG_DISEASE_INTERACTION",
+        "description": "Lisinopril (an ACE inhibitor) is prescribed alongside documented acute and chronic renal failure, requiring urgent review of renal function and potassium levels.",
+        "clinical_subject": "lisinopril in renal failure",
+        "cited_document_id": "input_document",
+        "source_quote": "Lisinopril 20 mg",
+        "grounding_status": null,
+        "passed_guards": true,
+        "failed_guard": null,
+        "grounding_verdict": "verbatim"
+      },
+      {
+        "severity": "HIGH",
+        "category": "AI_DRUG_DISEASE_INTERACTION",
+        "description": "Prednisone is prescribed in the context of documented hyperglycemia, which corticosteroids are known to exacerbate, and blood glucose monitoring and diabetes medication adjustment should be verified.",
+        "clinical_subject": "prednisone in hyperglycemia",
+        "cited_document_id": "input_document",
+        "source_quote": "Prednisone 40 mg",
+        "grounding_status": null,
+        "passed_guards": true,
+        "failed_guard": null,
+        "grounding_verdict": "verbatim"
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "AI_DRUG_INTERACTION",
+        "description": "Concurrent use of diltiazem (Cardizem CD) and digoxin is present, a known pharmacokinetic interaction that can elevate digoxin levels and increase risk of toxicity, particularly relevant given the documented renal failure.",
+        "clinical_subject": "diltiazem and digoxin interaction",
+        "cited_document_id": "input_document",
+        "source_quote": "Cardizem CD 180 mg",
+        "grounding_status": null,
+        "passed_guards": true,
+        "failed_guard": null,
+        "grounding_verdict": "verbatim"
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "AI_DRUG_DISEASE_INTERACTION",
+        "description": "Digoxin 0.25 mg is prescribed in the setting of acute and chronic renal failure; digoxin is renally cleared and this dose may require review to avoid toxicity.",
+        "clinical_subject": "digoxin dosing in renal failure",
+        "cited_document_id": "input_document",
+        "source_quote": "Digoxin 0.25 mg",
+        "grounding_status": null,
+        "passed_guards": true,
+        "failed_guard": null,
+        "grounding_verdict": "verbatim"
+      }
+    ],
+    "rejected": []
+  },
+  "contradictions": []
+}

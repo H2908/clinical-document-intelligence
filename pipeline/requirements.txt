@@ -1,0 +1,12 @@
+anthropic==0.105.2
+spacy==3.7.5
+scispacy==0.6.2
+PyMuPDF==1.27.2.3
+negspacy==1.0.4
+python-dotenv==1.2.2
+pytest==9.0.3
+
+# The scispaCy model itself is not installable via this file — it is
+# hosted separately from PyPI. Install it with:
+#   pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_sm-0.5.4.tar.gz
+# (see README.md for full setup instructions)
